@@ -74,7 +74,12 @@ def _normalize_layout_direction(value, default="vertical"):
 def _resolve_render_style():
     settings = load_settings()
     render = settings.get("render") or {}
-    layout_mode = _normalize_layout_direction(render.get("layout_mode"), default="auto")
+    from flask import current_app, has_app_context
+
+    override_layout_mode = None
+    if has_app_context():
+        override_layout_mode = current_app.config.get("CLI_LAYOUT_MODE_OVERRIDE")
+    layout_mode = _normalize_layout_direction(override_layout_mode or render.get("layout_mode"), default="auto")
     vertical_layout = render.get("vertical_layout") or {}
     font_family = str(render.get("font_family") or DEFAULT_CLI_READABILITY_STYLE["fontFamily"])
     line_spacing = float(render.get("line_spacing", DEFAULT_CLI_READABILITY_STYLE["lineSpacing"]) or DEFAULT_CLI_READABILITY_STYLE["lineSpacing"])

@@ -13,7 +13,9 @@ translate_manga_cli/.pytest_cache/
 translate_manga_cli/.venv/
 translate_manga_cli/.venv310/
 translate_manga_cli/config/local.json
+translate_manga_cli/config/session.json
 translate_manga_cli/data/
+translate_manga_cli/logs/
 
 translate_manga_cli/*.log
 translate_manga_cli/*.stderr.log

@@ -274,9 +274,13 @@ def _resolve_cli_settings():
     translation = resolve_translation_config(settings=settings)
     paths = settings.get("paths") or {}
     pipeline = resolve_pipeline_config(settings=settings)
+    render = settings.get("render") or {}
     return {
         "translation": translation,
         "pipeline": pipeline,
+        "render": {
+            "layout_mode": str(render.get("layout_mode") or "vertical").strip() or "vertical",
+        },
         "paths": {
             "input_dir": resolve_path_value(paths.get("input_dir")),
             "output_dir": resolve_path_value(paths.get("output_dir")),
@@ -688,11 +692,13 @@ def run_batch_translation(
     api_key=None,
     cache_root=None,
     overwrite_existing=None,
+    layout_mode=None,
 ):
     cli_config = _resolve_cli_settings()
     translation_config = cli_config["translation"]
     pipeline_config = cli_config["pipeline"]
     path_config = cli_config["paths"]
+    render_config = cli_config["render"]
 
     input_dir = input_dir or path_config["input_dir"]
     output_dir = output_dir or path_config["output_dir"]
@@ -707,6 +713,7 @@ def run_batch_translation(
         overwrite_existing = pipeline_config["overwrite_existing"]
     workspace_root = workspace_root or path_config["workspace_root"]
     cache_root = cache_root or path_config["cache_root"]
+    layout_mode = str(layout_mode or render_config["layout_mode"]).strip() or "vertical"
 
     reporter = reporter or BatchProgressReporter()
     image_paths = scan_input_images(input_dir)
@@ -751,6 +758,7 @@ def run_batch_translation(
 
     with tempfile.TemporaryDirectory(**temp_kwargs) as data_root:
         app = create_app({"DATA_ROOT": data_root, "TESTING": True})
+        app.config["CLI_LAYOUT_MODE_OVERRIDE"] = layout_mode
         with app.app_context():
             library_store = LibraryStore(app)
             library_store.seed_pages(pages)

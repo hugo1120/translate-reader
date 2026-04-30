@@ -50,7 +50,7 @@
   },
   "render": {
     "font_family": "fonts/思源黑体SourceHanSansK-Bold.TTF",
-    "layout_mode": "auto",
+    "layout_mode": "vertical",
     "stroke_enabled": true,
     "stroke_color": "#FFFFFF",
     "stroke_width": 1,
