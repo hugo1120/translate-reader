@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "C:\Users\Hugo\AppData\Local\Temp\tmpc4kgpa.py", line 4, in <module>
+    from src.cli.service import run_batch_translation
+ModuleNotFoundError: No module named 'src'

@@ -1,0 +1,22 @@
+Traceback (most recent call last):
+  File "D:\github\translate-reader\translate_manga_cli\_tmp_run_kaettakita_both.py", line 26, in <module>
+    summary = run_batch_translation(
+  File "D:\github\translate-reader\translate_manga_cli\src\cli\service.py", line 675, in run_batch_translation
+    current_batch, next_index = _prepare_batch(
+  File "D:\github\translate-reader\translate_manga_cli\src\cli\service.py", line 521, in _prepare_batch
+    preprocessed_payload = preprocess_page(page["sourcePath"], saber_session=saber_session)
+  File "D:\github\translate-reader\translate_manga_cli\src\core\pipeline\service.py", line 372, in preprocess_page
+    payload = run_saber_task(
+  File "D:\github\translate-reader\translate_manga_cli\src\integrations\saber_loader.py", line 962, in run_saber_task
+    return _run_saber_subprocess_task(operation, payload)
+  File "D:\github\translate-reader\translate_manga_cli\src\integrations\saber_loader.py", line 999, in _run_saber_subprocess_task
+    raise RuntimeError(stderr or stdout or f"Saber task failed: {operation}")
+RuntimeError: Traceback (most recent call last):
+  File "<string>", line 10, in <module>
+  File "D:\github\translate-reader\Saber-Translator\src\core\detection.py", line 14, in <module>
+    from src.core.detector import detect
+  File "D:\github\translate-reader\Saber-Translator\src\core\detector\__init__.py", line 10, in <module>
+    from .data_types import TextLine, TextBlock, DetectionResult
+  File "D:\github\translate-reader\Saber-Translator\src\core\detector\data_types.py", line 11, in <module>
+    import cv2
+ModuleNotFoundError: No module named 'cv2'

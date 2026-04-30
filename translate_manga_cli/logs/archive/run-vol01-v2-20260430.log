@@ -1,0 +1,681 @@
+RUN START 2026-04-30T01:54:19
+UPDATE 1/170 1.jpg ok=0 skip=0 fail=0 elapsed=0.02
+LOG PREP-CACHE 1.jpg stage=translated texts=4 chars=26
+UPDATE 2/170 2.jpg ok=0 skip=0 fail=0 elapsed=0.03
+LOG PREP-CACHE 2.jpg stage=translated texts=3 chars=17
+UPDATE 3/170 3.jpg ok=0 skip=0 fail=0 elapsed=0.03
+LOG PREP-CACHE 3.jpg stage=translated texts=9 chars=110
+UPDATE 4/170 4.jpg ok=0 skip=0 fail=0 elapsed=0.11
+LOG PREP-CACHE 4.jpg stage=translated texts=1 chars=5
+UPDATE 5/170 5.jpg ok=0 skip=0 fail=0 elapsed=0.11
+LOG PREP-CACHE 5.jpg stage=translated texts=6 chars=89
+UPDATE 6/170 6.jpg ok=0 skip=0 fail=0 elapsed=0.11
+LOG PREP-CACHE 6.jpg stage=translated texts=4 chars=129
+LOG RENDER 1.jpg start
+LOG OK   1.jpg -> 001.translated.png (7.89s)
+LOG RENDER 2.jpg start
+LOG OK   2.jpg -> 002.translated.png (0.37s)
+LOG RENDER 3.jpg start
+LOG OK   3.jpg -> 003.translated.png (0.25s)
+UPDATE 7/170 7.jpg ok=3 skip=0 fail=0 elapsed=8.65
+LOG PREP-CACHE 7.jpg stage=translated texts=6 chars=79
+UPDATE 8/170 8.jpg ok=3 skip=0 fail=0 elapsed=8.65
+LOG PREP-CACHE 8.jpg stage=translated texts=11 chars=168
+UPDATE 9/170 9.jpg ok=3 skip=0 fail=0 elapsed=8.66
+LOG PREP-CACHE 9.jpg stage=translated texts=7 chars=128
+LOG RENDER 4.jpg start
+LOG OK   4.jpg -> 004.translated.png (0.24s)
+LOG RENDER 5.jpg start
+LOG OK   5.jpg -> 005.translated.png (0.26s)
+LOG RENDER 6.jpg start
+LOG OK   6.jpg -> 006.translated.png (0.26s)
+UPDATE 10/170 10.jpg ok=6 skip=0 fail=0 elapsed=9.45
+LOG PREP-CACHE 10.jpg stage=translated texts=11 chars=178
+UPDATE 11/170 11.jpg ok=6 skip=0 fail=0 elapsed=9.45
+LOG PREP-CACHE 11.jpg stage=translated texts=9 chars=115
+UPDATE 12/170 12.jpg ok=6 skip=0 fail=0 elapsed=9.45
+LOG PREP-CACHE 12.jpg stage=translated texts=2 chars=3
+LOG RENDER 7.jpg start
+LOG OK   7.jpg -> 007.translated.png (0.23s)
+LOG RENDER 8.jpg start
+LOG OK   8.jpg -> 008.translated.png (0.25s)
+LOG RENDER 9.jpg start
+LOG OK   9.jpg -> 009.translated.png (0.24s)
+UPDATE 13/170 13.jpg ok=9 skip=0 fail=0 elapsed=10.20
+LOG PREP-CACHE 13.jpg stage=translated texts=2 chars=5
+UPDATE 14/170 14.jpg ok=9 skip=0 fail=0 elapsed=10.21
+LOG PREP-CACHE 14.jpg stage=translated texts=11 chars=126
+UPDATE 15/170 15.jpg ok=9 skip=0 fail=0 elapsed=10.21
+LOG PREP-CACHE 15.jpg stage=translated texts=13 chars=186
+LOG RENDER 10.jpg start
+LOG OK   10.jpg -> 010.translated.png (0.26s)
+LOG RENDER 11.jpg start
+LOG OK   11.jpg -> 011.translated.png (0.22s)
+LOG RENDER 12.jpg start
+LOG OK   12.jpg -> 012.translated.png (0.22s)
+UPDATE 16/170 16.jpg ok=12 skip=0 fail=0 elapsed=10.94
+LOG PREP-CACHE 16.jpg stage=translated texts=3 chars=22
+UPDATE 17/170 17.jpg ok=12 skip=0 fail=0 elapsed=10.94
+LOG PREP-CACHE 17.jpg stage=translated texts=14 chars=221
+UPDATE 18/170 18.jpg ok=12 skip=0 fail=0 elapsed=10.94
+LOG PREP-CACHE 18.jpg stage=translated texts=13 chars=208
+LOG RENDER 13.jpg start
+LOG OK   13.jpg -> 013.translated.png (0.21s)
+LOG RENDER 14.jpg start
+LOG OK   14.jpg -> 014.translated.png (0.23s)
+LOG RENDER 15.jpg start
+LOG OK   15.jpg -> 015.translated.png (0.24s)
+UPDATE 19/170 19.jpg ok=15 skip=0 fail=0 elapsed=11.66
+LOG PREP-CACHE 19.jpg stage=translated texts=10 chars=133
+UPDATE 20/170 20.jpg ok=15 skip=0 fail=0 elapsed=11.67
+LOG PREP-CACHE 20.jpg stage=translated texts=12 chars=205
+UPDATE 21/170 21.jpg ok=15 skip=0 fail=0 elapsed=11.67
+LOG PREP-CACHE 21.jpg stage=translated texts=11 chars=225
+LOG RENDER 16.jpg start
+LOG OK   16.jpg -> 016.translated.png (0.23s)
+LOG RENDER 17.jpg start
+LOG OK   17.jpg -> 017.translated.png (0.25s)
+LOG RENDER 18.jpg start
+LOG OK   18.jpg -> 018.translated.png (0.24s)
+UPDATE 22/170 22.jpg ok=18 skip=0 fail=0 elapsed=12.44
+LOG PREP-CACHE 22.jpg stage=translated texts=10 chars=158
+UPDATE 23/170 23.jpg ok=18 skip=0 fail=0 elapsed=12.44
+LOG PREP-CACHE 23.jpg stage=translated texts=8 chars=105
+UPDATE 24/170 24.jpg ok=18 skip=0 fail=0 elapsed=12.45
+LOG PREP-CACHE 24.jpg stage=translated texts=13 chars=106
+LOG RENDER 19.jpg start
+LOG OK   19.jpg -> 019.translated.png (0.23s)
+LOG RENDER 20.jpg start
+LOG OK   20.jpg -> 020.translated.png (0.25s)
+LOG RENDER 21.jpg start
+LOG OK   21.jpg -> 021.translated.png (0.24s)
+UPDATE 25/170 25.jpg ok=21 skip=0 fail=0 elapsed=13.20
+LOG PREP-CACHE 25.jpg stage=translated texts=8 chars=99
+UPDATE 26/170 26.jpg ok=21 skip=0 fail=0 elapsed=13.20
+LOG PREP-CACHE 26.jpg stage=translated texts=7 chars=57
+UPDATE 27/170 27.jpg ok=21 skip=0 fail=0 elapsed=13.21
+LOG PREP-CACHE 27.jpg stage=translated texts=9 chars=177
+LOG RENDER 22.jpg start
+LOG OK   22.jpg -> 022.translated.png (0.24s)
+LOG RENDER 23.jpg start
+LOG OK   23.jpg -> 023.translated.png (0.24s)
+LOG RENDER 24.jpg start
+LOG OK   24.jpg -> 024.translated.png (0.23s)
+UPDATE 28/170 28.jpg ok=24 skip=0 fail=0 elapsed=13.95
+LOG PREP-CACHE 28.jpg stage=translated texts=2 chars=8
+UPDATE 29/170 29.jpg ok=24 skip=0 fail=0 elapsed=13.96
+LOG PREP-CACHE 29.jpg stage=translated texts=6 chars=116
+UPDATE 30/170 30.jpg ok=24 skip=0 fail=0 elapsed=13.96
+LOG PREP-CACHE 30.jpg stage=translated texts=7 chars=86
+LOG RENDER 25.jpg start
+LOG OK   25.jpg -> 025.translated.png (0.24s)
+LOG RENDER 26.jpg start
+LOG OK   26.jpg -> 026.translated.png (0.23s)
+LOG RENDER 27.jpg start
+LOG OK   27.jpg -> 027.translated.png (0.24s)
+UPDATE 31/170 31.jpg ok=27 skip=0 fail=0 elapsed=14.71
+LOG PREP-CACHE 31.jpg stage=translated texts=6 chars=33
+UPDATE 32/170 32.jpg ok=27 skip=0 fail=0 elapsed=14.71
+LOG PREP-CACHE 32.jpg stage=translated texts=10 chars=113
+UPDATE 33/170 33.jpg ok=27 skip=0 fail=0 elapsed=14.72
+LOG PREP-CACHE 33.jpg stage=translated texts=6 chars=58
+LOG RENDER 28.jpg start
+LOG OK   28.jpg -> 028.translated.png (0.22s)
+LOG RENDER 29.jpg start
+LOG OK   29.jpg -> 029.translated.png (0.22s)
+LOG RENDER 30.jpg start
+LOG OK   30.jpg -> 030.translated.png (0.22s)
+UPDATE 34/170 34.jpg ok=30 skip=0 fail=0 elapsed=15.42
+LOG PREP-CACHE 34.jpg stage=translated texts=10 chars=112
+UPDATE 35/170 35.jpg ok=30 skip=0 fail=0 elapsed=15.43
+LOG PREP-CACHE 35.jpg stage=translated texts=8 chars=141
+UPDATE 36/170 36.jpg ok=30 skip=0 fail=0 elapsed=15.43
+LOG PREP-CACHE 36.jpg stage=translated texts=11 chars=243
+LOG RENDER 31.jpg start
+LOG OK   31.jpg -> 031.translated.png (0.28s)
+LOG RENDER 32.jpg start
+LOG OK   32.jpg -> 032.translated.png (0.24s)
+LOG RENDER 33.jpg start
+LOG OK   33.jpg -> 033.translated.png (0.24s)
+UPDATE 37/170 37.jpg ok=33 skip=0 fail=0 elapsed=16.25
+LOG PREP-CACHE 37.jpg stage=translated texts=7 chars=86
+UPDATE 38/170 38.jpg ok=33 skip=0 fail=0 elapsed=16.25
+LOG PREP-CACHE 38.jpg stage=translated texts=12 chars=191
+UPDATE 39/170 39.jpg ok=33 skip=0 fail=0 elapsed=16.26
+LOG PREP-CACHE 39.jpg stage=translated texts=7 chars=98
+LOG RENDER 34.jpg start
+LOG OK   34.jpg -> 034.translated.png (0.26s)
+LOG RENDER 35.jpg start
+LOG OK   35.jpg -> 035.translated.png (0.23s)
+LOG RENDER 36.jpg start
+LOG OK   36.jpg -> 036.translated.png (0.26s)
+UPDATE 40/170 40.jpg ok=36 skip=0 fail=0 elapsed=17.05
+LOG PREP-CACHE 40.jpg stage=translated texts=9 chars=136
+UPDATE 41/170 41.jpg ok=36 skip=0 fail=0 elapsed=17.06
+LOG PREP-CACHE 41.jpg stage=translated texts=1 chars=7
+UPDATE 42/170 42.jpg ok=36 skip=0 fail=0 elapsed=17.06
+LOG PREP-CACHE 42.jpg stage=translated texts=7 chars=125
+LOG RENDER 37.jpg start
+LOG OK   37.jpg -> 037.translated.png (0.22s)
+LOG RENDER 38.jpg start
+LOG OK   38.jpg -> 038.translated.png (0.24s)
+LOG RENDER 39.jpg start
+LOG OK   39.jpg -> 039.translated.png (0.24s)
+UPDATE 43/170 43.jpg ok=39 skip=0 fail=0 elapsed=17.82
+LOG PREP-CACHE 43.jpg stage=translated texts=11 chars=227
+UPDATE 44/170 44.jpg ok=39 skip=0 fail=0 elapsed=17.82
+LOG PREP-CACHE 44.jpg stage=translated texts=7 chars=80
+UPDATE 45/170 45.jpg ok=39 skip=0 fail=0 elapsed=17.82
+LOG PREP-CACHE 45.jpg stage=translated texts=5 chars=45
+LOG RENDER 40.jpg start
+LOG OK   40.jpg -> 040.translated.png (0.24s)
+LOG RENDER 41.jpg start
+LOG OK   41.jpg -> 041.translated.png (0.23s)
+LOG RENDER 42.jpg start
+LOG OK   42.jpg -> 042.translated.png (0.24s)
+UPDATE 46/170 46.jpg ok=42 skip=0 fail=0 elapsed=18.60
+LOG PREP-CACHE 46.jpg stage=translated texts=7 chars=111
+UPDATE 47/170 47.jpg ok=42 skip=0 fail=0 elapsed=18.60
+LOG PREP-CACHE 47.jpg stage=translated texts=8 chars=184
+UPDATE 48/170 48.jpg ok=42 skip=0 fail=0 elapsed=18.61
+LOG PREP-CACHE 48.jpg stage=translated texts=2 chars=11
+LOG RENDER 43.jpg start
+LOG OK   43.jpg -> 043.translated.png (0.25s)
+LOG RENDER 44.jpg start
+LOG OK   44.jpg -> 044.translated.png (0.22s)
+LOG RENDER 45.jpg start
+LOG OK   45.jpg -> 045.translated.png (0.24s)
+UPDATE 49/170 49.jpg ok=45 skip=0 fail=0 elapsed=19.37
+LOG PREP-CACHE 49.jpg stage=translated texts=3 chars=70
+UPDATE 50/170 50.jpg ok=45 skip=0 fail=0 elapsed=19.37
+LOG PREP-CACHE 50.jpg stage=translated texts=3 chars=88
+UPDATE 51/170 51.jpg ok=45 skip=0 fail=0 elapsed=19.37
+LOG PREP-CACHE 51.jpg stage=translated texts=9 chars=78
+LOG RENDER 46.jpg start
+LOG OK   46.jpg -> 046.translated.png (0.24s)
+LOG RENDER 47.jpg start
+LOG OK   47.jpg -> 047.translated.png (0.23s)
+LOG RENDER 48.jpg start
+LOG OK   48.jpg -> 048.translated.png (0.19s)
+UPDATE 52/170 52.jpg ok=48 skip=0 fail=0 elapsed=20.10
+LOG PREP-CACHE 52.jpg stage=translated texts=10 chars=234
+UPDATE 53/170 53.jpg ok=48 skip=0 fail=0 elapsed=20.10
+LOG PREP-CACHE 53.jpg stage=translated texts=13 chars=186
+UPDATE 54/170 54.jpg ok=48 skip=0 fail=0 elapsed=20.10
+LOG PREP-CACHE 54.jpg stage=translated texts=18 chars=261
+LOG RENDER 49.jpg start
+LOG OK   49.jpg -> 049.translated.png (0.20s)
+LOG RENDER 50.jpg start
+LOG OK   50.jpg -> 050.translated.png (0.21s)
+LOG RENDER 51.jpg start
+LOG OK   51.jpg -> 051.translated.png (0.23s)
+UPDATE 55/170 55.jpg ok=51 skip=0 fail=0 elapsed=20.82
+LOG PREP-CACHE 55.jpg stage=translated texts=12 chars=205
+UPDATE 56/170 56.jpg ok=51 skip=0 fail=0 elapsed=20.83
+LOG PREP-CACHE 56.jpg stage=translated texts=7 chars=94
+UPDATE 57/170 57.jpg ok=51 skip=0 fail=0 elapsed=20.83
+LOG PREP-CACHE 57.jpg stage=translated texts=6 chars=77
+LOG RENDER 52.jpg start
+LOG OK   52.jpg -> 052.translated.png (0.25s)
+LOG RENDER 53.jpg start
+LOG OK   53.jpg -> 053.translated.png (0.25s)
+LOG RENDER 54.jpg start
+LOG OK   54.jpg -> 054.translated.png (0.25s)
+UPDATE 58/170 58.jpg ok=54 skip=0 fail=0 elapsed=21.63
+LOG PREP-CACHE 58.jpg stage=translated texts=7 chars=115
+UPDATE 59/170 59.jpg ok=54 skip=0 fail=0 elapsed=21.64
+LOG PREP-CACHE 59.jpg stage=translated texts=7 chars=143
+UPDATE 60/170 60.jpg ok=54 skip=0 fail=0 elapsed=21.64
+LOG PREP-CACHE 60.jpg stage=translated texts=13 chars=193
+LOG RENDER 55.jpg start
+LOG OK   55.jpg -> 055.translated.png (0.25s)
+LOG RENDER 56.jpg start
+LOG OK   56.jpg -> 056.translated.png (0.23s)
+LOG RENDER 57.jpg start
+LOG OK   57.jpg -> 057.translated.png (0.23s)
+UPDATE 61/170 61.jpg ok=57 skip=0 fail=0 elapsed=22.40
+LOG PREP-CACHE 61.jpg stage=translated texts=11 chars=188
+UPDATE 62/170 62.jpg ok=57 skip=0 fail=0 elapsed=22.41
+LOG PREP-CACHE 62.jpg stage=translated texts=8 chars=178
+UPDATE 63/170 63.jpg ok=57 skip=0 fail=0 elapsed=22.41
+LOG PREP-CACHE 63.jpg stage=translated texts=11 chars=139
+LOG RENDER 58.jpg start
+LOG OK   58.jpg -> 058.translated.png (0.24s)
+LOG RENDER 59.jpg start
+LOG OK   59.jpg -> 059.translated.png (0.24s)
+LOG RENDER 60.jpg start
+LOG OK   60.jpg -> 060.translated.png (0.25s)
+UPDATE 64/170 64.jpg ok=60 skip=0 fail=0 elapsed=23.21
+LOG PREP-CACHE 64.jpg stage=translated texts=14 chars=204
+UPDATE 65/170 65.jpg ok=60 skip=0 fail=0 elapsed=23.21
+LOG PREP-CACHE 65.jpg stage=translated texts=6 chars=144
+UPDATE 66/170 66.jpg ok=60 skip=0 fail=0 elapsed=23.22
+LOG PREP-CACHE 66.jpg stage=translated texts=5 chars=67
+LOG RENDER 61.jpg start
+LOG OK   61.jpg -> 061.translated.png (0.24s)
+LOG RENDER 62.jpg start
+LOG OK   62.jpg -> 062.translated.png (0.25s)
+LOG RENDER 63.jpg start
+LOG OK   63.jpg -> 063.translated.png (0.26s)
+UPDATE 67/170 67.jpg ok=63 skip=0 fail=0 elapsed=24.03
+LOG PREP-CACHE 67.jpg stage=translated texts=3 chars=75
+UPDATE 68/170 68.jpg ok=63 skip=0 fail=0 elapsed=24.04
+LOG PREP-CACHE 68.jpg stage=translated texts=1 chars=10
+UPDATE 69/170 69.jpg ok=63 skip=0 fail=0 elapsed=24.04
+LOG PREP-CACHE 69.jpg stage=translated texts=5 chars=91
+LOG RENDER 64.jpg start
+LOG OK   64.jpg -> 064.translated.png (0.27s)
+LOG RENDER 65.jpg start
+LOG OK   65.jpg -> 065.translated.png (0.24s)
+LOG RENDER 66.jpg start
+LOG OK   66.jpg -> 066.translated.png (0.24s)
+UPDATE 70/170 70.jpg ok=66 skip=0 fail=0 elapsed=24.85
+LOG PREP-CACHE 70.jpg stage=translated texts=8 chars=153
+UPDATE 71/170 71.jpg ok=66 skip=0 fail=0 elapsed=24.86
+LOG PREP-CACHE 71.jpg stage=translated texts=1 chars=3
+UPDATE 72/170 72.jpg ok=66 skip=0 fail=0 elapsed=24.86
+LOG PREP-CACHE 72.jpg stage=translated texts=3 chars=33
+LOG RENDER 67.jpg start
+LOG OK   67.jpg -> 067.translated.png (0.24s)
+LOG RENDER 68.jpg start
+LOG OK   68.jpg -> 068.translated.png (0.32s)
+LOG RENDER 69.jpg start
+LOG OK   69.jpg -> 069.translated.png (0.28s)
+UPDATE 73/170 73.jpg ok=69 skip=0 fail=0 elapsed=25.79
+LOG PREP-CACHE 73.jpg stage=translated texts=7 chars=141
+UPDATE 74/170 74.jpg ok=69 skip=0 fail=0 elapsed=25.80
+LOG PREP-CACHE 74.jpg stage=translated texts=3 chars=28
+UPDATE 75/170 75.jpg ok=69 skip=0 fail=0 elapsed=25.80
+LOG PREP-CACHE 75.jpg stage=translated texts=8 chars=112
+LOG RENDER 70.jpg start
+LOG OK   70.jpg -> 070.translated.png (0.30s)
+LOG RENDER 71.jpg start
+LOG OK   71.jpg -> 071.translated.png (0.12s)
+LOG RENDER 72.jpg start
+LOG OK   72.jpg -> 072.translated.png (0.21s)
+UPDATE 76/170 76.jpg ok=72 skip=0 fail=0 elapsed=26.49
+LOG PREP-CACHE 76.jpg stage=translated texts=12 chars=185
+UPDATE 77/170 77.jpg ok=72 skip=0 fail=0 elapsed=26.50
+LOG PREP-CACHE 77.jpg stage=translated texts=2 chars=25
+UPDATE 78/170 78.jpg ok=72 skip=0 fail=0 elapsed=26.50
+LOG PREP-CACHE 78.jpg stage=translated texts=3 chars=23
+LOG RENDER 73.jpg start
+LOG OK   73.jpg -> 073.translated.png (0.23s)
+LOG RENDER 74.jpg start
+LOG OK   74.jpg -> 074.translated.png (0.22s)
+LOG RENDER 75.jpg start
+LOG OK   75.jpg -> 075.translated.png (0.22s)
+UPDATE 79/170 79.jpg ok=75 skip=0 fail=0 elapsed=27.25
+LOG PREP-CACHE 79.jpg stage=translated texts=11 chars=168
+UPDATE 80/170 80.jpg ok=75 skip=0 fail=0 elapsed=27.26
+LOG PREP-CACHE 80.jpg stage=translated texts=12 chars=133
+UPDATE 81/170 81.jpg ok=75 skip=0 fail=0 elapsed=27.26
+LOG PREP-CACHE 81.jpg stage=translated texts=14 chars=184
+LOG RENDER 76.jpg start
+LOG OK   76.jpg -> 076.translated.png (0.24s)
+LOG RENDER 77.jpg start
+LOG OK   77.jpg -> 077.translated.png (0.22s)
+LOG RENDER 78.jpg start
+LOG OK   78.jpg -> 078.translated.png (0.22s)
+UPDATE 82/170 82.jpg ok=78 skip=0 fail=0 elapsed=28.02
+LOG PREP-CACHE 82.jpg stage=translated texts=10 chars=111
+UPDATE 83/170 83.jpg ok=78 skip=0 fail=0 elapsed=28.02
+LOG PREP-CACHE 83.jpg stage=translated texts=6 chars=49
+UPDATE 84/170 84.jpg ok=78 skip=0 fail=0 elapsed=28.02
+LOG PREP-CACHE 84.jpg stage=translated texts=8 chars=64
+LOG RENDER 79.jpg start
+LOG OK   79.jpg -> 079.translated.png (0.25s)
+LOG RENDER 80.jpg start
+LOG OK   80.jpg -> 080.translated.png (0.24s)
+LOG RENDER 81.jpg start
+LOG OK   81.jpg -> 081.translated.png (0.25s)
+UPDATE 85/170 85.jpg ok=81 skip=0 fail=0 elapsed=28.86
+LOG PREP-CACHE 85.jpg stage=translated texts=11 chars=209
+UPDATE 86/170 86.jpg ok=81 skip=0 fail=0 elapsed=28.86
+LOG PREP-CACHE 86.jpg stage=translated texts=16 chars=285
+UPDATE 87/170 87.jpg ok=81 skip=0 fail=0 elapsed=28.86
+LOG PREP-CACHE 87.jpg stage=translated texts=15 chars=289
+LOG RENDER 82.jpg start
+LOG OK   82.jpg -> 082.translated.png (0.24s)
+LOG RENDER 83.jpg start
+LOG OK   83.jpg -> 083.translated.png (0.24s)
+LOG RENDER 84.jpg start
+LOG OK   84.jpg -> 084.translated.png (0.25s)
+UPDATE 88/170 88.jpg ok=84 skip=0 fail=0 elapsed=29.69
+LOG PREP-CACHE 88.jpg stage=translated texts=12 chars=110
+UPDATE 89/170 89.jpg ok=84 skip=0 fail=0 elapsed=29.70
+LOG PREP-CACHE 89.jpg stage=translated texts=8 chars=171
+UPDATE 90/170 90.jpg ok=84 skip=0 fail=0 elapsed=29.70
+LOG PREP-CACHE 90.jpg stage=translated texts=6 chars=62
+LOG RENDER 85.jpg start
+LOG OK   85.jpg -> 085.translated.png (0.27s)
+LOG RENDER 86.jpg start
+LOG OK   86.jpg -> 086.translated.png (0.26s)
+LOG RENDER 87.jpg start
+LOG OK   87.jpg -> 087.translated.png (0.25s)
+UPDATE 91/170 91.jpg ok=87 skip=0 fail=0 elapsed=30.56
+LOG PREP-CACHE 91.jpg stage=translated texts=5 chars=54
+UPDATE 92/170 92.jpg ok=87 skip=0 fail=0 elapsed=30.57
+LOG PREP-CACHE 92.jpg stage=translated texts=1 chars=6
+UPDATE 93/170 93.jpg ok=87 skip=0 fail=0 elapsed=30.57
+LOG PREP-CACHE 93.jpg stage=translated texts=6 chars=128
+LOG RENDER 88.jpg start
+LOG OK   88.jpg -> 088.translated.png (0.24s)
+LOG RENDER 89.jpg start
+LOG OK   89.jpg -> 089.translated.png (0.26s)
+LOG RENDER 90.jpg start
+LOG OK   90.jpg -> 090.translated.png (0.23s)
+UPDATE 94/170 94.jpg ok=90 skip=0 fail=0 elapsed=31.40
+LOG PREP-CACHE 94.jpg stage=translated texts=10 chars=131
+UPDATE 95/170 95.jpg ok=90 skip=0 fail=0 elapsed=31.41
+LOG PREP-CACHE 95.jpg stage=preprocessed texts=0 chars=0
+LOG COPY 95.jpg -> 095.translated.png (blank)
+UPDATE 96/170 96.jpg ok=91 skip=0 fail=0 elapsed=31.42
+LOG PREP-CACHE 96.jpg stage=translated texts=2 chars=34
+UPDATE 97/170 97.jpg ok=91 skip=0 fail=0 elapsed=31.42
+LOG PREP-CACHE 97.jpg stage=translated texts=6 chars=37
+LOG RENDER 91.jpg start
+LOG OK   91.jpg -> 091.translated.png (0.24s)
+LOG RENDER 92.jpg start
+LOG OK   92.jpg -> 092.translated.png (0.21s)
+LOG RENDER 93.jpg start
+LOG OK   93.jpg -> 093.translated.png (0.22s)
+UPDATE 98/170 98.jpg ok=94 skip=0 fail=0 elapsed=32.20
+LOG PREP-CACHE 98.jpg stage=translated texts=5 chars=50
+UPDATE 99/170 99.jpg ok=94 skip=0 fail=0 elapsed=32.20
+LOG PREP-CACHE 99.jpg stage=translated texts=16 chars=217
+UPDATE 100/170 100.jpg ok=94 skip=0 fail=0 elapsed=32.21
+LOG PREP-CACHE 100.jpg stage=translated texts=13 chars=225
+LOG RENDER 94.jpg start
+LOG OK   94.jpg -> 094.translated.png (0.23s)
+LOG RENDER 96.jpg start
+LOG OK   96.jpg -> 096.translated.png (0.23s)
+LOG RENDER 97.jpg start
+LOG OK   97.jpg -> 097.translated.png (0.23s)
+UPDATE 101/170 101.jpg ok=97 skip=0 fail=0 elapsed=32.98
+LOG PREP-CACHE 101.jpg stage=translated texts=9 chars=142
+UPDATE 102/170 102.jpg ok=97 skip=0 fail=0 elapsed=32.99
+LOG PREP-CACHE 102.jpg stage=translated texts=7 chars=117
+UPDATE 103/170 103.jpg ok=97 skip=0 fail=0 elapsed=32.99
+LOG PREP-CACHE 103.jpg stage=translated texts=6 chars=60
+LOG RENDER 98.jpg start
+LOG OK   98.jpg -> 098.translated.png (0.24s)
+LOG RENDER 99.jpg start
+LOG OK   99.jpg -> 099.translated.png (0.25s)
+LOG RENDER 100.jpg start
+LOG OK   100.jpg -> 100.translated.png (0.25s)
+UPDATE 104/170 104.jpg ok=100 skip=0 fail=0 elapsed=33.83
+LOG PREP-CACHE 104.jpg stage=translated texts=9 chars=171
+UPDATE 105/170 105.jpg ok=100 skip=0 fail=0 elapsed=33.83
+LOG PREP-CACHE 105.jpg stage=translated texts=15 chars=270
+UPDATE 106/170 106.jpg ok=100 skip=0 fail=0 elapsed=33.84
+LOG PREP-CACHE 106.jpg stage=translated texts=8 chars=80
+LOG RENDER 101.jpg start
+LOG OK   101.jpg -> 101.translated.png (0.23s)
+LOG RENDER 102.jpg start
+LOG OK   102.jpg -> 102.translated.png (0.23s)
+LOG RENDER 103.jpg start
+LOG OK   103.jpg -> 103.translated.png (0.24s)
+UPDATE 107/170 107.jpg ok=103 skip=0 fail=0 elapsed=34.64
+LOG PREP-CACHE 107.jpg stage=translated texts=12 chars=114
+UPDATE 108/170 108.jpg ok=103 skip=0 fail=0 elapsed=34.65
+LOG PREP-CACHE 108.jpg stage=translated texts=8 chars=107
+UPDATE 109/170 109.jpg ok=103 skip=0 fail=0 elapsed=34.65
+LOG PREP-CACHE 109.jpg stage=translated texts=15 chars=289
+LOG RENDER 104.jpg start
+LOG OK   104.jpg -> 104.translated.png (0.26s)
+LOG RENDER 105.jpg start
+LOG OK   105.jpg -> 105.translated.png (0.26s)
+LOG RENDER 106.jpg start
+LOG OK   106.jpg -> 106.translated.png (0.23s)
+UPDATE 110/170 110.jpg ok=106 skip=0 fail=0 elapsed=35.51
+LOG PREP-CACHE 110.jpg stage=translated texts=9 chars=117
+UPDATE 111/170 111.jpg ok=106 skip=0 fail=0 elapsed=35.51
+LOG PREP-CACHE 111.jpg stage=translated texts=20 chars=272
+UPDATE 112/170 112.jpg ok=106 skip=0 fail=0 elapsed=35.51
+LOG PREP-CACHE 112.jpg stage=translated texts=5 chars=84
+LOG RENDER 107.jpg start
+LOG OK   107.jpg -> 107.translated.png (0.25s)
+LOG RENDER 108.jpg start
+LOG OK   108.jpg -> 108.translated.png (0.24s)
+LOG RENDER 109.jpg start
+LOG OK   109.jpg -> 109.translated.png (0.26s)
+UPDATE 113/170 113.jpg ok=109 skip=0 fail=0 elapsed=36.38
+LOG PREP-CACHE 113.jpg stage=translated texts=6 chars=61
+UPDATE 114/170 114.jpg ok=109 skip=0 fail=0 elapsed=36.38
+LOG PREP-CACHE 114.jpg stage=translated texts=8 chars=101
+UPDATE 115/170 115.jpg ok=109 skip=0 fail=0 elapsed=36.39
+LOG PREP-CACHE 115.jpg stage=translated texts=7 chars=103
+LOG RENDER 110.jpg start
+LOG OK   110.jpg -> 110.translated.png (0.25s)
+LOG RENDER 111.jpg start
+LOG OK   111.jpg -> 111.translated.png (0.26s)
+LOG RENDER 112.jpg start
+LOG OK   112.jpg -> 112.translated.png (0.25s)
+UPDATE 116/170 116.jpg ok=112 skip=0 fail=0 elapsed=37.26
+LOG PREP-CACHE 116.jpg stage=preprocessed texts=0 chars=0
+LOG COPY 116.jpg -> 116.translated.png (blank)
+UPDATE 117/170 117.jpg ok=113 skip=0 fail=0 elapsed=37.28
+LOG PREP-CACHE 117.jpg stage=translated texts=5 chars=389
+UPDATE 118/170 118.jpg ok=113 skip=0 fail=0 elapsed=37.28
+LOG PREP-CACHE 118.jpg stage=translated texts=3 chars=19
+UPDATE 119/170 119.jpg ok=113 skip=0 fail=0 elapsed=37.29
+LOG PREP-CACHE 119.jpg stage=translated texts=10 chars=127
+LOG RENDER 113.jpg start
+LOG OK   113.jpg -> 113.translated.png (0.24s)
+LOG RENDER 114.jpg start
+LOG OK   114.jpg -> 114.translated.png (0.24s)
+LOG RENDER 115.jpg start
+LOG OK   115.jpg -> 115.translated.png (0.25s)
+UPDATE 120/170 120.jpg ok=116 skip=0 fail=0 elapsed=38.10
+LOG PREP-CACHE 120.jpg stage=translated texts=8 chars=198
+UPDATE 121/170 121.jpg ok=116 skip=0 fail=0 elapsed=38.11
+LOG PREP-CACHE 121.jpg stage=translated texts=6 chars=38
+UPDATE 122/170 122.jpg ok=116 skip=0 fail=0 elapsed=38.11
+LOG PREP-CACHE 122.jpg stage=translated texts=10 chars=182
+LOG RENDER 117.jpg start
+LOG OK   117.jpg -> 117.translated.png (0.18s)
+LOG RENDER 118.jpg start
+LOG OK   118.jpg -> 118.translated.png (0.17s)
+LOG RENDER 119.jpg start
+LOG OK   119.jpg -> 119.translated.png (0.25s)
+UPDATE 123/170 123.jpg ok=119 skip=0 fail=0 elapsed=38.83
+LOG PREP-CACHE 123.jpg stage=translated texts=13 chars=255
+UPDATE 124/170 124.jpg ok=119 skip=0 fail=0 elapsed=38.84
+LOG PREP-CACHE 124.jpg stage=translated texts=11 chars=218
+UPDATE 125/170 125.jpg ok=119 skip=0 fail=0 elapsed=38.84
+LOG PREP-CACHE 125.jpg stage=translated texts=10 chars=168
+LOG RENDER 120.jpg start
+LOG OK   120.jpg -> 120.translated.png (0.26s)
+LOG RENDER 121.jpg start
+LOG OK   121.jpg -> 121.translated.png (0.23s)
+LOG RENDER 122.jpg start
+LOG OK   122.jpg -> 122.translated.png (0.25s)
+UPDATE 126/170 126.jpg ok=122 skip=0 fail=0 elapsed=39.69
+LOG PREP-CACHE 126.jpg stage=translated texts=11 chars=245
+UPDATE 127/170 127.jpg ok=122 skip=0 fail=0 elapsed=39.70
+LOG PREP-CACHE 127.jpg stage=translated texts=9 chars=160
+UPDATE 128/170 128.jpg ok=122 skip=0 fail=0 elapsed=39.70
+LOG PREP-CACHE 128.jpg stage=translated texts=7 chars=133
+LOG RENDER 123.jpg start
+LOG OK   123.jpg -> 123.translated.png (0.27s)
+LOG RENDER 124.jpg start
+LOG OK   124.jpg -> 124.translated.png (0.24s)
+LOG RENDER 125.jpg start
+LOG OK   125.jpg -> 125.translated.png (0.25s)
+UPDATE 129/170 129.jpg ok=125 skip=0 fail=0 elapsed=40.57
+LOG PREP-CACHE 129.jpg stage=translated texts=12 chars=308
+UPDATE 130/170 130.jpg ok=125 skip=0 fail=0 elapsed=40.58
+LOG PREP-CACHE 130.jpg stage=translated texts=13 chars=267
+UPDATE 131/170 131.jpg ok=125 skip=0 fail=0 elapsed=40.58
+LOG PREP-CACHE 131.jpg stage=translated texts=15 chars=308
+LOG RENDER 126.jpg start
+LOG OK   126.jpg -> 126.translated.png (0.25s)
+LOG RENDER 127.jpg start
+LOG OK   127.jpg -> 127.translated.png (0.25s)
+LOG RENDER 128.jpg start
+LOG OK   128.jpg -> 128.translated.png (0.24s)
+UPDATE 132/170 132.jpg ok=128 skip=0 fail=0 elapsed=41.44
+LOG PREP-CACHE 132.jpg stage=translated texts=10 chars=256
+UPDATE 133/170 133.jpg ok=128 skip=0 fail=0 elapsed=41.44
+LOG PREP-CACHE 133.jpg stage=translated texts=12 chars=146
+UPDATE 134/170 134.jpg ok=128 skip=0 fail=0 elapsed=41.44
+LOG PREP-CACHE 134.jpg stage=translated texts=2 chars=9
+LOG RENDER 129.jpg start
+LOG OK   129.jpg -> 129.translated.png (0.27s)
+LOG RENDER 130.jpg start
+LOG OK   130.jpg -> 130.translated.png (0.26s)
+LOG RENDER 131.jpg start
+LOG OK   131.jpg -> 131.translated.png (0.27s)
+UPDATE 135/170 135.jpg ok=131 skip=0 fail=0 elapsed=42.36
+LOG PREP-CACHE 135.jpg stage=translated texts=9 chars=121
+UPDATE 136/170 136.jpg ok=131 skip=0 fail=0 elapsed=42.36
+LOG PREP-CACHE 136.jpg stage=translated texts=15 chars=158
+UPDATE 137/170 137.jpg ok=131 skip=0 fail=0 elapsed=42.36
+LOG PREP-CACHE 137.jpg stage=translated texts=6 chars=104
+LOG RENDER 132.jpg start
+LOG OK   132.jpg -> 132.translated.png (0.27s)
+LOG RENDER 133.jpg start
+LOG OK   133.jpg -> 133.translated.png (0.25s)
+LOG RENDER 134.jpg start
+LOG OK   134.jpg -> 134.translated.png (0.16s)
+UPDATE 138/170 138.jpg ok=134 skip=0 fail=0 elapsed=43.20
+LOG PREP-CACHE 138.jpg stage=translated texts=13 chars=331
+UPDATE 139/170 139.jpg ok=134 skip=0 fail=0 elapsed=43.21
+LOG PREP-CACHE 139.jpg stage=translated texts=11 chars=188
+UPDATE 140/170 140.jpg ok=134 skip=0 fail=0 elapsed=43.21
+LOG PREP-CACHE 140.jpg stage=translated texts=12 chars=263
+LOG RENDER 135.jpg start
+LOG OK   135.jpg -> 135.translated.png (0.23s)
+LOG RENDER 136.jpg start
+LOG OK   136.jpg -> 136.translated.png (0.25s)
+LOG RENDER 137.jpg start
+LOG OK   137.jpg -> 137.translated.png (0.25s)
+UPDATE 141/170 141.jpg ok=137 skip=0 fail=0 elapsed=44.07
+LOG PREP-CACHE 141.jpg stage=translated texts=11 chars=178
+UPDATE 142/170 142.jpg ok=137 skip=0 fail=0 elapsed=44.08
+LOG PREP-CACHE 142.jpg stage=translated texts=8 chars=257
+UPDATE 143/170 143.jpg ok=137 skip=0 fail=0 elapsed=44.08
+LOG PREP-CACHE 143.jpg stage=translated texts=12 chars=211
+LOG RENDER 138.jpg start
+LOG OK   138.jpg -> 138.translated.png (0.29s)
+LOG RENDER 139.jpg start
+LOG OK   139.jpg -> 139.translated.png (0.25s)
+LOG RENDER 140.jpg start
+LOG OK   140.jpg -> 140.translated.png (0.26s)
+UPDATE 144/170 144.jpg ok=140 skip=0 fail=0 elapsed=45.03
+LOG PREP-CACHE 144.jpg stage=translated texts=8 chars=195
+UPDATE 145/170 145.jpg ok=140 skip=0 fail=0 elapsed=45.03
+LOG PREP-CACHE 145.jpg stage=translated texts=17 chars=291
+UPDATE 146/170 146.jpg ok=140 skip=0 fail=0 elapsed=45.03
+LOG PREP-CACHE 146.jpg stage=translated texts=9 chars=170
+LOG RENDER 141.jpg start
+LOG OK   141.jpg -> 141.translated.png (0.26s)
+LOG RENDER 142.jpg start
+LOG OK   142.jpg -> 142.translated.png (0.27s)
+LOG RENDER 143.jpg start
+LOG OK   143.jpg -> 143.translated.png (0.26s)
+UPDATE 147/170 147.jpg ok=143 skip=0 fail=0 elapsed=45.97
+LOG PREP-CACHE 147.jpg stage=translated texts=9 chars=263
+UPDATE 148/170 148.jpg ok=143 skip=0 fail=0 elapsed=45.98
+LOG PREP-CACHE 148.jpg stage=translated texts=10 chars=238
+UPDATE 149/170 149.jpg ok=143 skip=0 fail=0 elapsed=45.98
+LOG PREP-CACHE 149.jpg stage=translated texts=9 chars=99
+LOG RENDER 144.jpg start
+LOG OK   144.jpg -> 144.translated.png (0.27s)
+LOG RENDER 145.jpg start
+LOG OK   145.jpg -> 145.translated.png (0.27s)
+LOG RENDER 146.jpg start
+LOG OK   146.jpg -> 146.translated.png (0.24s)
+UPDATE 150/170 150.jpg ok=146 skip=0 fail=0 elapsed=46.90
+LOG PREP-CACHE 150.jpg stage=translated texts=2 chars=9
+UPDATE 151/170 151.jpg ok=146 skip=0 fail=0 elapsed=46.91
+LOG PREP-CACHE 151.jpg stage=translated texts=7 chars=75
+UPDATE 152/170 152.jpg ok=146 skip=0 fail=0 elapsed=46.91
+LOG PREP-CACHE 152.jpg stage=translated texts=11 chars=181
+LOG RENDER 147.jpg start
+LOG OK   147.jpg -> 147.translated.png (0.28s)
+LOG RENDER 148.jpg start
+LOG OK   148.jpg -> 148.translated.png (0.27s)
+LOG RENDER 149.jpg start
+LOG OK   149.jpg -> 149.translated.png (0.25s)
+UPDATE 153/170 153.jpg ok=149 skip=0 fail=0 elapsed=47.87
+LOG PREP-CACHE 153.jpg stage=translated texts=10 chars=271
+UPDATE 154/170 154.jpg ok=149 skip=0 fail=0 elapsed=47.88
+LOG PREP-CACHE 154.jpg stage=translated texts=11 chars=291
+UPDATE 155/170 155.jpg ok=149 skip=0 fail=0 elapsed=47.88
+LOG PREP-CACHE 155.jpg stage=translated texts=8 chars=142
+LOG RENDER 150.jpg start
+LOG OK   150.jpg -> 150.translated.png (0.21s)
+LOG RENDER 151.jpg start
+LOG OK   151.jpg -> 151.translated.png (0.22s)
+LOG RENDER 152.jpg start
+LOG OK   152.jpg -> 152.translated.png (0.25s)
+UPDATE 156/170 156.jpg ok=152 skip=0 fail=0 elapsed=48.71
+LOG PREP-CACHE 156.jpg stage=translated texts=7 chars=85
+UPDATE 157/170 157.jpg ok=152 skip=0 fail=0 elapsed=48.71
+LOG PREP-CACHE 157.jpg stage=translated texts=13 chars=190
+UPDATE 158/170 158.jpg ok=152 skip=0 fail=0 elapsed=48.72
+LOG PREP-CACHE 158.jpg stage=translated texts=12 chars=279
+LOG RENDER 153.jpg start
+LOG OK   153.jpg -> 153.translated.png (0.27s)
+LOG RENDER 154.jpg start
+LOG OK   154.jpg -> 154.translated.png (0.28s)
+LOG RENDER 155.jpg start
+LOG OK   155.jpg -> 155.translated.png (0.26s)
+UPDATE 159/170 159.jpg ok=155 skip=0 fail=0 elapsed=49.67
+LOG PREP-CACHE 159.jpg stage=translated texts=7 chars=240
+UPDATE 160/170 160.jpg ok=155 skip=0 fail=0 elapsed=49.68
+LOG PREP-CACHE 160.jpg stage=translated texts=10 chars=287
+UPDATE 161/170 161.jpg ok=155 skip=0 fail=0 elapsed=49.68
+LOG PREP-CACHE 161.jpg stage=translated texts=10 chars=200
+LOG RENDER 156.jpg start
+LOG OK   156.jpg -> 156.translated.png (0.25s)
+LOG RENDER 157.jpg start
+LOG OK   157.jpg -> 157.translated.png (0.27s)
+LOG RENDER 158.jpg start
+LOG OK   158.jpg -> 158.translated.png (0.26s)
+UPDATE 162/170 162.jpg ok=158 skip=0 fail=0 elapsed=50.65
+LOG PREP-CACHE 162.jpg stage=translated texts=9 chars=117
+UPDATE 163/170 163.jpg ok=158 skip=0 fail=0 elapsed=50.65
+LOG PREP-CACHE 163.jpg stage=translated texts=12 chars=293
+UPDATE 164/170 164.jpg ok=158 skip=0 fail=0 elapsed=50.66
+LOG PREP-CACHE 164.jpg stage=translated texts=8 chars=266
+LOG RENDER 159.jpg start
+LOG OK   159.jpg -> 159.translated.png (0.28s)
+LOG RENDER 160.jpg start
+LOG OK   160.jpg -> 160.translated.png (0.27s)
+LOG RENDER 161.jpg start
+LOG OK   161.jpg -> 161.translated.png (0.25s)
+UPDATE 165/170 165.jpg ok=161 skip=0 fail=0 elapsed=51.62
+LOG PREP-CACHE 165.jpg stage=translated texts=10 chars=167
+UPDATE 166/170 166.jpg ok=161 skip=0 fail=0 elapsed=51.62
+LOG PREP-CACHE 166.jpg stage=translated texts=3 chars=156
+UPDATE 167/170 167.jpg ok=161 skip=0 fail=0 elapsed=51.62
+LOG PREP-CACHE 167.jpg stage=translated texts=7 chars=353
+LOG RENDER 162.jpg start
+LOG OK   162.jpg -> 162.translated.png (0.27s)
+LOG RENDER 163.jpg start
+LOG OK   163.jpg -> 163.translated.png (0.26s)
+LOG RENDER 164.jpg start
+LOG OK   164.jpg -> 164.translated.png (0.26s)
+UPDATE 168/170 168.jpg ok=164 skip=0 fail=0 elapsed=52.59
+LOG PREP-CACHE 168.jpg stage=translated texts=7 chars=141
+UPDATE 169/170 169.jpg ok=164 skip=0 fail=0 elapsed=52.60
+LOG PREP-CACHE 169.jpg stage=translated texts=6 chars=200
+UPDATE 170/170 170.jpg ok=164 skip=0 fail=0 elapsed=52.60
+LOG PREP-CACHE 170.jpg stage=translated texts=10 chars=329
+LOG RENDER 165.jpg start
+LOG OK   165.jpg -> 165.translated.png (0.27s)
+LOG RENDER 166.jpg start
+LOG OK   166.jpg -> 166.translated.png (0.14s)
+LOG RENDER 167.jpg start
+LOG OK   167.jpg -> 167.translated.png (0.18s)
+LOG RENDER 168.jpg start
+LOG OK   168.jpg -> 168.translated.png (0.17s)
+LOG RENDER 169.jpg start
+LOG OK   169.jpg -> 169.translated.png (0.15s)
+LOG RENDER 170.jpg start
+LOG OK   170.jpg -> 170.translated.png (0.18s)
+FINISH total=170 ok=170 skip=0 fail=0 elapsed=54.01
+SUMMARY {'total': 170, 'succeeded': 170, 'skipped': 0, 'failed': 0, 'elapsedSeconds': 54.01181930000894}

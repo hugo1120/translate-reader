@@ -1,0 +1,1136 @@
+RUN START 2026-04-30T01:57:47
+UPDATE 1/170 1.jpg ok=0 skip=0 fail=0 elapsed=0.03
+LOG PREP 1.jpg start
+LOG PREP 1.jpg done bubbles=4 texts=4 chars=26 (6.51s)
+LOG OVERWRITE 1.jpg -> 001.translated.png
+UPDATE 2/170 2.jpg ok=0 skip=0 fail=0 elapsed=12.49
+LOG PREP 2.jpg start
+LOG PREP 2.jpg done bubbles=3 texts=3 chars=17 (2.39s)
+LOG OVERWRITE 2.jpg -> 002.translated.png
+UPDATE 3/170 3.jpg ok=0 skip=0 fail=0 elapsed=14.90
+LOG PREP 3.jpg start
+LOG PREP 3.jpg done bubbles=9 texts=9 chars=110 (4.74s)
+LOG OVERWRITE 3.jpg -> 003.translated.png
+LOG TRANSLATE start pages=1.jpg, 2.jpg, 3.jpg texts=16 chars=153
+UPDATE 4/170 4.jpg ok=0 skip=0 fail=0 elapsed=19.72
+LOG PREP 4.jpg start
+LOG PREP 4.jpg done bubbles=1 texts=1 chars=5 (2.06s)
+LOG OVERWRITE 4.jpg -> 004.translated.png
+UPDATE 5/170 5.jpg ok=0 skip=0 fail=0 elapsed=21.83
+LOG PREP 5.jpg start
+LOG PREP 5.jpg done bubbles=6 texts=6 chars=89 (3.60s)
+LOG OVERWRITE 5.jpg -> 005.translated.png
+UPDATE 6/170 6.jpg ok=0 skip=0 fail=0 elapsed=25.45
+LOG PREP 6.jpg start
+LOG PREP 6.jpg done bubbles=4 texts=4 chars=129 (3.64s)
+LOG OVERWRITE 6.jpg -> 006.translated.png
+LOG TRANSLATE done pages=1.jpg, 2.jpg, 3.jpg (12.11s)
+LOG RENDER 1.jpg start
+LOG OK   1.jpg -> 001.translated.png (0.39s)
+LOG RENDER 2.jpg start
+LOG OK   2.jpg -> 002.translated.png (0.38s)
+LOG RENDER 3.jpg start
+LOG OK   3.jpg -> 003.translated.png (0.24s)
+LOG TRANSLATE start pages=4.jpg, 5.jpg, 6.jpg texts=11 chars=223
+UPDATE 7/170 7.jpg ok=3 skip=0 fail=0 elapsed=32.87
+LOG PREP 7.jpg start
+LOG PREP 7.jpg done bubbles=6 texts=6 chars=79 (3.49s)
+LOG OVERWRITE 7.jpg -> 007.translated.png
+UPDATE 8/170 8.jpg ok=3 skip=0 fail=0 elapsed=36.38
+LOG PREP 8.jpg start
+LOG PREP 8.jpg done bubbles=11 texts=11 chars=168 (5.10s)
+LOG OVERWRITE 8.jpg -> 008.translated.png
+UPDATE 9/170 9.jpg ok=3 skip=0 fail=0 elapsed=41.52
+LOG PREP 9.jpg start
+LOG PREP 9.jpg done bubbles=7 texts=7 chars=128 (4.10s)
+LOG OVERWRITE 9.jpg -> 009.translated.png
+LOG TRANSLATE done pages=4.jpg, 5.jpg, 6.jpg (12.78s)
+LOG RENDER 4.jpg start
+LOG OK   4.jpg -> 004.translated.png (0.29s)
+LOG RENDER 5.jpg start
+LOG OK   5.jpg -> 005.translated.png (0.26s)
+LOG RENDER 6.jpg start
+LOG OK   6.jpg -> 006.translated.png (0.24s)
+LOG TRANSLATE start pages=7.jpg, 8.jpg, 9.jpg texts=24 chars=375
+UPDATE 10/170 10.jpg ok=6 skip=0 fail=0 elapsed=46.45
+LOG PREP 10.jpg start
+LOG PREP 10.jpg done bubbles=11 texts=11 chars=178 (5.15s)
+LOG OVERWRITE 10.jpg -> 010.translated.png
+UPDATE 11/170 11.jpg ok=6 skip=0 fail=0 elapsed=51.63
+LOG PREP 11.jpg start
+LOG PREP 11.jpg done bubbles=9 texts=9 chars=115 (4.41s)
+LOG OVERWRITE 11.jpg -> 011.translated.png
+UPDATE 12/170 12.jpg ok=6 skip=0 fail=0 elapsed=56.07
+LOG PREP 12.jpg start
+LOG PREP 12.jpg done bubbles=2 texts=2 chars=3 (2.27s)
+LOG OVERWRITE 12.jpg -> 012.translated.png
+LOG TRANSLATE done pages=7.jpg, 8.jpg, 9.jpg (11.92s)
+LOG RENDER 7.jpg start
+LOG OK   7.jpg -> 007.translated.png (0.31s)
+LOG RENDER 8.jpg start
+LOG OK   8.jpg -> 008.translated.png (0.24s)
+LOG RENDER 9.jpg start
+LOG OK   9.jpg -> 009.translated.png (0.23s)
+LOG TRANSLATE start pages=10.jpg, 11.jpg, 12.jpg texts=22 chars=296
+UPDATE 13/170 13.jpg ok=9 skip=0 fail=0 elapsed=59.17
+LOG PREP 13.jpg start
+LOG PREP 13.jpg done bubbles=2 texts=2 chars=5 (2.15s)
+LOG OVERWRITE 13.jpg -> 013.translated.png
+UPDATE 14/170 14.jpg ok=9 skip=0 fail=0 elapsed=61.34
+LOG PREP 14.jpg start
+LOG PREP 14.jpg done bubbles=11 texts=11 chars=126 (4.66s)
+LOG OVERWRITE 14.jpg -> 014.translated.png
+UPDATE 15/170 15.jpg ok=9 skip=0 fail=0 elapsed=66.03
+LOG PREP 15.jpg start
+LOG PREP 15.jpg done bubbles=13 texts=13 chars=186 (5.53s)
+LOG OVERWRITE 15.jpg -> 015.translated.png
+LOG TRANSLATE done pages=10.jpg, 11.jpg, 12.jpg (01:39)
+LOG RENDER 10.jpg start
+LOG OK   10.jpg -> 010.translated.png (0.27s)
+LOG RENDER 11.jpg start
+LOG OK   11.jpg -> 011.translated.png (0.22s)
+LOG RENDER 12.jpg start
+LOG OK   12.jpg -> 012.translated.png (0.22s)
+LOG TRANSLATE start pages=13.jpg, 14.jpg, 15.jpg texts=26 chars=317
+UPDATE 16/170 16.jpg ok=12 skip=0 fail=0 elapsed=159.86
+LOG PREP 16.jpg start
+LOG PREP 16.jpg done bubbles=3 texts=3 chars=22 (2.49s)
+LOG OVERWRITE 16.jpg -> 016.translated.png
+UPDATE 17/170 17.jpg ok=12 skip=0 fail=0 elapsed=162.37
+LOG PREP 17.jpg start
+LOG PREP 17.jpg done bubbles=14 texts=14 chars=221 (5.57s)
+LOG OVERWRITE 17.jpg -> 017.translated.png
+UPDATE 18/170 18.jpg ok=12 skip=0 fail=0 elapsed=167.97
+LOG PREP 18.jpg start
+LOG PREP 18.jpg done bubbles=13 texts=13 chars=208 (5.82s)
+LOG OVERWRITE 18.jpg -> 018.translated.png
+LOG TRANSLATE done pages=13.jpg, 14.jpg, 15.jpg (13.95s)
+LOG RENDER 13.jpg start
+LOG OK   13.jpg -> 013.translated.png (0.28s)
+LOG RENDER 14.jpg start
+LOG OK   14.jpg -> 014.translated.png (0.24s)
+LOG RENDER 15.jpg start
+LOG OK   15.jpg -> 015.translated.png (0.24s)
+LOG TRANSLATE start pages=16.jpg, 17.jpg, 18.jpg texts=30 chars=451
+UPDATE 19/170 19.jpg ok=15 skip=0 fail=0 elapsed=174.61
+LOG PREP 19.jpg start
+LOG PREP 19.jpg done bubbles=10 texts=10 chars=133 (4.53s)
+LOG OVERWRITE 19.jpg -> 019.translated.png
+UPDATE 20/170 20.jpg ok=15 skip=0 fail=0 elapsed=179.16
+LOG PREP 20.jpg start
+LOG PREP 20.jpg done bubbles=12 texts=12 chars=205 (5.51s)
+LOG OVERWRITE 20.jpg -> 020.translated.png
+UPDATE 21/170 21.jpg ok=15 skip=0 fail=0 elapsed=184.69
+LOG PREP 21.jpg start
+LOG PREP 21.jpg done bubbles=11 texts=11 chars=225 (5.59s)
+LOG OVERWRITE 21.jpg -> 021.translated.png
+LOG TRANSLATE done pages=16.jpg, 17.jpg, 18.jpg (15.70s)
+LOG RENDER 16.jpg start
+LOG OK   16.jpg -> 016.translated.png (0.27s)
+LOG RENDER 17.jpg start
+LOG OK   17.jpg -> 017.translated.png (0.24s)
+LOG RENDER 18.jpg start
+LOG OK   18.jpg -> 018.translated.png (0.24s)
+LOG TRANSLATE start pages=19.jpg, 20.jpg, 21.jpg texts=33 chars=563
+UPDATE 22/170 22.jpg ok=18 skip=0 fail=0 elapsed=191.09
+LOG PREP 22.jpg start
+LOG PREP 22.jpg done bubbles=10 texts=10 chars=158 (4.97s)
+LOG OVERWRITE 22.jpg -> 022.translated.png
+UPDATE 23/170 23.jpg ok=18 skip=0 fail=0 elapsed=196.09
+LOG PREP 23.jpg start
+LOG PREP 23.jpg done bubbles=8 texts=8 chars=105 (4.18s)
+LOG OVERWRITE 23.jpg -> 023.translated.png
+UPDATE 24/170 24.jpg ok=18 skip=0 fail=0 elapsed=200.29
+LOG PREP 24.jpg start
+LOG PREP 24.jpg done bubbles=13 texts=13 chars=106 (5.18s)
+LOG OVERWRITE 24.jpg -> 024.translated.png
+LOG TRANSLATE done pages=19.jpg, 20.jpg, 21.jpg (14.42s)
+LOG RENDER 19.jpg start
+LOG OK   19.jpg -> 019.translated.png (0.29s)
+LOG RENDER 20.jpg start
+LOG OK   20.jpg -> 020.translated.png (0.24s)
+LOG RENDER 21.jpg start
+LOG OK   21.jpg -> 021.translated.png (0.25s)
+LOG TRANSLATE start pages=22.jpg, 23.jpg, 24.jpg texts=31 chars=369
+UPDATE 25/170 25.jpg ok=21 skip=0 fail=0 elapsed=206.33
+LOG PREP 25.jpg start
+LOG PREP 25.jpg done bubbles=8 texts=8 chars=99 (4.26s)
+LOG OVERWRITE 25.jpg -> 025.translated.png
+UPDATE 26/170 26.jpg ok=21 skip=0 fail=0 elapsed=210.61
+LOG PREP 26.jpg start
+LOG PREP 26.jpg done bubbles=7 texts=7 chars=57 (3.84s)
+LOG OVERWRITE 26.jpg -> 026.translated.png
+UPDATE 27/170 27.jpg ok=21 skip=0 fail=0 elapsed=214.48
+LOG PREP 27.jpg start
+LOG PREP 27.jpg done bubbles=9 texts=9 chars=177 (5.01s)
+LOG OVERWRITE 27.jpg -> 027.translated.png
+LOG TRANSLATE done pages=22.jpg, 23.jpg, 24.jpg (01:12)
+LOG RENDER 22.jpg start
+LOG OK   22.jpg -> 022.translated.png (0.23s)
+LOG RENDER 23.jpg start
+LOG OK   23.jpg -> 023.translated.png (0.23s)
+LOG RENDER 24.jpg start
+LOG OK   24.jpg -> 024.translated.png (0.22s)
+LOG TRANSLATE start pages=25.jpg, 26.jpg, 27.jpg texts=24 chars=333
+UPDATE 28/170 28.jpg ok=24 skip=0 fail=0 elapsed=279.48
+LOG PREP 28.jpg start
+LOG PREP 28.jpg done bubbles=2 texts=2 chars=8 (1.92s)
+LOG OVERWRITE 28.jpg -> 028.translated.png
+UPDATE 29/170 29.jpg ok=24 skip=0 fail=0 elapsed=281.42
+LOG PREP 29.jpg start
+LOG PREP 29.jpg done bubbles=6 texts=6 chars=116 (3.57s)
+LOG OVERWRITE 29.jpg -> 029.translated.png
+UPDATE 30/170 30.jpg ok=24 skip=0 fail=0 elapsed=285.02
+LOG PREP 30.jpg start
+LOG PREP 30.jpg done bubbles=7 texts=7 chars=86 (3.39s)
+LOG OVERWRITE 30.jpg -> 030.translated.png
+LOG TRANSLATE done pages=25.jpg, 26.jpg, 27.jpg (14.76s)
+LOG RENDER 25.jpg start
+LOG OK   25.jpg -> 025.translated.png (0.23s)
+LOG RENDER 26.jpg start
+LOG OK   26.jpg -> 026.translated.png (0.23s)
+LOG RENDER 27.jpg start
+LOG OK   27.jpg -> 027.translated.png (0.23s)
+LOG TRANSLATE start pages=28.jpg, 29.jpg, 30.jpg texts=15 chars=210
+UPDATE 31/170 31.jpg ok=27 skip=0 fail=0 elapsed=295.00
+LOG PREP 31.jpg start
+LOG PREP 31.jpg done bubbles=6 texts=6 chars=33 (2.80s)
+LOG OVERWRITE 31.jpg -> 031.translated.png
+UPDATE 32/170 32.jpg ok=27 skip=0 fail=0 elapsed=297.83
+LOG PREP 32.jpg start
+LOG PREP 32.jpg done bubbles=10 texts=10 chars=113 (4.13s)
+LOG OVERWRITE 32.jpg -> 032.translated.png
+UPDATE 33/170 33.jpg ok=27 skip=0 fail=0 elapsed=302.00
+LOG PREP 33.jpg start
+LOG PREP 33.jpg done bubbles=6 texts=6 chars=58 (3.37s)
+LOG OVERWRITE 33.jpg -> 033.translated.png
+LOG TRANSLATE done pages=28.jpg, 29.jpg, 30.jpg (10.39s)
+LOG RENDER 28.jpg start
+LOG OK   28.jpg -> 028.translated.png (0.23s)
+LOG RENDER 29.jpg start
+LOG OK   29.jpg -> 029.translated.png (0.22s)
+LOG RENDER 30.jpg start
+LOG OK   30.jpg -> 030.translated.png (0.21s)
+LOG TRANSLATE start pages=31.jpg, 32.jpg, 33.jpg texts=22 chars=204
+UPDATE 34/170 34.jpg ok=30 skip=0 fail=0 elapsed=306.10
+LOG PREP 34.jpg start
+LOG PREP 34.jpg done bubbles=10 texts=10 chars=112 (4.31s)
+LOG OVERWRITE 34.jpg -> 034.translated.png
+UPDATE 35/170 35.jpg ok=30 skip=0 fail=0 elapsed=310.43
+LOG PREP 35.jpg start
+LOG PREP 35.jpg done bubbles=8 texts=8 chars=141 (4.56s)
+LOG OVERWRITE 35.jpg -> 035.translated.png
+UPDATE 36/170 36.jpg ok=30 skip=0 fail=0 elapsed=315.02
+LOG PREP 36.jpg start
+LOG PREP 36.jpg done bubbles=11 texts=11 chars=243 (5.83s)
+LOG OVERWRITE 36.jpg -> 036.translated.png
+LOG TRANSLATE done pages=31.jpg, 32.jpg, 33.jpg (14.79s)
+LOG RENDER 31.jpg start
+LOG OK   31.jpg -> 031.translated.png (0.33s)
+LOG RENDER 32.jpg start
+LOG OK   32.jpg -> 032.translated.png (0.23s)
+LOG RENDER 33.jpg start
+LOG OK   33.jpg -> 033.translated.png (0.23s)
+LOG TRANSLATE start pages=34.jpg, 35.jpg, 36.jpg texts=29 chars=496
+UPDATE 37/170 37.jpg ok=33 skip=0 fail=0 elapsed=321.73
+LOG PREP 37.jpg start
+LOG PREP 37.jpg done bubbles=7 texts=7 chars=86 (3.75s)
+LOG OVERWRITE 37.jpg -> 037.translated.png
+UPDATE 38/170 38.jpg ok=33 skip=0 fail=0 elapsed=325.51
+LOG PREP 38.jpg start
+LOG PREP 38.jpg done bubbles=12 texts=12 chars=191 (5.63s)
+LOG OVERWRITE 38.jpg -> 038.translated.png
+UPDATE 39/170 39.jpg ok=33 skip=0 fail=0 elapsed=331.17
+LOG PREP 39.jpg start
+LOG PREP 39.jpg done bubbles=7 texts=7 chars=98 (3.98s)
+LOG OVERWRITE 39.jpg -> 039.translated.png
+LOG TRANSLATE done pages=34.jpg, 35.jpg, 36.jpg (42.10s)
+LOG RENDER 34.jpg start
+LOG OK   34.jpg -> 034.translated.png (0.26s)
+LOG RENDER 35.jpg start
+LOG OK   35.jpg -> 035.translated.png (0.23s)
+LOG RENDER 36.jpg start
+LOG OK   36.jpg -> 036.translated.png (0.25s)
+LOG TRANSLATE start pages=37.jpg, 38.jpg, 39.jpg texts=26 chars=375
+UPDATE 40/170 40.jpg ok=36 skip=0 fail=0 elapsed=364.62
+LOG PREP 40.jpg start
+LOG PREP 40.jpg done bubbles=9 texts=9 chars=136 (3.99s)
+LOG OVERWRITE 40.jpg -> 040.translated.png
+UPDATE 41/170 41.jpg ok=36 skip=0 fail=0 elapsed=368.64
+LOG PREP 41.jpg start
+LOG PREP 41.jpg done bubbles=1 texts=1 chars=7 (1.90s)
+LOG OVERWRITE 41.jpg -> 041.translated.png
+UPDATE 42/170 42.jpg ok=36 skip=0 fail=0 elapsed=370.56
+LOG PREP 42.jpg start
+LOG PREP 42.jpg done bubbles=7 texts=7 chars=125 (3.82s)
+LOG OVERWRITE 42.jpg -> 042.translated.png
+LOG TRANSLATE done pages=37.jpg, 38.jpg, 39.jpg (11.87s)
+LOG RENDER 37.jpg start
+LOG OK   37.jpg -> 037.translated.png (0.22s)
+LOG RENDER 38.jpg start
+LOG OK   38.jpg -> 038.translated.png (0.23s)
+LOG RENDER 39.jpg start
+LOG OK   39.jpg -> 039.translated.png (0.23s)
+LOG TRANSLATE start pages=40.jpg, 41.jpg, 42.jpg texts=17 chars=268
+UPDATE 43/170 43.jpg ok=39 skip=0 fail=0 elapsed=377.24
+LOG PREP 43.jpg start
+LOG PREP 43.jpg done bubbles=11 texts=11 chars=227 (5.37s)
+LOG OVERWRITE 43.jpg -> 043.translated.png
+UPDATE 44/170 44.jpg ok=39 skip=0 fail=0 elapsed=382.64
+LOG PREP 44.jpg start
+LOG PREP 44.jpg done bubbles=7 texts=7 chars=80 (3.63s)
+LOG OVERWRITE 44.jpg -> 044.translated.png
+UPDATE 45/170 45.jpg ok=39 skip=0 fail=0 elapsed=386.29
+LOG PREP 45.jpg start
+LOG PREP 45.jpg done bubbles=5 texts=5 chars=45 (2.97s)
+LOG OVERWRITE 45.jpg -> 045.translated.png
+LOG TRANSLATE fail pages=40.jpg, 41.jpg, 42.jpg (03:02) error=Error code: 504 - {'type': 'https://developers.cloudflare.com/support/troubleshooting/http-status-codes/cloudflare-5xx-errors/error-504/', 'title': 'Error 504: Gateway time-out', 'status': 504, 'detail': 'The origin web server did not respond to Cloudflare within the allowed time. This typically means the origin is overloaded or a backend process is taking too long.', 'instance': '9f403d28fca4f457', 'error_code': 504, 'error_name': 'origin_gateway_timeout', 'error_category': 'origin', 'ray_id': '9f403d28fca4f457', 'timestamp': '2026-04-29T18:07:08Z', 'zone': 'fufu.iqach.top', 'cloudflare_error': True, 'retryable': True, 'retry_after': 120, 'owner_action_required': True, 'what_you_should_do': '**Wait and retry.** Back off for at least 120 seconds. If the error persists, the website operator should investigate long-running processes on the origin server.', 'footer': 'This error was generated by Cloudflare on behalf of the website owner.'}
+LOG TRANSLATE retry-single 40.jpg
+LOG TRANSLATE retry-single 41.jpg
+LOG TRANSLATE retry-single 42.jpg
+LOG RENDER 40.jpg start
+LOG OK   40.jpg -> 040.translated.png (0.25s)
+LOG RENDER 41.jpg start
+LOG OK   41.jpg -> 041.translated.png (0.22s)
+LOG RENDER 42.jpg start
+LOG OK   42.jpg -> 042.translated.png (0.23s)
+LOG TRANSLATE start pages=43.jpg, 44.jpg, 45.jpg texts=23 chars=352
+UPDATE 46/170 46.jpg ok=42 skip=0 fail=0 elapsed=688.22
+LOG PREP 46.jpg start
+LOG PREP 46.jpg done bubbles=7 texts=7 chars=111 (3.44s)
+LOG OVERWRITE 46.jpg -> 046.translated.png
+UPDATE 47/170 47.jpg ok=42 skip=0 fail=0 elapsed=691.68
+LOG PREP 47.jpg start
+LOG PREP 47.jpg done bubbles=8 texts=8 chars=184 (4.29s)
+LOG OVERWRITE 47.jpg -> 047.translated.png
+UPDATE 48/170 48.jpg ok=42 skip=0 fail=0 elapsed=696.00
+LOG PREP 48.jpg start
+LOG PREP 48.jpg done bubbles=2 texts=2 chars=11 (2.19s)
+LOG OVERWRITE 48.jpg -> 048.translated.png
+LOG TRANSLATE done pages=43.jpg, 44.jpg, 45.jpg (01:28)
+LOG RENDER 43.jpg start
+LOG OK   43.jpg -> 043.translated.png (0.23s)
+LOG RENDER 44.jpg start
+LOG OK   44.jpg -> 044.translated.png (0.23s)
+LOG RENDER 45.jpg start
+LOG OK   45.jpg -> 045.translated.png (0.23s)
+LOG TRANSLATE start pages=46.jpg, 47.jpg, 48.jpg texts=17 chars=306
+UPDATE 49/170 49.jpg ok=45 skip=0 fail=0 elapsed=777.02
+LOG PREP 49.jpg start
+LOG PREP 49.jpg done bubbles=3 texts=3 chars=70 (2.59s)
+LOG OVERWRITE 49.jpg -> 049.translated.png
+UPDATE 50/170 50.jpg ok=45 skip=0 fail=0 elapsed=779.63
+LOG PREP 50.jpg start
+LOG PREP 50.jpg done bubbles=3 texts=3 chars=88 (3.07s)
+LOG OVERWRITE 50.jpg -> 050.translated.png
+UPDATE 51/170 51.jpg ok=45 skip=0 fail=0 elapsed=782.72
+LOG PREP 51.jpg start
+LOG PREP 51.jpg done bubbles=9 texts=9 chars=78 (3.88s)
+LOG OVERWRITE 51.jpg -> 051.translated.png
+LOG TRANSLATE done pages=46.jpg, 47.jpg, 48.jpg (01:42)
+LOG RENDER 46.jpg start
+LOG OK   46.jpg -> 046.translated.png (0.25s)
+LOG RENDER 47.jpg start
+LOG OK   47.jpg -> 047.translated.png (0.23s)
+LOG RENDER 48.jpg start
+LOG OK   48.jpg -> 048.translated.png (0.20s)
+LOG TRANSLATE start pages=49.jpg, 50.jpg, 51.jpg texts=15 chars=236
+UPDATE 52/170 52.jpg ok=48 skip=0 fail=0 elapsed=880.22
+LOG PREP 52.jpg start
+LOG PREP 52.jpg done bubbles=10 texts=10 chars=234 (4.83s)
+LOG OVERWRITE 52.jpg -> 052.translated.png
+UPDATE 53/170 53.jpg ok=48 skip=0 fail=0 elapsed=885.08
+LOG PREP 53.jpg start
+LOG PREP 53.jpg done bubbles=13 texts=13 chars=186 (5.41s)
+LOG OVERWRITE 53.jpg -> 053.translated.png
+UPDATE 54/170 54.jpg ok=48 skip=0 fail=0 elapsed=890.52
+LOG PREP 54.jpg start
+LOG PREP 54.jpg done bubbles=18 texts=18 chars=261 (6.84s)
+LOG OVERWRITE 54.jpg -> 054.translated.png
+LOG TRANSLATE done pages=49.jpg, 50.jpg, 51.jpg (28.76s)
+LOG RENDER 49.jpg start
+LOG OK   49.jpg -> 049.translated.png (0.21s)
+LOG RENDER 50.jpg start
+LOG OK   50.jpg -> 050.translated.png (0.21s)
+LOG RENDER 51.jpg start
+LOG OK   51.jpg -> 051.translated.png (0.22s)
+LOG TRANSLATE start pages=52.jpg, 53.jpg, 54.jpg texts=41 chars=681
+UPDATE 55/170 55.jpg ok=51 skip=0 fail=0 elapsed=909.67
+LOG PREP 55.jpg start
+LOG PREP 55.jpg done bubbles=12 texts=12 chars=205 (5.16s)
+LOG OVERWRITE 55.jpg -> 055.translated.png
+UPDATE 56/170 56.jpg ok=51 skip=0 fail=0 elapsed=914.86
+LOG PREP 56.jpg start
+LOG PREP 56.jpg done bubbles=7 texts=7 chars=94 (3.59s)
+LOG OVERWRITE 56.jpg -> 056.translated.png
+UPDATE 57/170 57.jpg ok=51 skip=0 fail=0 elapsed=918.47
+LOG PREP 57.jpg start
+LOG PREP 57.jpg done bubbles=6 texts=6 chars=77 (3.36s)
+LOG OVERWRITE 57.jpg -> 057.translated.png
+LOG TRANSLATE done pages=52.jpg, 53.jpg, 54.jpg (16.22s)
+LOG RENDER 52.jpg start
+LOG OK   52.jpg -> 052.translated.png (0.26s)
+LOG RENDER 53.jpg start
+LOG OK   53.jpg -> 053.translated.png (0.24s)
+LOG RENDER 54.jpg start
+LOG OK   54.jpg -> 054.translated.png (0.24s)
+LOG TRANSLATE start pages=55.jpg, 56.jpg, 57.jpg texts=25 chars=376
+UPDATE 58/170 58.jpg ok=54 skip=0 fail=0 elapsed=926.71
+LOG PREP 58.jpg start
+LOG PREP 58.jpg done bubbles=7 texts=7 chars=115 (3.69s)
+LOG OVERWRITE 58.jpg -> 058.translated.png
+UPDATE 59/170 59.jpg ok=54 skip=0 fail=0 elapsed=930.43
+LOG PREP 59.jpg start
+LOG PREP 59.jpg done bubbles=7 texts=7 chars=143 (4.04s)
+LOG OVERWRITE 59.jpg -> 059.translated.png
+UPDATE 60/170 60.jpg ok=54 skip=0 fail=0 elapsed=934.50
+LOG PREP 60.jpg start
+LOG PREP 60.jpg done bubbles=13 texts=13 chars=193 (5.42s)
+LOG OVERWRITE 60.jpg -> 060.translated.png
+LOG TRANSLATE done pages=55.jpg, 56.jpg, 57.jpg (41.84s)
+LOG RENDER 55.jpg start
+LOG OK   55.jpg -> 055.translated.png (0.26s)
+LOG RENDER 56.jpg start
+LOG OK   56.jpg -> 056.translated.png (0.22s)
+LOG RENDER 57.jpg start
+LOG OK   57.jpg -> 057.translated.png (0.21s)
+LOG TRANSLATE start pages=58.jpg, 59.jpg, 60.jpg texts=27 chars=451
+UPDATE 61/170 61.jpg ok=57 skip=0 fail=0 elapsed=969.29
+LOG PREP 61.jpg start
+LOG PREP 61.jpg done bubbles=11 texts=11 chars=188 (4.65s)
+LOG OVERWRITE 61.jpg -> 061.translated.png
+UPDATE 62/170 62.jpg ok=57 skip=0 fail=0 elapsed=973.97
+LOG PREP 62.jpg start
+LOG PREP 62.jpg done bubbles=8 texts=8 chars=178 (4.50s)
+LOG OVERWRITE 62.jpg -> 062.translated.png
+UPDATE 63/170 63.jpg ok=57 skip=0 fail=0 elapsed=978.50
+LOG PREP 63.jpg start
+LOG PREP 63.jpg done bubbles=11 texts=11 chars=139 (4.56s)
+LOG OVERWRITE 63.jpg -> 063.translated.png
+LOG TRANSLATE done pages=58.jpg, 59.jpg, 60.jpg (30.63s)
+LOG RENDER 58.jpg start
+LOG OK   58.jpg -> 058.translated.png (0.24s)
+LOG RENDER 59.jpg start
+LOG OK   59.jpg -> 059.translated.png (0.23s)
+LOG RENDER 60.jpg start
+LOG OK   60.jpg -> 060.translated.png (0.23s)
+LOG TRANSLATE start pages=61.jpg, 62.jpg, 63.jpg texts=30 chars=505
+UPDATE 64/170 64.jpg ok=60 skip=0 fail=0 elapsed=1000.70
+LOG PREP 64.jpg start
+LOG PREP 64.jpg done bubbles=14 texts=14 chars=204 (5.23s)
+LOG OVERWRITE 64.jpg -> 064.translated.png
+UPDATE 65/170 65.jpg ok=60 skip=0 fail=0 elapsed=1005.96
+LOG PREP 65.jpg start
+LOG PREP 65.jpg done bubbles=6 texts=6 chars=144 (3.94s)
+LOG OVERWRITE 65.jpg -> 065.translated.png
+UPDATE 66/170 66.jpg ok=60 skip=0 fail=0 elapsed=1009.92
+LOG PREP 66.jpg start
+LOG PREP 66.jpg done bubbles=5 texts=5 chars=67 (3.08s)
+LOG OVERWRITE 66.jpg -> 066.translated.png
+LOG TRANSLATE done pages=61.jpg, 62.jpg, 63.jpg (03:13)
+LOG RENDER 61.jpg start
+LOG OK   61.jpg -> 061.translated.png (0.23s)
+LOG RENDER 62.jpg start
+LOG OK   62.jpg -> 062.translated.png (0.23s)
+LOG RENDER 63.jpg start
+LOG OK   63.jpg -> 063.translated.png (0.24s)
+LOG TRANSLATE start pages=64.jpg, 65.jpg, 66.jpg texts=25 chars=415
+UPDATE 67/170 67.jpg ok=63 skip=0 fail=0 elapsed=1194.99
+LOG PREP 67.jpg start
+LOG PREP 67.jpg done bubbles=3 texts=3 chars=75 (2.55s)
+LOG OVERWRITE 67.jpg -> 067.translated.png
+UPDATE 68/170 68.jpg ok=63 skip=0 fail=0 elapsed=1197.56
+LOG PREP 68.jpg start
+LOG PREP 68.jpg done bubbles=1 texts=1 chars=10 (1.88s)
+LOG OVERWRITE 68.jpg -> 068.translated.png
+UPDATE 69/170 69.jpg ok=63 skip=0 fail=0 elapsed=1199.47
+LOG PREP 69.jpg start
+LOG PREP 69.jpg done bubbles=5 texts=5 chars=91 (3.13s)
+LOG OVERWRITE 69.jpg -> 069.translated.png
+LOG TRANSLATE done pages=64.jpg, 65.jpg, 66.jpg (10.09s)
+LOG RENDER 64.jpg start
+LOG OK   64.jpg -> 064.translated.png (0.25s)
+LOG RENDER 65.jpg start
+LOG OK   65.jpg -> 065.translated.png (0.23s)
+LOG RENDER 66.jpg start
+LOG OK   66.jpg -> 066.translated.png (0.22s)
+LOG TRANSLATE start pages=67.jpg, 68.jpg, 69.jpg texts=9 chars=176
+UPDATE 70/170 70.jpg ok=66 skip=0 fail=0 elapsed=1205.87
+LOG PREP 70.jpg start
+LOG PREP 70.jpg done bubbles=8 texts=8 chars=153 (3.96s)
+LOG OVERWRITE 70.jpg -> 070.translated.png
+UPDATE 71/170 71.jpg ok=66 skip=0 fail=0 elapsed=1209.86
+LOG PREP 71.jpg start
+LOG PREP 71.jpg done bubbles=1 texts=1 chars=3 (1.94s)
+LOG OVERWRITE 71.jpg -> 071.translated.png
+UPDATE 72/170 72.jpg ok=66 skip=0 fail=0 elapsed=1211.82
+LOG PREP 72.jpg start
+LOG PREP 72.jpg done bubbles=3 texts=3 chars=33 (2.49s)
+LOG OVERWRITE 72.jpg -> 072.translated.png
+LOG TRANSLATE done pages=67.jpg, 68.jpg, 69.jpg (20.47s)
+LOG RENDER 67.jpg start
+LOG OK   67.jpg -> 067.translated.png (0.25s)
+LOG RENDER 68.jpg start
+LOG OK   68.jpg -> 068.translated.png (0.31s)
+LOG RENDER 69.jpg start
+LOG OK   69.jpg -> 069.translated.png (0.26s)
+LOG TRANSLATE start pages=70.jpg, 71.jpg, 72.jpg texts=12 chars=189
+UPDATE 73/170 73.jpg ok=69 skip=0 fail=0 elapsed=1227.23
+LOG PREP 73.jpg start
+LOG PREP 73.jpg done bubbles=7 texts=7 chars=141 (3.91s)
+LOG OVERWRITE 73.jpg -> 073.translated.png
+UPDATE 74/170 74.jpg ok=69 skip=0 fail=0 elapsed=1231.17
+LOG PREP 74.jpg start
+LOG PREP 74.jpg done bubbles=3 texts=3 chars=28 (2.46s)
+LOG OVERWRITE 74.jpg -> 074.translated.png
+UPDATE 75/170 75.jpg ok=69 skip=0 fail=0 elapsed=1233.65
+LOG PREP 75.jpg start
+LOG PREP 75.jpg done bubbles=8 texts=8 chars=112 (3.99s)
+LOG OVERWRITE 75.jpg -> 075.translated.png
+LOG TRANSLATE done pages=70.jpg, 71.jpg, 72.jpg (29.07s)
+LOG RENDER 70.jpg start
+LOG OK   70.jpg -> 070.translated.png (0.27s)
+LOG RENDER 71.jpg start
+LOG OK   71.jpg -> 071.translated.png (0.11s)
+LOG RENDER 72.jpg start
+LOG OK   72.jpg -> 072.translated.png (0.20s)
+LOG TRANSLATE start pages=73.jpg, 74.jpg, 75.jpg texts=18 chars=281
+UPDATE 76/170 76.jpg ok=72 skip=0 fail=0 elapsed=1256.98
+LOG PREP 76.jpg start
+LOG PREP 76.jpg done bubbles=12 texts=12 chars=185 (4.88s)
+LOG OVERWRITE 76.jpg -> 076.translated.png
+UPDATE 77/170 77.jpg ok=72 skip=0 fail=0 elapsed=1261.88
+LOG PREP 77.jpg start
+LOG PREP 77.jpg done bubbles=2 texts=2 chars=25 (2.21s)
+LOG OVERWRITE 77.jpg -> 077.translated.png
+UPDATE 78/170 78.jpg ok=72 skip=0 fail=0 elapsed=1264.11
+LOG PREP 78.jpg start
+LOG PREP 78.jpg done bubbles=3 texts=3 chars=23 (2.41s)
+LOG OVERWRITE 78.jpg -> 078.translated.png
+LOG TRANSLATE done pages=73.jpg, 74.jpg, 75.jpg (39.23s)
+LOG RENDER 73.jpg start
+LOG OK   73.jpg -> 073.translated.png (0.24s)
+LOG RENDER 74.jpg start
+LOG OK   74.jpg -> 074.translated.png (0.21s)
+LOG RENDER 75.jpg start
+LOG OK   75.jpg -> 075.translated.png (0.21s)
+LOG TRANSLATE start pages=76.jpg, 77.jpg, 78.jpg texts=17 chars=233
+UPDATE 79/170 79.jpg ok=75 skip=0 fail=0 elapsed=1296.93
+LOG PREP 79.jpg start
+LOG PREP 79.jpg done bubbles=11 texts=11 chars=168 (4.64s)
+LOG OVERWRITE 79.jpg -> 079.translated.png
+UPDATE 80/170 80.jpg ok=75 skip=0 fail=0 elapsed=1301.60
+LOG PREP 80.jpg start
+LOG PREP 80.jpg done bubbles=12 texts=12 chars=133 (4.62s)
+LOG OVERWRITE 80.jpg -> 080.translated.png
+UPDATE 81/170 81.jpg ok=75 skip=0 fail=0 elapsed=1306.25
+LOG PREP 81.jpg start
+LOG PREP 81.jpg done bubbles=14 texts=14 chars=184 (5.57s)
+LOG OVERWRITE 81.jpg -> 081.translated.png
+LOG TRANSLATE done pages=76.jpg, 77.jpg, 78.jpg (02:39)
+LOG RENDER 76.jpg start
+LOG OK   76.jpg -> 076.translated.png (0.24s)
+LOG RENDER 77.jpg start
+LOG OK   77.jpg -> 077.translated.png (0.21s)
+LOG RENDER 78.jpg start
+LOG OK   78.jpg -> 078.translated.png (0.21s)
+LOG TRANSLATE start pages=79.jpg, 80.jpg, 81.jpg texts=37 chars=485
+UPDATE 82/170 82.jpg ok=78 skip=0 fail=0 elapsed=1457.00
+LOG PREP 82.jpg start
+LOG PREP 82.jpg done bubbles=10 texts=10 chars=111 (3.83s)
+LOG OVERWRITE 82.jpg -> 082.translated.png
+UPDATE 83/170 83.jpg ok=78 skip=0 fail=0 elapsed=1460.85
+LOG PREP 83.jpg start
+LOG PREP 83.jpg done bubbles=6 texts=6 chars=49 (2.97s)
+LOG OVERWRITE 83.jpg -> 083.translated.png
+UPDATE 84/170 84.jpg ok=78 skip=0 fail=0 elapsed=1463.84
+LOG PREP 84.jpg start
+LOG PREP 84.jpg done bubbles=8 texts=8 chars=64 (3.49s)
+LOG OVERWRITE 84.jpg -> 084.translated.png
+LOG TRANSLATE done pages=79.jpg, 80.jpg, 81.jpg (40.80s)
+LOG RENDER 79.jpg start
+LOG OK   79.jpg -> 079.translated.png (0.24s)
+LOG RENDER 80.jpg start
+LOG OK   80.jpg -> 080.translated.png (0.23s)
+LOG RENDER 81.jpg start
+LOG OK   81.jpg -> 081.translated.png (0.23s)
+LOG TRANSLATE start pages=82.jpg, 83.jpg, 84.jpg texts=24 chars=224
+UPDATE 85/170 85.jpg ok=81 skip=0 fail=0 elapsed=1498.56
+LOG PREP 85.jpg start
+LOG PREP 85.jpg done bubbles=11 texts=11 chars=209 (4.89s)
+LOG OVERWRITE 85.jpg -> 085.translated.png
+UPDATE 86/170 86.jpg ok=81 skip=0 fail=0 elapsed=1503.48
+LOG PREP 86.jpg start
+LOG PREP 86.jpg done bubbles=16 texts=16 chars=285 (6.92s)
+LOG OVERWRITE 86.jpg -> 086.translated.png
+UPDATE 87/170 87.jpg ok=81 skip=0 fail=0 elapsed=1510.43
+LOG PREP 87.jpg start
+LOG PREP 87.jpg done bubbles=15 texts=15 chars=289 (6.48s)
+LOG OVERWRITE 87.jpg -> 087.translated.png
+LOG TRANSLATE done pages=82.jpg, 83.jpg, 84.jpg (01:09)
+LOG RENDER 82.jpg start
+LOG OK   82.jpg -> 082.translated.png (0.23s)
+LOG RENDER 83.jpg start
+LOG OK   83.jpg -> 083.translated.png (0.23s)
+LOG RENDER 84.jpg start
+LOG OK   84.jpg -> 084.translated.png (0.22s)
+LOG TRANSLATE start pages=85.jpg, 86.jpg, 87.jpg texts=42 chars=783
+UPDATE 88/170 88.jpg ok=84 skip=0 fail=0 elapsed=1568.44
+LOG PREP 88.jpg start
+LOG PREP 88.jpg done bubbles=12 texts=12 chars=110 (4.38s)
+LOG OVERWRITE 88.jpg -> 088.translated.png
+UPDATE 89/170 89.jpg ok=84 skip=0 fail=0 elapsed=1572.85
+LOG PREP 89.jpg start
+LOG PREP 89.jpg done bubbles=8 texts=8 chars=171 (4.42s)
+LOG OVERWRITE 89.jpg -> 089.translated.png
+UPDATE 90/170 90.jpg ok=84 skip=0 fail=0 elapsed=1577.29
+LOG PREP 90.jpg start
+LOG PREP 90.jpg done bubbles=6 texts=6 chars=62 (3.21s)
+LOG OVERWRITE 90.jpg -> 090.translated.png
+LOG TRANSLATE done pages=85.jpg, 86.jpg, 87.jpg (14.63s)
+LOG RENDER 85.jpg start
+LOG OK   85.jpg -> 085.translated.png (0.25s)
+LOG RENDER 86.jpg start
+LOG OK   86.jpg -> 086.translated.png (0.24s)
+LOG RENDER 87.jpg start
+LOG OK   87.jpg -> 087.translated.png (0.25s)
+LOG TRANSLATE start pages=88.jpg, 89.jpg, 90.jpg texts=26 chars=343
+UPDATE 91/170 91.jpg ok=87 skip=0 fail=0 elapsed=1583.91
+LOG PREP 91.jpg start
+LOG PREP 91.jpg done bubbles=5 texts=5 chars=54 (2.90s)
+LOG OVERWRITE 91.jpg -> 091.translated.png
+UPDATE 92/170 92.jpg ok=87 skip=0 fail=0 elapsed=1586.83
+LOG PREP 92.jpg start
+LOG PREP 92.jpg done bubbles=1 texts=1 chars=6 (2.04s)
+LOG OVERWRITE 92.jpg -> 092.translated.png
+UPDATE 93/170 93.jpg ok=87 skip=0 fail=0 elapsed=1588.88
+LOG PREP 93.jpg start
+LOG PREP 93.jpg done bubbles=6 texts=6 chars=128 (3.71s)
+LOG OVERWRITE 93.jpg -> 093.translated.png
+LOG TRANSLATE done pages=88.jpg, 89.jpg, 90.jpg (41.31s)
+LOG RENDER 88.jpg start
+LOG OK   88.jpg -> 088.translated.png (0.24s)
+LOG RENDER 89.jpg start
+LOG OK   89.jpg -> 089.translated.png (0.24s)
+LOG RENDER 90.jpg start
+LOG OK   90.jpg -> 090.translated.png (0.23s)
+LOG TRANSLATE start pages=91.jpg, 92.jpg, 93.jpg texts=12 chars=188
+UPDATE 94/170 94.jpg ok=90 skip=0 fail=0 elapsed=1626.03
+LOG PREP 94.jpg start
+LOG PREP 94.jpg done bubbles=10 texts=10 chars=131 (4.10s)
+LOG OVERWRITE 94.jpg -> 094.translated.png
+UPDATE 95/170 95.jpg ok=90 skip=0 fail=0 elapsed=1630.16
+LOG PREP 95.jpg start
+LOG PREP 95.jpg done bubbles=0 texts=0 chars=0 (1.65s)
+LOG OVERWRITE 95.jpg -> 095.translated.png
+LOG COPY 95.jpg -> 095.translated.png (blank)
+UPDATE 96/170 96.jpg ok=91 skip=0 fail=0 elapsed=1631.84
+LOG PREP 96.jpg start
+LOG PREP 96.jpg done bubbles=2 texts=2 chars=34 (2.44s)
+LOG OVERWRITE 96.jpg -> 096.translated.png
+UPDATE 97/170 97.jpg ok=91 skip=0 fail=0 elapsed=1634.30
+LOG PREP 97.jpg start
+LOG PREP 97.jpg done bubbles=6 texts=6 chars=37 (3.00s)
+LOG OVERWRITE 97.jpg -> 097.translated.png
+LOG TRANSLATE done pages=91.jpg, 92.jpg, 93.jpg (29.51s)
+LOG RENDER 91.jpg start
+LOG OK   91.jpg -> 091.translated.png (0.21s)
+LOG RENDER 92.jpg start
+LOG OK   92.jpg -> 092.translated.png (0.20s)
+LOG RENDER 93.jpg start
+LOG OK   93.jpg -> 093.translated.png (0.21s)
+LOG TRANSLATE start pages=94.jpg, 96.jpg, 97.jpg texts=18 chars=202
+UPDATE 98/170 98.jpg ok=94 skip=0 fail=0 elapsed=1656.23
+LOG PREP 98.jpg start
+LOG PREP 98.jpg done bubbles=5 texts=5 chars=50 (2.73s)
+LOG OVERWRITE 98.jpg -> 098.translated.png
+UPDATE 99/170 99.jpg ok=94 skip=0 fail=0 elapsed=1658.98
+LOG PREP 99.jpg start
+LOG PREP 99.jpg done bubbles=16 texts=16 chars=217 (5.97s)
+LOG OVERWRITE 99.jpg -> 099.translated.png
+UPDATE 100/170 100.jpg ok=94 skip=0 fail=0 elapsed=1664.98
+LOG PREP 100.jpg start
+LOG PREP 100.jpg done bubbles=13 texts=13 chars=225 (5.63s)
+LOG OVERWRITE 100.jpg -> 100.translated.png
+LOG TRANSLATE done pages=94.jpg, 96.jpg, 97.jpg (14.40s)
+LOG RENDER 94.jpg start
+LOG OK   94.jpg -> 094.translated.png (0.28s)
+LOG RENDER 96.jpg start
+LOG OK   96.jpg -> 096.translated.png (0.22s)
+LOG RENDER 97.jpg start
+LOG OK   97.jpg -> 097.translated.png (0.22s)
+LOG TRANSLATE start pages=98.jpg, 99.jpg, 100.jpg texts=34 chars=492
+UPDATE 101/170 101.jpg ok=97 skip=0 fail=0 elapsed=1671.47
+LOG PREP 101.jpg start
+LOG PREP 101.jpg done bubbles=9 texts=9 chars=142 (4.37s)
+LOG OVERWRITE 101.jpg -> 101.translated.png
+UPDATE 102/170 102.jpg ok=97 skip=0 fail=0 elapsed=1675.87
+LOG PREP 102.jpg start
+LOG PREP 102.jpg done bubbles=7 texts=7 chars=117 (4.17s)
+LOG OVERWRITE 102.jpg -> 102.translated.png
+UPDATE 103/170 103.jpg ok=97 skip=0 fail=0 elapsed=1680.07
+LOG PREP 103.jpg start
+LOG PREP 103.jpg done bubbles=6 texts=6 chars=60 (3.67s)
+LOG OVERWRITE 103.jpg -> 103.translated.png
+LOG TRANSLATE done pages=98.jpg, 99.jpg, 100.jpg (41.09s)
+LOG RENDER 98.jpg start
+LOG OK   98.jpg -> 098.translated.png (0.24s)
+LOG RENDER 99.jpg start
+LOG OK   99.jpg -> 099.translated.png (0.24s)
+LOG RENDER 100.jpg start
+LOG OK   100.jpg -> 100.translated.png (0.24s)
+LOG TRANSLATE start pages=101.jpg, 102.jpg, 103.jpg texts=22 chars=319
+UPDATE 104/170 104.jpg ok=100 skip=0 fail=0 elapsed=1713.40
+LOG PREP 104.jpg start
+LOG PREP 104.jpg done bubbles=9 texts=9 chars=171 (4.35s)
+LOG OVERWRITE 104.jpg -> 104.translated.png
+UPDATE 105/170 105.jpg ok=100 skip=0 fail=0 elapsed=1717.78
+LOG PREP 105.jpg start
+LOG PREP 105.jpg done bubbles=15 texts=15 chars=270 (6.12s)
+LOG OVERWRITE 105.jpg -> 105.translated.png
+UPDATE 106/170 106.jpg ok=100 skip=0 fail=0 elapsed=1723.92
+LOG PREP 106.jpg start
+LOG PREP 106.jpg done bubbles=8 texts=8 chars=80 (3.66s)
+LOG OVERWRITE 106.jpg -> 106.translated.png
+LOG TRANSLATE done pages=101.jpg, 102.jpg, 103.jpg (02:00)
+LOG RENDER 101.jpg start
+LOG OK   101.jpg -> 101.translated.png (0.23s)
+LOG RENDER 102.jpg start
+LOG OK   102.jpg -> 102.translated.png (0.22s)
+LOG RENDER 103.jpg start
+LOG OK   103.jpg -> 103.translated.png (0.23s)
+LOG TRANSLATE start pages=104.jpg, 105.jpg, 106.jpg texts=32 chars=521
+UPDATE 107/170 107.jpg ok=103 skip=0 fail=0 elapsed=1834.31
+LOG PREP 107.jpg start
+LOG PREP 107.jpg done bubbles=12 texts=12 chars=114 (4.32s)
+LOG OVERWRITE 107.jpg -> 107.translated.png
+UPDATE 108/170 108.jpg ok=103 skip=0 fail=0 elapsed=1838.65
+LOG PREP 108.jpg start
+LOG PREP 108.jpg done bubbles=8 texts=8 chars=107 (3.69s)
+LOG OVERWRITE 108.jpg -> 108.translated.png
+UPDATE 109/170 109.jpg ok=103 skip=0 fail=0 elapsed=1842.37
+LOG PREP 109.jpg start
+LOG PREP 109.jpg done bubbles=15 texts=15 chars=289 (6.26s)
+LOG OVERWRITE 109.jpg -> 109.translated.png
+LOG TRANSLATE done pages=104.jpg, 105.jpg, 106.jpg (01:41)
+LOG RENDER 104.jpg start
+LOG OK   104.jpg -> 104.translated.png (0.25s)
+LOG RENDER 105.jpg start
+LOG OK   105.jpg -> 105.translated.png (0.24s)
+LOG RENDER 106.jpg start
+LOG OK   106.jpg -> 106.translated.png (0.22s)
+LOG TRANSLATE start pages=107.jpg, 108.jpg, 109.jpg texts=35 chars=510
+UPDATE 110/170 110.jpg ok=106 skip=0 fail=0 elapsed=1936.95
+LOG PREP 110.jpg start
+LOG PREP 110.jpg done bubbles=9 texts=9 chars=117 (3.73s)
+LOG OVERWRITE 110.jpg -> 110.translated.png
+UPDATE 111/170 111.jpg ok=106 skip=0 fail=0 elapsed=1940.71
+LOG PREP 111.jpg start
+LOG PREP 111.jpg done bubbles=20 texts=20 chars=272 (6.83s)
+LOG OVERWRITE 111.jpg -> 111.translated.png
+UPDATE 112/170 112.jpg ok=106 skip=0 fail=0 elapsed=1947.56
+LOG PREP 112.jpg start
+LOG PREP 112.jpg done bubbles=5 texts=5 chars=84 (3.22s)
+LOG OVERWRITE 112.jpg -> 112.translated.png
+LOG TRANSLATE done pages=107.jpg, 108.jpg, 109.jpg (13.86s)
+LOG RENDER 107.jpg start
+LOG OK   107.jpg -> 107.translated.png (0.27s)
+LOG RENDER 108.jpg start
+LOG OK   108.jpg -> 108.translated.png (0.24s)
+LOG RENDER 109.jpg start
+LOG OK   109.jpg -> 109.translated.png (0.24s)
+LOG TRANSLATE start pages=110.jpg, 111.jpg, 112.jpg texts=34 chars=473
+UPDATE 113/170 113.jpg ok=109 skip=0 fail=0 elapsed=1951.67
+LOG PREP 113.jpg start
+LOG PREP 113.jpg done bubbles=6 texts=6 chars=61 (3.14s)
+LOG OVERWRITE 113.jpg -> 113.translated.png
+UPDATE 114/170 114.jpg ok=109 skip=0 fail=0 elapsed=1954.83
+LOG PREP 114.jpg start
+LOG PREP 114.jpg done bubbles=8 texts=8 chars=101 (3.90s)
+LOG OVERWRITE 114.jpg -> 114.translated.png
+UPDATE 115/170 115.jpg ok=109 skip=0 fail=0 elapsed=1958.76
+LOG PREP 115.jpg start
+LOG PREP 115.jpg done bubbles=7 texts=7 chars=103 (3.73s)
+LOG OVERWRITE 115.jpg -> 115.translated.png
+LOG TRANSLATE done pages=110.jpg, 111.jpg, 112.jpg (11.06s)
+LOG RENDER 110.jpg start
+LOG OK   110.jpg -> 110.translated.png (0.25s)
+LOG RENDER 111.jpg start
+LOG OK   111.jpg -> 111.translated.png (0.25s)
+LOG RENDER 112.jpg start
+LOG OK   112.jpg -> 112.translated.png (0.24s)
+LOG TRANSLATE start pages=113.jpg, 114.jpg, 115.jpg texts=21 chars=265
+UPDATE 116/170 116.jpg ok=112 skip=0 fail=0 elapsed=1963.57
+LOG PREP 116.jpg start
+LOG PREP 116.jpg done bubbles=0 texts=0 chars=0 (1.68s)
+LOG OVERWRITE 116.jpg -> 116.translated.png
+LOG COPY 116.jpg -> 116.translated.png (blank)
+UPDATE 117/170 117.jpg ok=113 skip=0 fail=0 elapsed=1965.29
+LOG PREP 117.jpg start
+LOG PREP 117.jpg done bubbles=5 texts=5 chars=389 (5.82s)
+LOG OVERWRITE 117.jpg -> 117.translated.png
+UPDATE 118/170 118.jpg ok=113 skip=0 fail=0 elapsed=1971.13
+LOG PREP 118.jpg start
+LOG PREP 118.jpg done bubbles=3 texts=3 chars=19 (2.42s)
+LOG OVERWRITE 118.jpg -> 118.translated.png
+UPDATE 119/170 119.jpg ok=113 skip=0 fail=0 elapsed=1973.58
+LOG PREP 119.jpg start
+LOG PREP 119.jpg done bubbles=10 texts=10 chars=127 (4.51s)
+LOG OVERWRITE 119.jpg -> 119.translated.png
+LOG TRANSLATE done pages=113.jpg, 114.jpg, 115.jpg (14.54s)
+LOG RENDER 113.jpg start
+LOG OK   113.jpg -> 113.translated.png (0.29s)
+LOG RENDER 114.jpg start
+LOG OK   114.jpg -> 114.translated.png (0.23s)
+LOG RENDER 115.jpg start
+LOG OK   115.jpg -> 115.translated.png (0.24s)
+LOG TRANSLATE start pages=117.jpg, 118.jpg, 119.jpg texts=18 chars=535
+UPDATE 120/170 120.jpg ok=116 skip=0 fail=0 elapsed=1979.00
+LOG PREP 120.jpg start
+LOG PREP 120.jpg done bubbles=8 texts=8 chars=198 (4.87s)
+LOG OVERWRITE 120.jpg -> 120.translated.png
+UPDATE 121/170 121.jpg ok=116 skip=0 fail=0 elapsed=1983.89
+LOG PREP 121.jpg start
+LOG PREP 121.jpg done bubbles=6 texts=6 chars=38 (3.23s)
+LOG OVERWRITE 121.jpg -> 121.translated.png
+UPDATE 122/170 122.jpg ok=116 skip=0 fail=0 elapsed=1987.15
+LOG PREP 122.jpg start
+LOG PREP 122.jpg done bubbles=10 texts=10 chars=182 (5.13s)
+LOG OVERWRITE 122.jpg -> 122.translated.png
+LOG TRANSLATE done pages=117.jpg, 118.jpg, 119.jpg (01:14)
+LOG RENDER 117.jpg start
+LOG OK   117.jpg -> 117.translated.png (0.17s)
+LOG RENDER 118.jpg start
+LOG OK   118.jpg -> 118.translated.png (0.16s)
+LOG RENDER 119.jpg start
+LOG OK   119.jpg -> 119.translated.png (0.24s)
+LOG TRANSLATE start pages=120.jpg, 121.jpg, 122.jpg texts=24 chars=418
+UPDATE 123/170 123.jpg ok=119 skip=0 fail=0 elapsed=2054.37
+LOG PREP 123.jpg start
+LOG PREP 123.jpg done bubbles=13 texts=13 chars=255 (5.39s)
+LOG OVERWRITE 123.jpg -> 123.translated.png
+UPDATE 124/170 124.jpg ok=119 skip=0 fail=0 elapsed=2059.79
+LOG PREP 124.jpg start
+LOG PREP 124.jpg done bubbles=11 texts=11 chars=218 (5.13s)
+LOG OVERWRITE 124.jpg -> 124.translated.png
+UPDATE 125/170 125.jpg ok=119 skip=0 fail=0 elapsed=2064.95
+LOG PREP 125.jpg start
+LOG PREP 125.jpg done bubbles=10 texts=10 chars=168 (4.81s)
+LOG OVERWRITE 125.jpg -> 125.translated.png
+LOG TRANSLATE done pages=120.jpg, 121.jpg, 122.jpg (15.42s)
+LOG RENDER 120.jpg start
+LOG OK   120.jpg -> 120.translated.png (0.31s)
+LOG RENDER 121.jpg start
+LOG OK   121.jpg -> 121.translated.png (0.23s)
+LOG RENDER 122.jpg start
+LOG OK   122.jpg -> 122.translated.png (0.26s)
+LOG TRANSLATE start pages=123.jpg, 124.jpg, 125.jpg texts=34 chars=641
+UPDATE 126/170 126.jpg ok=122 skip=0 fail=0 elapsed=2070.72
+LOG PREP 126.jpg start
+LOG PREP 126.jpg done bubbles=11 texts=11 chars=245 (5.77s)
+LOG OVERWRITE 126.jpg -> 126.translated.png
+UPDATE 127/170 127.jpg ok=122 skip=0 fail=0 elapsed=2076.53
+LOG PREP 127.jpg start
+LOG PREP 127.jpg done bubbles=9 texts=9 chars=160 (4.51s)
+LOG OVERWRITE 127.jpg -> 127.translated.png
+UPDATE 128/170 128.jpg ok=122 skip=0 fail=0 elapsed=2081.07
+LOG PREP 128.jpg start
+LOG PREP 128.jpg done bubbles=7 texts=7 chars=133 (4.40s)
+LOG OVERWRITE 128.jpg -> 128.translated.png
+LOG TRANSLATE done pages=123.jpg, 124.jpg, 125.jpg (15.47s)
+LOG RENDER 123.jpg start
+LOG OK   123.jpg -> 123.translated.png (0.27s)
+LOG RENDER 124.jpg start
+LOG OK   124.jpg -> 124.translated.png (0.24s)
+LOG RENDER 125.jpg start
+LOG OK   125.jpg -> 125.translated.png (0.25s)
+LOG TRANSLATE start pages=126.jpg, 127.jpg, 128.jpg texts=27 chars=538
+UPDATE 129/170 129.jpg ok=125 skip=0 fail=0 elapsed=2087.08
+LOG PREP 129.jpg start
+LOG PREP 129.jpg done bubbles=12 texts=12 chars=308 (6.45s)
+LOG OVERWRITE 129.jpg -> 129.translated.png
+UPDATE 130/170 130.jpg ok=125 skip=0 fail=0 elapsed=2093.56
+LOG PREP 130.jpg start
+LOG PREP 130.jpg done bubbles=13 texts=13 chars=267 (6.43s)
+LOG OVERWRITE 130.jpg -> 130.translated.png
+UPDATE 131/170 131.jpg ok=125 skip=0 fail=0 elapsed=2100.03
+LOG PREP 131.jpg start
+LOG PREP 131.jpg done bubbles=15 texts=15 chars=308 (7.16s)
+LOG OVERWRITE 131.jpg -> 131.translated.png
+LOG TRANSLATE done pages=126.jpg, 127.jpg, 128.jpg (20.14s)
+LOG RENDER 126.jpg start
+LOG OK   126.jpg -> 126.translated.png (0.30s)
+LOG RENDER 127.jpg start
+LOG OK   127.jpg -> 127.translated.png (0.23s)
+LOG RENDER 128.jpg start
+LOG OK   128.jpg -> 128.translated.png (0.23s)
+LOG TRANSLATE start pages=129.jpg, 130.jpg, 131.jpg texts=40 chars=883
+UPDATE 132/170 132.jpg ok=128 skip=0 fail=0 elapsed=2108.11
+LOG PREP 132.jpg start
+LOG PREP 132.jpg done bubbles=10 texts=10 chars=256 (5.66s)
+LOG OVERWRITE 132.jpg -> 132.translated.png
+UPDATE 133/170 133.jpg ok=128 skip=0 fail=0 elapsed=2113.80
+LOG PREP 133.jpg start
+LOG PREP 133.jpg done bubbles=12 texts=12 chars=146 (5.21s)
+LOG OVERWRITE 133.jpg -> 133.translated.png
+UPDATE 134/170 134.jpg ok=128 skip=0 fail=0 elapsed=2119.04
+LOG PREP 134.jpg start
+LOG PREP 134.jpg done bubbles=2 texts=2 chars=9 (2.22s)
+LOG OVERWRITE 134.jpg -> 134.translated.png
+LOG TRANSLATE done pages=129.jpg, 130.jpg, 131.jpg (14.88s)
+LOG RENDER 129.jpg start
+LOG OK   129.jpg -> 129.translated.png (0.26s)
+LOG RENDER 130.jpg start
+LOG OK   130.jpg -> 130.translated.png (0.24s)
+LOG RENDER 131.jpg start
+LOG OK   131.jpg -> 131.translated.png (0.26s)
+LOG TRANSLATE start pages=132.jpg, 133.jpg, 134.jpg texts=24 chars=411
+UPDATE 135/170 135.jpg ok=131 skip=0 fail=0 elapsed=2123.88
+LOG PREP 135.jpg start
+LOG PREP 135.jpg done bubbles=9 texts=9 chars=121 (4.20s)
+LOG OVERWRITE 135.jpg -> 135.translated.png
+UPDATE 136/170 136.jpg ok=131 skip=0 fail=0 elapsed=2128.10
+LOG PREP 136.jpg start
+LOG PREP 136.jpg done bubbles=15 texts=15 chars=158 (6.06s)
+LOG OVERWRITE 136.jpg -> 136.translated.png
+UPDATE 137/170 137.jpg ok=131 skip=0 fail=0 elapsed=2134.19
+LOG PREP 137.jpg start
+LOG PREP 137.jpg done bubbles=6 texts=6 chars=104 (3.93s)
+LOG OVERWRITE 137.jpg -> 137.translated.png
+LOG TRANSLATE done pages=132.jpg, 133.jpg, 134.jpg (47.76s)
+LOG RENDER 132.jpg start
+LOG OK   132.jpg -> 132.translated.png (0.24s)
+LOG RENDER 133.jpg start
+LOG OK   133.jpg -> 133.translated.png (0.24s)
+LOG RENDER 134.jpg start
+LOG OK   134.jpg -> 134.translated.png (0.15s)
+LOG TRANSLATE start pages=135.jpg, 136.jpg, 137.jpg texts=30 chars=383
+UPDATE 138/170 138.jpg ok=134 skip=0 fail=0 elapsed=2172.41
+LOG PREP 138.jpg start
+LOG PREP 138.jpg done bubbles=13 texts=13 chars=331 (6.07s)
+LOG OVERWRITE 138.jpg -> 138.translated.png
+UPDATE 139/170 139.jpg ok=134 skip=0 fail=0 elapsed=2178.51
+LOG PREP 139.jpg start
+LOG PREP 139.jpg done bubbles=11 texts=11 chars=188 (4.87s)
+LOG OVERWRITE 139.jpg -> 139.translated.png
+UPDATE 140/170 140.jpg ok=134 skip=0 fail=0 elapsed=2183.41
+LOG PREP 140.jpg start
+LOG PREP 140.jpg done bubbles=12 texts=12 chars=263 (5.87s)
+LOG OVERWRITE 140.jpg -> 140.translated.png
+LOG TRANSLATE done pages=135.jpg, 136.jpg, 137.jpg (16.91s)
+LOG RENDER 135.jpg start
+LOG OK   135.jpg -> 135.translated.png (0.27s)
+LOG RENDER 136.jpg start
+LOG OK   136.jpg -> 136.translated.png (0.25s)
+LOG RENDER 137.jpg start
+LOG OK   137.jpg -> 137.translated.png (0.23s)
+LOG TRANSLATE start pages=138.jpg, 139.jpg, 140.jpg texts=36 chars=782
+UPDATE 141/170 141.jpg ok=137 skip=0 fail=0 elapsed=2190.20
+LOG PREP 141.jpg start
+LOG PREP 141.jpg done bubbles=11 texts=11 chars=178 (5.07s)
+LOG OVERWRITE 141.jpg -> 141.translated.png
+UPDATE 142/170 142.jpg ok=137 skip=0 fail=0 elapsed=2195.30
+LOG PREP 142.jpg start
+LOG PREP 142.jpg done bubbles=8 texts=8 chars=257 (5.74s)
+LOG OVERWRITE 142.jpg -> 142.translated.png
+UPDATE 143/170 143.jpg ok=137 skip=0 fail=0 elapsed=2201.08
+LOG PREP 143.jpg start
+LOG PREP 143.jpg done bubbles=12 texts=12 chars=211 (6.19s)
+LOG OVERWRITE 143.jpg -> 143.translated.png
+LOG TRANSLATE done pages=138.jpg, 139.jpg, 140.jpg (17.11s)
+LOG RENDER 138.jpg start
+LOG OK   138.jpg -> 138.translated.png (0.32s)
+LOG RENDER 139.jpg start
+LOG OK   139.jpg -> 139.translated.png (0.25s)
+LOG RENDER 140.jpg start
+LOG OK   140.jpg -> 140.translated.png (0.25s)
+LOG TRANSLATE start pages=141.jpg, 142.jpg, 143.jpg texts=31 chars=646
+UPDATE 144/170 144.jpg ok=140 skip=0 fail=0 elapsed=2208.30
+LOG PREP 144.jpg start
+LOG PREP 144.jpg done bubbles=8 texts=8 chars=195 (5.05s)
+LOG OVERWRITE 144.jpg -> 144.translated.png
+UPDATE 145/170 145.jpg ok=140 skip=0 fail=0 elapsed=2213.38
+LOG PREP 145.jpg start
+LOG PREP 145.jpg done bubbles=17 texts=17 chars=291 (7.40s)
+LOG OVERWRITE 145.jpg -> 145.translated.png
+UPDATE 146/170 146.jpg ok=140 skip=0 fail=0 elapsed=2220.81
+LOG PREP 146.jpg start
+LOG PREP 146.jpg done bubbles=9 texts=9 chars=170 (5.39s)
+LOG OVERWRITE 146.jpg -> 146.translated.png
+LOG TRANSLATE done pages=141.jpg, 142.jpg, 143.jpg (01:13)
+LOG RENDER 141.jpg start
+LOG OK   141.jpg -> 141.translated.png (0.27s)
+LOG RENDER 142.jpg start
+LOG OK   142.jpg -> 142.translated.png (0.26s)
+LOG RENDER 143.jpg start
+LOG OK   143.jpg -> 143.translated.png (0.25s)
+LOG TRANSLATE start pages=144.jpg, 145.jpg, 146.jpg texts=34 chars=656
+UPDATE 147/170 147.jpg ok=143 skip=0 fail=0 elapsed=2282.63
+LOG PREP 147.jpg start
+LOG PREP 147.jpg done bubbles=9 texts=9 chars=263 (5.28s)
+LOG OVERWRITE 147.jpg -> 147.translated.png
+UPDATE 148/170 148.jpg ok=143 skip=0 fail=0 elapsed=2287.95
+LOG PREP 148.jpg start
+LOG PREP 148.jpg done bubbles=10 texts=10 chars=238 (5.30s)
+LOG OVERWRITE 148.jpg -> 148.translated.png
+UPDATE 149/170 149.jpg ok=143 skip=0 fail=0 elapsed=2293.27
+LOG PREP 149.jpg start
+LOG PREP 149.jpg done bubbles=9 texts=9 chars=99 (3.92s)
+LOG OVERWRITE 149.jpg -> 149.translated.png
+LOG TRANSLATE done pages=144.jpg, 145.jpg, 146.jpg (14.85s)
+LOG RENDER 144.jpg start
+LOG OK   144.jpg -> 144.translated.png (0.26s)
+LOG RENDER 145.jpg start
+LOG OK   145.jpg -> 145.translated.png (0.26s)
+LOG RENDER 146.jpg start
+LOG OK   146.jpg -> 146.translated.png (0.24s)
+LOG TRANSLATE start pages=147.jpg, 148.jpg, 149.jpg texts=28 chars=600
+UPDATE 150/170 150.jpg ok=146 skip=0 fail=0 elapsed=2298.38
+LOG PREP 150.jpg start
+LOG PREP 150.jpg done bubbles=2 texts=2 chars=9 (2.04s)
+LOG OVERWRITE 150.jpg -> 150.translated.png
+UPDATE 151/170 151.jpg ok=146 skip=0 fail=0 elapsed=2300.45
+LOG PREP 151.jpg start
+LOG PREP 151.jpg done bubbles=7 texts=7 chars=75 (3.64s)
+LOG OVERWRITE 151.jpg -> 151.translated.png
+UPDATE 152/170 152.jpg ok=146 skip=0 fail=0 elapsed=2304.11
+LOG PREP 152.jpg start
+LOG PREP 152.jpg done bubbles=11 texts=11 chars=181 (5.46s)
+LOG OVERWRITE 152.jpg -> 152.translated.png
+LOG TRANSLATE done pages=147.jpg, 148.jpg, 149.jpg (20.88s)
+LOG RENDER 147.jpg start
+LOG OK   147.jpg -> 147.translated.png (0.28s)
+LOG RENDER 148.jpg start
+LOG OK   148.jpg -> 148.translated.png (0.26s)
+LOG RENDER 149.jpg start
+LOG OK   149.jpg -> 149.translated.png (0.24s)
+LOG TRANSLATE start pages=150.jpg, 151.jpg, 152.jpg texts=20 chars=265
+UPDATE 153/170 153.jpg ok=149 skip=0 fail=0 elapsed=2320.18
+LOG PREP 153.jpg start
+LOG PREP 153.jpg done bubbles=10 texts=10 chars=271 (5.25s)
+LOG OVERWRITE 153.jpg -> 153.translated.png
+UPDATE 154/170 154.jpg ok=149 skip=0 fail=0 elapsed=2325.46
+LOG PREP 154.jpg start
+LOG PREP 154.jpg done bubbles=11 texts=11 chars=291 (5.89s)
+LOG OVERWRITE 154.jpg -> 154.translated.png
+UPDATE 155/170 155.jpg ok=149 skip=0 fail=0 elapsed=2331.38
+LOG PREP 155.jpg start
+LOG PREP 155.jpg done bubbles=8 texts=8 chars=142 (4.40s)
+LOG OVERWRITE 155.jpg -> 155.translated.png
+LOG TRANSLATE done pages=150.jpg, 151.jpg, 152.jpg (27.94s)
+LOG RENDER 150.jpg start
+LOG OK   150.jpg -> 150.translated.png (0.20s)
+LOG RENDER 151.jpg start
+LOG OK   151.jpg -> 151.translated.png (0.22s)
+LOG RENDER 152.jpg start
+LOG OK   152.jpg -> 152.translated.png (0.26s)
+LOG TRANSLATE start pages=153.jpg, 154.jpg, 155.jpg texts=29 chars=704
+UPDATE 156/170 156.jpg ok=152 skip=0 fail=0 elapsed=2348.98
+LOG PREP 156.jpg start
+LOG PREP 156.jpg done bubbles=7 texts=7 chars=85 (3.38s)
+LOG OVERWRITE 156.jpg -> 156.translated.png
+UPDATE 157/170 157.jpg ok=152 skip=0 fail=0 elapsed=2352.39
+LOG PREP 157.jpg start
+LOG PREP 157.jpg done bubbles=13 texts=13 chars=190 (5.31s)
+LOG OVERWRITE 157.jpg -> 157.translated.png
+UPDATE 158/170 158.jpg ok=152 skip=0 fail=0 elapsed=2357.73
+LOG PREP 158.jpg start
+LOG PREP 158.jpg done bubbles=12 texts=12 chars=279 (6.21s)
+LOG OVERWRITE 158.jpg -> 158.translated.png
+LOG TRANSLATE done pages=153.jpg, 154.jpg, 155.jpg (42.57s)
+LOG RENDER 153.jpg start
+LOG OK   153.jpg -> 153.translated.png (0.27s)
+LOG RENDER 154.jpg start
+LOG OK   154.jpg -> 154.translated.png (0.26s)
+LOG RENDER 155.jpg start
+LOG OK   155.jpg -> 155.translated.png (0.25s)
+LOG TRANSLATE start pages=156.jpg, 157.jpg, 158.jpg texts=32 chars=554
+UPDATE 159/170 159.jpg ok=155 skip=0 fail=0 elapsed=2392.47
+LOG PREP 159.jpg start
+LOG PREP 159.jpg done bubbles=7 texts=7 chars=240 (4.55s)
+LOG OVERWRITE 159.jpg -> 159.translated.png
+UPDATE 160/170 160.jpg ok=155 skip=0 fail=0 elapsed=2397.05
+LOG PREP 160.jpg start
+LOG PREP 160.jpg done bubbles=10 texts=10 chars=287 (5.62s)
+LOG OVERWRITE 160.jpg -> 160.translated.png
+UPDATE 161/170 161.jpg ok=155 skip=0 fail=0 elapsed=2402.71
+LOG PREP 161.jpg start
+LOG PREP 161.jpg done bubbles=10 texts=10 chars=200 (4.97s)
+LOG OVERWRITE 161.jpg -> 161.translated.png
+LOG TRANSLATE done pages=156.jpg, 157.jpg, 158.jpg (15.24s)
+LOG RENDER 156.jpg start
+LOG OK   156.jpg -> 156.translated.png (0.30s)
+LOG RENDER 157.jpg start
+LOG OK   157.jpg -> 157.translated.png (0.25s)
+LOG RENDER 158.jpg start
+LOG OK   158.jpg -> 158.translated.png (0.26s)
+LOG TRANSLATE start pages=159.jpg, 160.jpg, 161.jpg texts=27 chars=727
+UPDATE 162/170 162.jpg ok=158 skip=0 fail=0 elapsed=2408.68
+LOG PREP 162.jpg start
+LOG PREP 162.jpg done bubbles=9 texts=9 chars=117 (4.37s)
+LOG OVERWRITE 162.jpg -> 162.translated.png
+UPDATE 163/170 163.jpg ok=158 skip=0 fail=0 elapsed=2413.09
+LOG PREP 163.jpg start
+LOG PREP 163.jpg done bubbles=12 texts=12 chars=293 (6.42s)
+LOG OVERWRITE 163.jpg -> 163.translated.png
+UPDATE 164/170 164.jpg ok=158 skip=0 fail=0 elapsed=2419.54
+LOG PREP 164.jpg start
+LOG PREP 164.jpg done bubbles=8 texts=8 chars=266 (5.70s)
+LOG OVERWRITE 164.jpg -> 164.translated.png
+LOG TRANSLATE done pages=159.jpg, 160.jpg, 161.jpg (01:13)
+LOG RENDER 159.jpg start
+LOG OK   159.jpg -> 159.translated.png (0.27s)
+LOG RENDER 160.jpg start
+LOG OK   160.jpg -> 160.translated.png (0.27s)
+LOG RENDER 161.jpg start
+LOG OK   161.jpg -> 161.translated.png (0.25s)
+LOG TRANSLATE start pages=162.jpg, 163.jpg, 164.jpg texts=29 chars=676
+UPDATE 165/170 165.jpg ok=161 skip=0 fail=0 elapsed=2483.50
+LOG PREP 165.jpg start
+LOG PREP 165.jpg done bubbles=10 texts=10 chars=167 (4.83s)
+LOG OVERWRITE 165.jpg -> 165.translated.png
+UPDATE 166/170 166.jpg ok=161 skip=0 fail=0 elapsed=2488.36
+LOG PREP 166.jpg start
+LOG PREP 166.jpg done bubbles=3 texts=3 chars=156 (3.45s)
+LOG OVERWRITE 166.jpg -> 166.translated.png
+UPDATE 167/170 167.jpg ok=161 skip=0 fail=0 elapsed=2491.83
+LOG PREP 167.jpg start
+LOG PREP 167.jpg done bubbles=7 texts=7 chars=353 (5.69s)
+LOG OVERWRITE 167.jpg -> 167.translated.png
+LOG TRANSLATE done pages=162.jpg, 163.jpg, 164.jpg (14.05s)
+LOG RENDER 162.jpg start
+LOG OK   162.jpg -> 162.translated.png (0.29s)
+LOG RENDER 163.jpg start
+LOG OK   163.jpg -> 163.translated.png (0.26s)
+LOG RENDER 164.jpg start
+LOG OK   164.jpg -> 164.translated.png (0.26s)
+LOG TRANSLATE start pages=165.jpg, 166.jpg, 167.jpg texts=20 chars=676
+UPDATE 168/170 168.jpg ok=164 skip=0 fail=0 elapsed=2498.52
+LOG PREP 168.jpg start
+LOG PREP 168.jpg done bubbles=7 texts=7 chars=141 (4.09s)
+LOG OVERWRITE 168.jpg -> 168.translated.png
+UPDATE 169/170 169.jpg ok=164 skip=0 fail=0 elapsed=2502.63
+LOG PREP 169.jpg start
+LOG PREP 169.jpg done bubbles=6 texts=6 chars=200 (4.49s)
+LOG OVERWRITE 169.jpg -> 169.translated.png
+UPDATE 170/170 170.jpg ok=164 skip=0 fail=0 elapsed=2507.15
+LOG PREP 170.jpg start
+LOG PREP 170.jpg done bubbles=10 texts=10 chars=329 (6.20s)
+LOG OVERWRITE 170.jpg -> 170.translated.png
+LOG TRANSLATE done pages=165.jpg, 166.jpg, 167.jpg (15.22s)
+LOG RENDER 165.jpg start
+LOG OK   165.jpg -> 165.translated.png (0.27s)
+LOG RENDER 166.jpg start
+LOG OK   166.jpg -> 166.translated.png (0.14s)
+LOG RENDER 167.jpg start
+LOG OK   167.jpg -> 167.translated.png (0.18s)
+LOG TRANSLATE start pages=168.jpg, 169.jpg, 170.jpg texts=23 chars=670
+LOG TRANSLATE done pages=168.jpg, 169.jpg, 170.jpg (20.56s)
+LOG RENDER 168.jpg start
+LOG OK   168.jpg -> 168.translated.png (0.17s)
+LOG RENDER 169.jpg start
+LOG OK   169.jpg -> 169.translated.png (0.15s)
+LOG RENDER 170.jpg start
+LOG OK   170.jpg -> 170.translated.png (0.18s)
+FINISH total=170 ok=170 skip=0 fail=0 elapsed=2535.75
+SUMMARY {'total': 170, 'succeeded': 170, 'skipped': 0, 'failed': 0, 'elapsedSeconds': 2535.7468208000064}

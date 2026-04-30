@@ -1,0 +1,855 @@
+START input=D:\github\translate-reader\翻译测试日漫\藤子不二雄\[藤子不二雄A] 帰ッテキタせぇるすまん 全02巻\[藤子不二雄A] 帰ッテキタせぇるすまん 第01巻
+OUTPUT output=D:\github\translate-reader\翻译测试日漫\藤子不二雄\[藤子不二雄A] 帰ッテキタせぇるすまん 全02巻\归来吧！笑面推销员 01 V2
+CACHE cache_root=D:\github\translate-reader\translate_manga_cli\.cache\v2-vol01-hybrid-real-20260430b
+[1/170] current=1.jpg ok=0 skip=0 fail=0 elapsed=0.02s
+PREP-CACHE 1.jpg stage=translated texts=4 chars=28
+OVERWRITE 1.jpg -> 001.translated.png
+[2/170] current=2.jpg ok=0 skip=0 fail=0 elapsed=0.02s
+PREP-CACHE 2.jpg stage=translated texts=3 chars=15
+OVERWRITE 2.jpg -> 002.translated.png
+[3/170] current=3.jpg ok=0 skip=0 fail=0 elapsed=0.04s
+PREP-CACHE 3.jpg stage=translated texts=9 chars=142
+OVERWRITE 3.jpg -> 003.translated.png
+[4/170] current=4.jpg ok=0 skip=0 fail=0 elapsed=0.09s
+PREP-CACHE 4.jpg stage=translated texts=1 chars=9
+OVERWRITE 4.jpg -> 004.translated.png
+[5/170] current=5.jpg ok=0 skip=0 fail=0 elapsed=0.09s
+PREP-CACHE 5.jpg stage=translated texts=6 chars=118
+OVERWRITE 5.jpg -> 005.translated.png
+[6/170] current=6.jpg ok=0 skip=0 fail=0 elapsed=0.09s
+PREP-CACHE 6.jpg stage=translated texts=4 chars=147
+OVERWRITE 6.jpg -> 006.translated.png
+RENDER 1.jpg start
+OK   1.jpg -> 001.translated.png (6.45s)
+RENDER 2.jpg start
+OK   2.jpg -> 002.translated.png (0.36s)
+RENDER 3.jpg start
+OK   3.jpg -> 003.translated.png (0.21s)
+[7/170] current=7.jpg ok=3 skip=0 fail=0 elapsed=7.14s
+PREP-CACHE 7.jpg stage=preprocessed texts=6 chars=88
+OVERWRITE 7.jpg -> 007.translated.png
+[8/170] current=8.jpg ok=3 skip=0 fail=0 elapsed=7.15s
+PREP-CACHE 8.jpg stage=translated texts=11 chars=188
+OVERWRITE 8.jpg -> 008.translated.png
+[9/170] current=9.jpg ok=3 skip=0 fail=0 elapsed=7.15s
+PREP-CACHE 9.jpg stage=translated texts=7 chars=149
+OVERWRITE 9.jpg -> 009.translated.png
+RENDER 4.jpg start
+OK   4.jpg -> 004.translated.png (0.24s)
+RENDER 5.jpg start
+OK   5.jpg -> 005.translated.png (0.23s)
+RENDER 6.jpg start
+OK   6.jpg -> 006.translated.png (0.22s)
+TRANSLATE start pages=7.jpg texts=6 chars=88
+[10/170] current=10.jpg ok=6 skip=0 fail=0 elapsed=7.86s
+PREP-CACHE 10.jpg stage=translated texts=11 chars=202
+OVERWRITE 10.jpg -> 010.translated.png
+[11/170] current=11.jpg ok=6 skip=0 fail=0 elapsed=7.87s
+PREP-CACHE 11.jpg stage=translated texts=9 chars=125
+OVERWRITE 11.jpg -> 011.translated.png
+[12/170] current=12.jpg ok=6 skip=0 fail=0 elapsed=7.87s
+PREP-CACHE 12.jpg stage=translated texts=2 chars=4
+OVERWRITE 12.jpg -> 012.translated.png
+TRANSLATE done pages=7.jpg (06:56)
+RENDER 7.jpg start
+OK   7.jpg -> 007.translated.png (0.26s)
+RENDER 8.jpg start
+OK   8.jpg -> 008.translated.png (0.24s)
+RENDER 9.jpg start
+OK   9.jpg -> 009.translated.png (0.22s)
+[13/170] current=13.jpg ok=9 skip=0 fail=0 elapsed=07:05
+PREP-CACHE 13.jpg stage=translated texts=2 chars=4
+OVERWRITE 13.jpg -> 013.translated.png
+[14/170] current=14.jpg ok=9 skip=0 fail=0 elapsed=07:05
+PREP-CACHE 14.jpg stage=translated texts=11 chars=133
+OVERWRITE 14.jpg -> 014.translated.png
+[15/170] current=15.jpg ok=9 skip=0 fail=0 elapsed=07:05
+PREP-CACHE 15.jpg stage=translated texts=13 chars=215
+OVERWRITE 15.jpg -> 015.translated.png
+RENDER 10.jpg start
+OK   10.jpg -> 010.translated.png (0.23s)
+RENDER 11.jpg start
+OK   11.jpg -> 011.translated.png (0.21s)
+RENDER 12.jpg start
+OK   12.jpg -> 012.translated.png (0.21s)
+[16/170] current=16.jpg ok=12 skip=0 fail=0 elapsed=07:06
+PREP-CACHE 16.jpg stage=translated texts=3 chars=20
+OVERWRITE 16.jpg -> 016.translated.png
+[17/170] current=17.jpg ok=12 skip=0 fail=0 elapsed=07:06
+PREP-CACHE 17.jpg stage=translated texts=14 chars=230
+OVERWRITE 17.jpg -> 017.translated.png
+[18/170] current=18.jpg ok=12 skip=0 fail=0 elapsed=07:06
+PREP-CACHE 18.jpg stage=translated texts=13 chars=240
+OVERWRITE 18.jpg -> 018.translated.png
+RENDER 13.jpg start
+OK   13.jpg -> 013.translated.png (0.21s)
+RENDER 14.jpg start
+OK   14.jpg -> 014.translated.png (0.22s)
+RENDER 15.jpg start
+OK   15.jpg -> 015.translated.png (0.24s)
+[19/170] current=19.jpg ok=15 skip=0 fail=0 elapsed=07:06
+PREP-CACHE 19.jpg stage=translated texts=10 chars=144
+OVERWRITE 19.jpg -> 019.translated.png
+[20/170] current=20.jpg ok=15 skip=0 fail=0 elapsed=07:06
+PREP-CACHE 20.jpg stage=translated texts=12 chars=229
+OVERWRITE 20.jpg -> 020.translated.png
+[21/170] current=21.jpg ok=15 skip=0 fail=0 elapsed=07:06
+PREP-CACHE 21.jpg stage=translated texts=11 chars=240
+OVERWRITE 21.jpg -> 021.translated.png
+RENDER 16.jpg start
+OK   16.jpg -> 016.translated.png (0.22s)
+RENDER 17.jpg start
+OK   17.jpg -> 017.translated.png (0.24s)
+RENDER 18.jpg start
+OK   18.jpg -> 018.translated.png (0.22s)
+[22/170] current=22.jpg ok=18 skip=0 fail=0 elapsed=07:07
+PREP-CACHE 22.jpg stage=translated texts=10 chars=163
+OVERWRITE 22.jpg -> 022.translated.png
+[23/170] current=23.jpg ok=18 skip=0 fail=0 elapsed=07:07
+PREP-CACHE 23.jpg stage=translated texts=8 chars=105
+OVERWRITE 23.jpg -> 023.translated.png
+[24/170] current=24.jpg ok=18 skip=0 fail=0 elapsed=07:07
+PREP-CACHE 24.jpg stage=translated texts=13 chars=117
+OVERWRITE 24.jpg -> 024.translated.png
+RENDER 19.jpg start
+OK   19.jpg -> 019.translated.png (0.22s)
+RENDER 20.jpg start
+OK   20.jpg -> 020.translated.png (0.23s)
+RENDER 21.jpg start
+OK   21.jpg -> 021.translated.png (0.23s)
+[25/170] current=25.jpg ok=21 skip=0 fail=0 elapsed=07:08
+PREP-CACHE 25.jpg stage=translated texts=8 chars=105
+OVERWRITE 25.jpg -> 025.translated.png
+[26/170] current=26.jpg ok=21 skip=0 fail=0 elapsed=07:08
+PREP-CACHE 26.jpg stage=translated texts=7 chars=59
+OVERWRITE 26.jpg -> 026.translated.png
+[27/170] current=27.jpg ok=21 skip=0 fail=0 elapsed=07:08
+PREP-CACHE 27.jpg stage=translated texts=9 chars=198
+OVERWRITE 27.jpg -> 027.translated.png
+RENDER 22.jpg start
+OK   22.jpg -> 022.translated.png (0.23s)
+RENDER 23.jpg start
+OK   23.jpg -> 023.translated.png (0.23s)
+RENDER 24.jpg start
+OK   24.jpg -> 024.translated.png (0.22s)
+[28/170] current=28.jpg ok=24 skip=0 fail=0 elapsed=07:08
+PREP-CACHE 28.jpg stage=translated texts=2 chars=9
+OVERWRITE 28.jpg -> 028.translated.png
+[29/170] current=29.jpg ok=24 skip=0 fail=0 elapsed=07:08
+PREP-CACHE 29.jpg stage=translated texts=6 chars=124
+OVERWRITE 29.jpg -> 029.translated.png
+[30/170] current=30.jpg ok=24 skip=0 fail=0 elapsed=07:08
+PREP-CACHE 30.jpg stage=translated texts=7 chars=95
+OVERWRITE 30.jpg -> 030.translated.png
+RENDER 25.jpg start
+OK   25.jpg -> 025.translated.png (0.23s)
+RENDER 26.jpg start
+OK   26.jpg -> 026.translated.png (0.22s)
+RENDER 27.jpg start
+OK   27.jpg -> 027.translated.png (0.23s)
+[31/170] current=31.jpg ok=27 skip=0 fail=0 elapsed=07:09
+PREP-CACHE 31.jpg stage=translated texts=6 chars=44
+OVERWRITE 31.jpg -> 031.translated.png
+[32/170] current=32.jpg ok=27 skip=0 fail=0 elapsed=07:09
+PREP-CACHE 32.jpg stage=translated texts=10 chars=115
+OVERWRITE 32.jpg -> 032.translated.png
+[33/170] current=33.jpg ok=27 skip=0 fail=0 elapsed=07:09
+PREP-CACHE 33.jpg stage=translated texts=6 chars=62
+OVERWRITE 33.jpg -> 033.translated.png
+RENDER 28.jpg start
+OK   28.jpg -> 028.translated.png (0.18s)
+RENDER 29.jpg start
+OK   29.jpg -> 029.translated.png (0.22s)
+RENDER 30.jpg start
+OK   30.jpg -> 030.translated.png (0.21s)
+[34/170] current=34.jpg ok=30 skip=0 fail=0 elapsed=07:10
+PREP-CACHE 34.jpg stage=translated texts=10 chars=124
+OVERWRITE 34.jpg -> 034.translated.png
+[35/170] current=35.jpg ok=30 skip=0 fail=0 elapsed=07:10
+PREP-CACHE 35.jpg stage=translated texts=8 chars=152
+OVERWRITE 35.jpg -> 035.translated.png
+[36/170] current=36.jpg ok=30 skip=0 fail=0 elapsed=07:10
+PREP-CACHE 36.jpg stage=translated texts=11 chars=287
+OVERWRITE 36.jpg -> 036.translated.png
+RENDER 31.jpg start
+OK   31.jpg -> 031.translated.png (0.24s)
+RENDER 32.jpg start
+OK   32.jpg -> 032.translated.png (0.23s)
+RENDER 33.jpg start
+OK   33.jpg -> 033.translated.png (0.23s)
+[37/170] current=37.jpg ok=33 skip=0 fail=0 elapsed=07:11
+PREP-CACHE 37.jpg stage=translated texts=7 chars=96
+OVERWRITE 37.jpg -> 037.translated.png
+[38/170] current=38.jpg ok=33 skip=0 fail=0 elapsed=07:11
+PREP-CACHE 38.jpg stage=translated texts=12 chars=200
+OVERWRITE 38.jpg -> 038.translated.png
+[39/170] current=39.jpg ok=33 skip=0 fail=0 elapsed=07:11
+PREP-CACHE 39.jpg stage=translated texts=7 chars=118
+OVERWRITE 39.jpg -> 039.translated.png
+RENDER 34.jpg start
+OK   34.jpg -> 034.translated.png (0.22s)
+RENDER 35.jpg start
+OK   35.jpg -> 035.translated.png (0.22s)
+RENDER 36.jpg start
+OK   36.jpg -> 036.translated.png (0.23s)
+[40/170] current=40.jpg ok=36 skip=0 fail=0 elapsed=07:11
+PREP-CACHE 40.jpg stage=translated texts=9 chars=165
+OVERWRITE 40.jpg -> 040.translated.png
+[41/170] current=41.jpg ok=36 skip=0 fail=0 elapsed=07:11
+PREP-CACHE 41.jpg stage=translated texts=1 chars=5
+OVERWRITE 41.jpg -> 041.translated.png
+[42/170] current=42.jpg ok=36 skip=0 fail=0 elapsed=07:11
+PREP-CACHE 42.jpg stage=translated texts=7 chars=127
+OVERWRITE 42.jpg -> 042.translated.png
+RENDER 37.jpg start
+OK   37.jpg -> 037.translated.png (0.21s)
+RENDER 38.jpg start
+OK   38.jpg -> 038.translated.png (0.23s)
+RENDER 39.jpg start
+OK   39.jpg -> 039.translated.png (0.23s)
+[43/170] current=43.jpg ok=39 skip=0 fail=0 elapsed=07:12
+PREP-CACHE 43.jpg stage=translated texts=11 chars=252
+OVERWRITE 43.jpg -> 043.translated.png
+[44/170] current=44.jpg ok=39 skip=0 fail=0 elapsed=07:12
+PREP-CACHE 44.jpg stage=translated texts=7 chars=84
+OVERWRITE 44.jpg -> 044.translated.png
+[45/170] current=45.jpg ok=39 skip=0 fail=0 elapsed=07:12
+PREP-CACHE 45.jpg stage=translated texts=5 chars=51
+OVERWRITE 45.jpg -> 045.translated.png
+RENDER 40.jpg start
+OK   40.jpg -> 040.translated.png (0.22s)
+RENDER 41.jpg start
+OK   41.jpg -> 041.translated.png (0.22s)
+RENDER 42.jpg start
+OK   42.jpg -> 042.translated.png (0.22s)
+[46/170] current=46.jpg ok=42 skip=0 fail=0 elapsed=07:13
+PREP-CACHE 46.jpg stage=translated texts=7 chars=115
+OVERWRITE 46.jpg -> 046.translated.png
+[47/170] current=47.jpg ok=42 skip=0 fail=0 elapsed=07:13
+PREP-CACHE 47.jpg stage=translated texts=8 chars=200
+OVERWRITE 47.jpg -> 047.translated.png
+[48/170] current=48.jpg ok=42 skip=0 fail=0 elapsed=07:13
+PREP-CACHE 48.jpg stage=translated texts=2 chars=16
+OVERWRITE 48.jpg -> 048.translated.png
+RENDER 43.jpg start
+OK   43.jpg -> 043.translated.png (0.23s)
+RENDER 44.jpg start
+OK   44.jpg -> 044.translated.png (0.22s)
+RENDER 45.jpg start
+OK   45.jpg -> 045.translated.png (0.25s)
+[49/170] current=49.jpg ok=45 skip=0 fail=0 elapsed=07:13
+PREP-CACHE 49.jpg stage=translated texts=3 chars=78
+OVERWRITE 49.jpg -> 049.translated.png
+[50/170] current=50.jpg ok=45 skip=0 fail=0 elapsed=07:13
+PREP-CACHE 50.jpg stage=translated texts=3 chars=99
+OVERWRITE 50.jpg -> 050.translated.png
+[51/170] current=51.jpg ok=45 skip=0 fail=0 elapsed=07:13
+PREP-CACHE 51.jpg stage=translated texts=8 chars=87
+OVERWRITE 51.jpg -> 051.translated.png
+RENDER 46.jpg start
+OK   46.jpg -> 046.translated.png (0.22s)
+RENDER 47.jpg start
+OK   47.jpg -> 047.translated.png (0.23s)
+RENDER 48.jpg start
+OK   48.jpg -> 048.translated.png (0.18s)
+[52/170] current=52.jpg ok=48 skip=0 fail=0 elapsed=07:14
+PREP-CACHE 52.jpg stage=translated texts=10 chars=259
+OVERWRITE 52.jpg -> 052.translated.png
+[53/170] current=53.jpg ok=48 skip=0 fail=0 elapsed=07:14
+PREP-CACHE 53.jpg stage=translated texts=13 chars=202
+OVERWRITE 53.jpg -> 053.translated.png
+[54/170] current=54.jpg ok=48 skip=0 fail=0 elapsed=07:14
+PREP-CACHE 54.jpg stage=translated texts=18 chars=288
+OVERWRITE 54.jpg -> 054.translated.png
+RENDER 49.jpg start
+OK   49.jpg -> 049.translated.png (0.20s)
+RENDER 50.jpg start
+OK   50.jpg -> 050.translated.png (0.20s)
+RENDER 51.jpg start
+OK   51.jpg -> 051.translated.png (0.22s)
+[55/170] current=55.jpg ok=51 skip=0 fail=0 elapsed=07:15
+PREP-CACHE 55.jpg stage=translated texts=12 chars=232
+OVERWRITE 55.jpg -> 055.translated.png
+[56/170] current=56.jpg ok=51 skip=0 fail=0 elapsed=07:15
+PREP-CACHE 56.jpg stage=translated texts=7 chars=109
+OVERWRITE 56.jpg -> 056.translated.png
+[57/170] current=57.jpg ok=51 skip=0 fail=0 elapsed=07:15
+PREP-CACHE 57.jpg stage=translated texts=6 chars=87
+OVERWRITE 57.jpg -> 057.translated.png
+RENDER 52.jpg start
+OK   52.jpg -> 052.translated.png (0.24s)
+RENDER 53.jpg start
+OK   53.jpg -> 053.translated.png (0.24s)
+RENDER 54.jpg start
+OK   54.jpg -> 054.translated.png (0.26s)
+[58/170] current=58.jpg ok=54 skip=0 fail=0 elapsed=07:16
+PREP-CACHE 58.jpg stage=translated texts=7 chars=130
+OVERWRITE 58.jpg -> 058.translated.png
+[59/170] current=59.jpg ok=54 skip=0 fail=0 elapsed=07:16
+PREP-CACHE 59.jpg stage=translated texts=7 chars=166
+OVERWRITE 59.jpg -> 059.translated.png
+[60/170] current=60.jpg ok=54 skip=0 fail=0 elapsed=07:16
+PREP-CACHE 60.jpg stage=translated texts=13 chars=204
+OVERWRITE 60.jpg -> 060.translated.png
+RENDER 55.jpg start
+OK   55.jpg -> 055.translated.png (0.23s)
+RENDER 56.jpg start
+OK   56.jpg -> 056.translated.png (0.22s)
+RENDER 57.jpg start
+OK   57.jpg -> 057.translated.png (0.22s)
+[61/170] current=61.jpg ok=57 skip=0 fail=0 elapsed=07:16
+PREP-CACHE 61.jpg stage=translated texts=11 chars=213
+OVERWRITE 61.jpg -> 061.translated.png
+[62/170] current=62.jpg ok=57 skip=0 fail=0 elapsed=07:16
+PREP-CACHE 62.jpg stage=translated texts=8 chars=192
+OVERWRITE 62.jpg -> 062.translated.png
+[63/170] current=63.jpg ok=57 skip=0 fail=0 elapsed=07:16
+PREP-CACHE 63.jpg stage=translated texts=11 chars=134
+OVERWRITE 63.jpg -> 063.translated.png
+RENDER 58.jpg start
+OK   58.jpg -> 058.translated.png (0.22s)
+RENDER 59.jpg start
+OK   59.jpg -> 059.translated.png (0.23s)
+RENDER 60.jpg start
+OK   60.jpg -> 060.translated.png (0.23s)
+[64/170] current=64.jpg ok=60 skip=0 fail=0 elapsed=07:17
+PREP-CACHE 64.jpg stage=translated texts=14 chars=216
+OVERWRITE 64.jpg -> 064.translated.png
+[65/170] current=65.jpg ok=60 skip=0 fail=0 elapsed=07:17
+PREP-CACHE 65.jpg stage=translated texts=6 chars=160
+OVERWRITE 65.jpg -> 065.translated.png
+[66/170] current=66.jpg ok=60 skip=0 fail=0 elapsed=07:17
+PREP-CACHE 66.jpg stage=translated texts=5 chars=72
+OVERWRITE 66.jpg -> 066.translated.png
+RENDER 61.jpg start
+OK   61.jpg -> 061.translated.png (0.23s)
+RENDER 62.jpg start
+OK   62.jpg -> 062.translated.png (0.23s)
+RENDER 63.jpg start
+OK   63.jpg -> 063.translated.png (0.25s)
+[67/170] current=67.jpg ok=63 skip=0 fail=0 elapsed=07:18
+PREP-CACHE 67.jpg stage=translated texts=3 chars=81
+OVERWRITE 67.jpg -> 067.translated.png
+[68/170] current=68.jpg ok=63 skip=0 fail=0 elapsed=07:18
+PREP-CACHE 68.jpg stage=translated texts=1 chars=10
+OVERWRITE 68.jpg -> 068.translated.png
+[69/170] current=69.jpg ok=63 skip=0 fail=0 elapsed=07:18
+PREP-CACHE 69.jpg stage=translated texts=5 chars=100
+OVERWRITE 69.jpg -> 069.translated.png
+RENDER 64.jpg start
+OK   64.jpg -> 064.translated.png (0.23s)
+RENDER 65.jpg start
+OK   65.jpg -> 065.translated.png (0.23s)
+RENDER 66.jpg start
+OK   66.jpg -> 066.translated.png (0.22s)
+[70/170] current=70.jpg ok=66 skip=0 fail=0 elapsed=07:19
+PREP-CACHE 70.jpg stage=translated texts=8 chars=156
+OVERWRITE 70.jpg -> 070.translated.png
+[71/170] current=71.jpg ok=66 skip=0 fail=0 elapsed=07:19
+PREP-CACHE 71.jpg stage=translated texts=1 chars=3
+OVERWRITE 71.jpg -> 071.translated.png
+[72/170] current=72.jpg ok=66 skip=0 fail=0 elapsed=07:19
+PREP-CACHE 72.jpg stage=translated texts=3 chars=34
+OVERWRITE 72.jpg -> 072.translated.png
+RENDER 67.jpg start
+OK   67.jpg -> 067.translated.png (0.25s)
+RENDER 68.jpg start
+OK   68.jpg -> 068.translated.png (0.30s)
+RENDER 69.jpg start
+OK   69.jpg -> 069.translated.png (0.26s)
+[73/170] current=73.jpg ok=69 skip=0 fail=0 elapsed=07:20
+PREP-CACHE 73.jpg stage=translated texts=7 chars=152
+OVERWRITE 73.jpg -> 073.translated.png
+[74/170] current=74.jpg ok=69 skip=0 fail=0 elapsed=07:20
+PREP-CACHE 74.jpg stage=translated texts=3 chars=25
+OVERWRITE 74.jpg -> 074.translated.png
+[75/170] current=75.jpg ok=69 skip=0 fail=0 elapsed=07:20
+PREP-CACHE 75.jpg stage=translated texts=8 chars=126
+OVERWRITE 75.jpg -> 075.translated.png
+RENDER 70.jpg start
+OK   70.jpg -> 070.translated.png (0.27s)
+RENDER 71.jpg start
+OK   71.jpg -> 071.translated.png (0.12s)
+RENDER 72.jpg start
+OK   72.jpg -> 072.translated.png (0.20s)
+[76/170] current=76.jpg ok=72 skip=0 fail=0 elapsed=07:20
+PREP-CACHE 76.jpg stage=translated texts=12 chars=197
+OVERWRITE 76.jpg -> 076.translated.png
+[77/170] current=77.jpg ok=72 skip=0 fail=0 elapsed=07:20
+PREP-CACHE 77.jpg stage=translated texts=2 chars=35
+OVERWRITE 77.jpg -> 077.translated.png
+[78/170] current=78.jpg ok=72 skip=0 fail=0 elapsed=07:20
+PREP-CACHE 78.jpg stage=translated texts=3 chars=20
+OVERWRITE 78.jpg -> 078.translated.png
+RENDER 73.jpg start
+OK   73.jpg -> 073.translated.png (0.22s)
+RENDER 74.jpg start
+OK   74.jpg -> 074.translated.png (0.21s)
+RENDER 75.jpg start
+OK   75.jpg -> 075.translated.png (0.21s)
+[79/170] current=79.jpg ok=75 skip=0 fail=0 elapsed=07:21
+PREP-CACHE 79.jpg stage=translated texts=11 chars=179
+OVERWRITE 79.jpg -> 079.translated.png
+[80/170] current=80.jpg ok=75 skip=0 fail=0 elapsed=07:21
+PREP-CACHE 80.jpg stage=translated texts=12 chars=150
+OVERWRITE 80.jpg -> 080.translated.png
+[81/170] current=81.jpg ok=75 skip=0 fail=0 elapsed=07:21
+PREP-CACHE 81.jpg stage=translated texts=14 chars=204
+OVERWRITE 81.jpg -> 081.translated.png
+RENDER 76.jpg start
+OK   76.jpg -> 076.translated.png (0.25s)
+RENDER 77.jpg start
+OK   77.jpg -> 077.translated.png (0.21s)
+RENDER 78.jpg start
+OK   78.jpg -> 078.translated.png (0.21s)
+[82/170] current=82.jpg ok=78 skip=0 fail=0 elapsed=07:22
+PREP-CACHE 82.jpg stage=translated texts=10 chars=109
+OVERWRITE 82.jpg -> 082.translated.png
+[83/170] current=83.jpg ok=78 skip=0 fail=0 elapsed=07:22
+PREP-CACHE 83.jpg stage=translated texts=6 chars=46
+OVERWRITE 83.jpg -> 083.translated.png
+[84/170] current=84.jpg ok=78 skip=0 fail=0 elapsed=07:22
+PREP-CACHE 84.jpg stage=translated texts=8 chars=71
+OVERWRITE 84.jpg -> 084.translated.png
+RENDER 79.jpg start
+OK   79.jpg -> 079.translated.png (0.22s)
+RENDER 80.jpg start
+OK   80.jpg -> 080.translated.png (0.23s)
+RENDER 81.jpg start
+OK   81.jpg -> 081.translated.png (0.24s)
+[85/170] current=85.jpg ok=81 skip=0 fail=0 elapsed=07:23
+PREP-CACHE 85.jpg stage=translated texts=11 chars=219
+OVERWRITE 85.jpg -> 085.translated.png
+[86/170] current=86.jpg ok=81 skip=0 fail=0 elapsed=07:23
+PREP-CACHE 86.jpg stage=translated texts=16 chars=303
+OVERWRITE 86.jpg -> 086.translated.png
+[87/170] current=87.jpg ok=81 skip=0 fail=0 elapsed=07:23
+PREP-CACHE 87.jpg stage=translated texts=15 chars=318
+OVERWRITE 87.jpg -> 087.translated.png
+RENDER 82.jpg start
+OK   82.jpg -> 082.translated.png (0.22s)
+RENDER 83.jpg start
+OK   83.jpg -> 083.translated.png (0.23s)
+RENDER 84.jpg start
+OK   84.jpg -> 084.translated.png (0.23s)
+[88/170] current=88.jpg ok=84 skip=0 fail=0 elapsed=07:23
+PREP-CACHE 88.jpg stage=translated texts=12 chars=118
+OVERWRITE 88.jpg -> 088.translated.png
+[89/170] current=89.jpg ok=84 skip=0 fail=0 elapsed=07:23
+PREP-CACHE 89.jpg stage=translated texts=8 chars=187
+OVERWRITE 89.jpg -> 089.translated.png
+[90/170] current=90.jpg ok=84 skip=0 fail=0 elapsed=07:23
+PREP-CACHE 90.jpg stage=translated texts=6 chars=65
+OVERWRITE 90.jpg -> 090.translated.png
+RENDER 85.jpg start
+OK   85.jpg -> 085.translated.png (0.26s)
+RENDER 86.jpg start
+OK   86.jpg -> 086.translated.png (0.24s)
+RENDER 87.jpg start
+OK   87.jpg -> 087.translated.png (0.25s)
+[91/170] current=91.jpg ok=87 skip=0 fail=0 elapsed=07:24
+PREP-CACHE 91.jpg stage=translated texts=5 chars=56
+OVERWRITE 91.jpg -> 091.translated.png
+[92/170] current=92.jpg ok=87 skip=0 fail=0 elapsed=07:24
+PREP-CACHE 92.jpg stage=translated texts=1 chars=10
+OVERWRITE 92.jpg -> 092.translated.png
+[93/170] current=93.jpg ok=87 skip=0 fail=0 elapsed=07:24
+PREP-CACHE 93.jpg stage=translated texts=6 chars=141
+OVERWRITE 93.jpg -> 093.translated.png
+RENDER 88.jpg start
+OK   88.jpg -> 088.translated.png (0.22s)
+RENDER 89.jpg start
+OK   89.jpg -> 089.translated.png (0.24s)
+RENDER 90.jpg start
+OK   90.jpg -> 090.translated.png (0.22s)
+[94/170] current=94.jpg ok=90 skip=0 fail=0 elapsed=07:25
+PREP-CACHE 94.jpg stage=translated texts=10 chars=138
+OVERWRITE 94.jpg -> 094.translated.png
+[95/170] current=95.jpg ok=90 skip=0 fail=0 elapsed=07:25
+PREP-CACHE 95.jpg stage=preprocessed texts=0 chars=0
+OVERWRITE 95.jpg -> 095.translated.png
+COPY 95.jpg -> 095.translated.png (blank)
+[96/170] current=96.jpg ok=91 skip=0 fail=0 elapsed=07:25
+PREP-CACHE 96.jpg stage=translated texts=2 chars=37
+OVERWRITE 96.jpg -> 096.translated.png
+[97/170] current=97.jpg ok=91 skip=0 fail=0 elapsed=07:25
+PREP-CACHE 97.jpg stage=translated texts=6 chars=40
+OVERWRITE 97.jpg -> 097.translated.png
+RENDER 91.jpg start
+OK   91.jpg -> 091.translated.png (0.21s)
+RENDER 92.jpg start
+OK   92.jpg -> 092.translated.png (0.20s)
+RENDER 93.jpg start
+OK   93.jpg -> 093.translated.png (0.21s)
+[98/170] current=98.jpg ok=94 skip=0 fail=0 elapsed=07:26
+PREP-CACHE 98.jpg stage=translated texts=5 chars=58
+OVERWRITE 98.jpg -> 098.translated.png
+[99/170] current=99.jpg ok=94 skip=0 fail=0 elapsed=07:26
+PREP-CACHE 99.jpg stage=translated texts=16 chars=253
+OVERWRITE 99.jpg -> 099.translated.png
+[100/170] current=100.jpg ok=94 skip=0 fail=0 elapsed=07:26
+PREP-CACHE 100.jpg stage=translated texts=13 chars=255
+OVERWRITE 100.jpg -> 100.translated.png
+RENDER 94.jpg start
+OK   94.jpg -> 094.translated.png (0.23s)
+RENDER 96.jpg start
+OK   96.jpg -> 096.translated.png (0.21s)
+RENDER 97.jpg start
+OK   97.jpg -> 097.translated.png (0.21s)
+[101/170] current=101.jpg ok=97 skip=0 fail=0 elapsed=07:26
+PREP-CACHE 101.jpg stage=translated texts=9 chars=158
+OVERWRITE 101.jpg -> 101.translated.png
+[102/170] current=102.jpg ok=97 skip=0 fail=0 elapsed=07:26
+PREP-CACHE 102.jpg stage=translated texts=8 chars=126
+OVERWRITE 102.jpg -> 102.translated.png
+[103/170] current=103.jpg ok=97 skip=0 fail=0 elapsed=07:26
+PREP-CACHE 103.jpg stage=translated texts=7 chars=65
+OVERWRITE 103.jpg -> 103.translated.png
+RENDER 98.jpg start
+OK   98.jpg -> 098.translated.png (0.22s)
+RENDER 99.jpg start
+OK   99.jpg -> 099.translated.png (0.23s)
+RENDER 100.jpg start
+OK   100.jpg -> 100.translated.png (0.24s)
+[104/170] current=104.jpg ok=100 skip=0 fail=0 elapsed=07:27
+PREP-CACHE 104.jpg stage=translated texts=9 chars=183
+OVERWRITE 104.jpg -> 104.translated.png
+[105/170] current=105.jpg ok=100 skip=0 fail=0 elapsed=07:27
+PREP-CACHE 105.jpg stage=translated texts=15 chars=301
+OVERWRITE 105.jpg -> 105.translated.png
+[106/170] current=106.jpg ok=100 skip=0 fail=0 elapsed=07:27
+PREP-CACHE 106.jpg stage=translated texts=8 chars=83
+OVERWRITE 106.jpg -> 106.translated.png
+RENDER 101.jpg start
+OK   101.jpg -> 101.translated.png (0.23s)
+RENDER 102.jpg start
+OK   102.jpg -> 102.translated.png (0.22s)
+RENDER 103.jpg start
+OK   103.jpg -> 103.translated.png (0.23s)
+[107/170] current=107.jpg ok=103 skip=0 fail=0 elapsed=07:28
+PREP-CACHE 107.jpg stage=translated texts=12 chars=121
+OVERWRITE 107.jpg -> 107.translated.png
+[108/170] current=108.jpg ok=103 skip=0 fail=0 elapsed=07:28
+PREP-CACHE 108.jpg stage=translated texts=8 chars=121
+OVERWRITE 108.jpg -> 108.translated.png
+[109/170] current=109.jpg ok=103 skip=0 fail=0 elapsed=07:28
+PREP-CACHE 109.jpg stage=translated texts=15 chars=302
+OVERWRITE 109.jpg -> 109.translated.png
+RENDER 104.jpg start
+OK   104.jpg -> 104.translated.png (0.25s)
+RENDER 105.jpg start
+OK   105.jpg -> 105.translated.png (0.25s)
+RENDER 106.jpg start
+OK   106.jpg -> 106.translated.png (0.22s)
+[110/170] current=110.jpg ok=106 skip=0 fail=0 elapsed=07:29
+PREP-CACHE 110.jpg stage=translated texts=9 chars=129
+OVERWRITE 110.jpg -> 110.translated.png
+[111/170] current=111.jpg ok=106 skip=0 fail=0 elapsed=07:29
+PREP-CACHE 111.jpg stage=translated texts=20 chars=294
+OVERWRITE 111.jpg -> 111.translated.png
+[112/170] current=112.jpg ok=106 skip=0 fail=0 elapsed=07:29
+PREP-CACHE 112.jpg stage=translated texts=5 chars=91
+OVERWRITE 112.jpg -> 112.translated.png
+RENDER 107.jpg start
+OK   107.jpg -> 107.translated.png (0.24s)
+RENDER 108.jpg start
+OK   108.jpg -> 108.translated.png (0.23s)
+RENDER 109.jpg start
+OK   109.jpg -> 109.translated.png (0.24s)
+[113/170] current=113.jpg ok=109 skip=0 fail=0 elapsed=07:30
+PREP-CACHE 113.jpg stage=translated texts=6 chars=63
+OVERWRITE 113.jpg -> 113.translated.png
+[114/170] current=114.jpg ok=109 skip=0 fail=0 elapsed=07:30
+PREP-CACHE 114.jpg stage=translated texts=8 chars=104
+OVERWRITE 114.jpg -> 114.translated.png
+[115/170] current=115.jpg ok=109 skip=0 fail=0 elapsed=07:30
+PREP-CACHE 115.jpg stage=translated texts=7 chars=117
+OVERWRITE 115.jpg -> 115.translated.png
+RENDER 110.jpg start
+OK   110.jpg -> 110.translated.png (0.24s)
+RENDER 111.jpg start
+OK   111.jpg -> 111.translated.png (0.24s)
+RENDER 112.jpg start
+OK   112.jpg -> 112.translated.png (0.23s)
+[116/170] current=116.jpg ok=112 skip=0 fail=0 elapsed=07:31
+PREP-CACHE 116.jpg stage=preprocessed texts=0 chars=0
+OVERWRITE 116.jpg -> 116.translated.png
+COPY 116.jpg -> 116.translated.png (blank)
+[117/170] current=117.jpg ok=113 skip=0 fail=0 elapsed=07:31
+PREP-CACHE 117.jpg stage=translated texts=5 chars=422
+OVERWRITE 117.jpg -> 117.translated.png
+[118/170] current=118.jpg ok=113 skip=0 fail=0 elapsed=07:31
+PREP-CACHE 118.jpg stage=translated texts=3 chars=25
+OVERWRITE 118.jpg -> 118.translated.png
+[119/170] current=119.jpg ok=113 skip=0 fail=0 elapsed=07:31
+PREP-CACHE 119.jpg stage=translated texts=10 chars=148
+OVERWRITE 119.jpg -> 119.translated.png
+RENDER 113.jpg start
+OK   113.jpg -> 113.translated.png (0.24s)
+RENDER 114.jpg start
+OK   114.jpg -> 114.translated.png (0.23s)
+RENDER 115.jpg start
+OK   115.jpg -> 115.translated.png (0.23s)
+[120/170] current=120.jpg ok=116 skip=0 fail=0 elapsed=07:31
+PREP-CACHE 120.jpg stage=translated texts=8 chars=216
+OVERWRITE 120.jpg -> 120.translated.png
+[121/170] current=121.jpg ok=116 skip=0 fail=0 elapsed=07:31
+PREP-CACHE 121.jpg stage=translated texts=6 chars=38
+OVERWRITE 121.jpg -> 121.translated.png
+[122/170] current=122.jpg ok=116 skip=0 fail=0 elapsed=07:31
+PREP-CACHE 122.jpg stage=translated texts=10 chars=217
+OVERWRITE 122.jpg -> 122.translated.png
+RENDER 117.jpg start
+OK   117.jpg -> 117.translated.png (0.18s)
+RENDER 118.jpg start
+OK   118.jpg -> 118.translated.png (0.16s)
+RENDER 119.jpg start
+OK   119.jpg -> 119.translated.png (0.24s)
+[123/170] current=123.jpg ok=119 skip=0 fail=0 elapsed=07:32
+PREP-CACHE 123.jpg stage=translated texts=13 chars=284
+OVERWRITE 123.jpg -> 123.translated.png
+[124/170] current=124.jpg ok=119 skip=0 fail=0 elapsed=07:32
+PREP-CACHE 124.jpg stage=translated texts=11 chars=262
+OVERWRITE 124.jpg -> 124.translated.png
+[125/170] current=125.jpg ok=119 skip=0 fail=0 elapsed=07:32
+PREP-CACHE 125.jpg stage=translated texts=10 chars=190
+OVERWRITE 125.jpg -> 125.translated.png
+RENDER 120.jpg start
+OK   120.jpg -> 120.translated.png (0.25s)
+RENDER 121.jpg start
+OK   121.jpg -> 121.translated.png (0.22s)
+RENDER 122.jpg start
+OK   122.jpg -> 122.translated.png (0.24s)
+[126/170] current=126.jpg ok=122 skip=0 fail=0 elapsed=07:33
+PREP-CACHE 126.jpg stage=translated texts=12 chars=295
+OVERWRITE 126.jpg -> 126.translated.png
+[127/170] current=127.jpg ok=122 skip=0 fail=0 elapsed=07:33
+PREP-CACHE 127.jpg stage=translated texts=9 chars=169
+OVERWRITE 127.jpg -> 127.translated.png
+[128/170] current=128.jpg ok=122 skip=0 fail=0 elapsed=07:33
+PREP-CACHE 128.jpg stage=translated texts=8 chars=152
+OVERWRITE 128.jpg -> 128.translated.png
+RENDER 123.jpg start
+OK   123.jpg -> 123.translated.png (0.25s)
+RENDER 124.jpg start
+OK   124.jpg -> 124.translated.png (0.25s)
+RENDER 125.jpg start
+OK   125.jpg -> 125.translated.png (0.24s)
+[129/170] current=129.jpg ok=125 skip=0 fail=0 elapsed=07:34
+PREP-CACHE 129.jpg stage=translated texts=12 chars=357
+OVERWRITE 129.jpg -> 129.translated.png
+[130/170] current=130.jpg ok=125 skip=0 fail=0 elapsed=07:34
+PREP-CACHE 130.jpg stage=translated texts=13 chars=298
+OVERWRITE 130.jpg -> 130.translated.png
+[131/170] current=131.jpg ok=125 skip=0 fail=0 elapsed=07:34
+PREP-CACHE 131.jpg stage=translated texts=15 chars=338
+OVERWRITE 131.jpg -> 131.translated.png
+RENDER 126.jpg start
+OK   126.jpg -> 126.translated.png (0.26s)
+RENDER 127.jpg start
+OK   127.jpg -> 127.translated.png (0.23s)
+RENDER 128.jpg start
+OK   128.jpg -> 128.translated.png (0.23s)
+[132/170] current=132.jpg ok=128 skip=0 fail=0 elapsed=07:35
+PREP-CACHE 132.jpg stage=translated texts=10 chars=289
+OVERWRITE 132.jpg -> 132.translated.png
+[133/170] current=133.jpg ok=128 skip=0 fail=0 elapsed=07:35
+PREP-CACHE 133.jpg stage=translated texts=12 chars=160
+OVERWRITE 133.jpg -> 133.translated.png
+[134/170] current=134.jpg ok=128 skip=0 fail=0 elapsed=07:35
+PREP-CACHE 134.jpg stage=translated texts=2 chars=10
+OVERWRITE 134.jpg -> 134.translated.png
+RENDER 129.jpg start
+OK   129.jpg -> 129.translated.png (0.25s)
+RENDER 130.jpg start
+OK   130.jpg -> 130.translated.png (0.24s)
+RENDER 131.jpg start
+OK   131.jpg -> 131.translated.png (0.26s)
+[135/170] current=135.jpg ok=131 skip=0 fail=0 elapsed=07:36
+PREP-CACHE 135.jpg stage=translated texts=9 chars=137
+OVERWRITE 135.jpg -> 135.translated.png
+[136/170] current=136.jpg ok=131 skip=0 fail=0 elapsed=07:36
+PREP-CACHE 136.jpg stage=translated texts=15 chars=180
+OVERWRITE 136.jpg -> 136.translated.png
+[137/170] current=137.jpg ok=131 skip=0 fail=0 elapsed=07:36
+PREP-CACHE 137.jpg stage=translated texts=6 chars=120
+OVERWRITE 137.jpg -> 137.translated.png
+RENDER 132.jpg start
+OK   132.jpg -> 132.translated.png (0.26s)
+RENDER 133.jpg start
+OK   133.jpg -> 133.translated.png (0.24s)
+RENDER 134.jpg start
+OK   134.jpg -> 134.translated.png (0.16s)
+[138/170] current=138.jpg ok=134 skip=0 fail=0 elapsed=07:36
+PREP-CACHE 138.jpg stage=translated texts=13 chars=382
+OVERWRITE 138.jpg -> 138.translated.png
+[139/170] current=139.jpg ok=134 skip=0 fail=0 elapsed=07:36
+PREP-CACHE 139.jpg stage=translated texts=11 chars=230
+OVERWRITE 139.jpg -> 139.translated.png
+[140/170] current=140.jpg ok=134 skip=0 fail=0 elapsed=07:36
+PREP-CACHE 140.jpg stage=translated texts=12 chars=305
+OVERWRITE 140.jpg -> 140.translated.png
+RENDER 135.jpg start
+OK   135.jpg -> 135.translated.png (0.22s)
+RENDER 136.jpg start
+OK   136.jpg -> 136.translated.png (0.24s)
+RENDER 137.jpg start
+OK   137.jpg -> 137.translated.png (0.23s)
+[141/170] current=141.jpg ok=137 skip=0 fail=0 elapsed=07:37
+PREP-CACHE 141.jpg stage=translated texts=11 chars=211
+OVERWRITE 141.jpg -> 141.translated.png
+[142/170] current=142.jpg ok=137 skip=0 fail=0 elapsed=07:37
+PREP-CACHE 142.jpg stage=translated texts=9 chars=304
+OVERWRITE 142.jpg -> 142.translated.png
+[143/170] current=143.jpg ok=137 skip=0 fail=0 elapsed=07:37
+PREP-CACHE 143.jpg stage=translated texts=12 chars=252
+OVERWRITE 143.jpg -> 143.translated.png
+RENDER 138.jpg start
+OK   138.jpg -> 138.translated.png (0.28s)
+RENDER 139.jpg start
+OK   139.jpg -> 139.translated.png (0.24s)
+RENDER 140.jpg start
+OK   140.jpg -> 140.translated.png (0.25s)
+[144/170] current=144.jpg ok=140 skip=0 fail=0 elapsed=07:38
+PREP-CACHE 144.jpg stage=translated texts=9 chars=233
+OVERWRITE 144.jpg -> 144.translated.png
+[145/170] current=145.jpg ok=140 skip=0 fail=0 elapsed=07:38
+PREP-CACHE 145.jpg stage=translated texts=17 chars=324
+OVERWRITE 145.jpg -> 145.translated.png
+[146/170] current=146.jpg ok=140 skip=0 fail=0 elapsed=07:38
+PREP-CACHE 146.jpg stage=translated texts=10 chars=195
+OVERWRITE 146.jpg -> 146.translated.png
+RENDER 141.jpg start
+OK   141.jpg -> 141.translated.png (0.27s)
+RENDER 142.jpg start
+OK   142.jpg -> 142.translated.png (0.29s)
+RENDER 143.jpg start
+OK   143.jpg -> 143.translated.png (0.26s)
+[147/170] current=147.jpg ok=143 skip=0 fail=0 elapsed=07:39
+PREP-CACHE 147.jpg stage=translated texts=10 chars=341
+OVERWRITE 147.jpg -> 147.translated.png
+[148/170] current=148.jpg ok=143 skip=0 fail=0 elapsed=07:39
+PREP-CACHE 148.jpg stage=translated texts=11 chars=266
+OVERWRITE 148.jpg -> 148.translated.png
+[149/170] current=149.jpg ok=143 skip=0 fail=0 elapsed=07:39
+PREP-CACHE 149.jpg stage=translated texts=9 chars=107
+OVERWRITE 149.jpg -> 149.translated.png
+RENDER 144.jpg start
+OK   144.jpg -> 144.translated.png (0.27s)
+RENDER 145.jpg start
+OK   145.jpg -> 145.translated.png (0.26s)
+RENDER 146.jpg start
+OK   146.jpg -> 146.translated.png (0.25s)
+[150/170] current=150.jpg ok=146 skip=0 fail=0 elapsed=07:40
+PREP-CACHE 150.jpg stage=translated texts=2 chars=13
+OVERWRITE 150.jpg -> 150.translated.png
+[151/170] current=151.jpg ok=146 skip=0 fail=0 elapsed=07:40
+PREP-CACHE 151.jpg stage=translated texts=8 chars=88
+OVERWRITE 151.jpg -> 151.translated.png
+[152/170] current=152.jpg ok=146 skip=0 fail=0 elapsed=07:40
+PREP-CACHE 152.jpg stage=translated texts=11 chars=221
+OVERWRITE 152.jpg -> 152.translated.png
+RENDER 147.jpg start
+OK   147.jpg -> 147.translated.png (0.26s)
+RENDER 148.jpg start
+OK   148.jpg -> 148.translated.png (0.26s)
+RENDER 149.jpg start
+OK   149.jpg -> 149.translated.png (0.25s)
+[153/170] current=153.jpg ok=149 skip=0 fail=0 elapsed=07:41
+PREP-CACHE 153.jpg stage=translated texts=10 chars=309
+OVERWRITE 153.jpg -> 153.translated.png
+[154/170] current=154.jpg ok=149 skip=0 fail=0 elapsed=07:41
+PREP-CACHE 154.jpg stage=translated texts=11 chars=342
+OVERWRITE 154.jpg -> 154.translated.png
+[155/170] current=155.jpg ok=149 skip=0 fail=0 elapsed=07:41
+PREP-CACHE 155.jpg stage=translated texts=8 chars=161
+OVERWRITE 155.jpg -> 155.translated.png
+RENDER 150.jpg start
+OK   150.jpg -> 150.translated.png (0.18s)
+RENDER 151.jpg start
+OK   151.jpg -> 151.translated.png (0.23s)
+RENDER 152.jpg start
+OK   152.jpg -> 152.translated.png (0.25s)
+[156/170] current=156.jpg ok=152 skip=0 fail=0 elapsed=07:42
+PREP-CACHE 156.jpg stage=translated texts=7 chars=95
+OVERWRITE 156.jpg -> 156.translated.png
+[157/170] current=157.jpg ok=152 skip=0 fail=0 elapsed=07:42
+PREP-CACHE 157.jpg stage=translated texts=13 chars=220
+OVERWRITE 157.jpg -> 157.translated.png
+[158/170] current=158.jpg ok=152 skip=0 fail=0 elapsed=07:42
+PREP-CACHE 158.jpg stage=translated texts=13 chars=318
+OVERWRITE 158.jpg -> 158.translated.png
+RENDER 153.jpg start
+OK   153.jpg -> 153.translated.png (0.25s)
+RENDER 154.jpg start
+OK   154.jpg -> 154.translated.png (0.26s)
+RENDER 155.jpg start
+OK   155.jpg -> 155.translated.png (0.25s)
+[159/170] current=159.jpg ok=155 skip=0 fail=0 elapsed=07:43
+PREP-CACHE 159.jpg stage=translated texts=7 chars=273
+OVERWRITE 159.jpg -> 159.translated.png
+[160/170] current=160.jpg ok=155 skip=0 fail=0 elapsed=07:43
+PREP-CACHE 160.jpg stage=translated texts=10 chars=340
+OVERWRITE 160.jpg -> 160.translated.png
+[161/170] current=161.jpg ok=155 skip=0 fail=0 elapsed=07:43
+PREP-CACHE 161.jpg stage=translated texts=10 chars=232
+OVERWRITE 161.jpg -> 161.translated.png
+RENDER 156.jpg start
+OK   156.jpg -> 156.translated.png (0.24s)
+RENDER 157.jpg start
+OK   157.jpg -> 157.translated.png (0.27s)
+RENDER 158.jpg start
+OK   158.jpg -> 158.translated.png (0.26s)
+[162/170] current=162.jpg ok=158 skip=0 fail=0 elapsed=07:44
+PREP-CACHE 162.jpg stage=translated texts=9 chars=163
+OVERWRITE 162.jpg -> 162.translated.png
+[163/170] current=163.jpg ok=158 skip=0 fail=0 elapsed=07:44
+PREP-CACHE 163.jpg stage=translated texts=12 chars=346
+OVERWRITE 163.jpg -> 163.translated.png
+[164/170] current=164.jpg ok=158 skip=0 fail=0 elapsed=07:44
+PREP-CACHE 164.jpg stage=translated texts=9 chars=310
+OVERWRITE 164.jpg -> 164.translated.png
+RENDER 159.jpg start
+OK   159.jpg -> 159.translated.png (0.28s)
+RENDER 160.jpg start
+OK   160.jpg -> 160.translated.png (0.26s)
+RENDER 161.jpg start
+OK   161.jpg -> 161.translated.png (0.24s)
+[165/170] current=165.jpg ok=161 skip=0 fail=0 elapsed=07:45
+PREP-CACHE 165.jpg stage=translated texts=10 chars=175
+OVERWRITE 165.jpg -> 165.translated.png
+[166/170] current=166.jpg ok=161 skip=0 fail=0 elapsed=07:45
+PREP-CACHE 166.jpg stage=translated texts=3 chars=127
+OVERWRITE 166.jpg -> 166.translated.png
+[167/170] current=167.jpg ok=161 skip=0 fail=0 elapsed=07:45
+PREP-CACHE 167.jpg stage=translated texts=7 chars=286
+OVERWRITE 167.jpg -> 167.translated.png
+RENDER 162.jpg start
+OK   162.jpg -> 162.translated.png (0.26s)
+RENDER 163.jpg start
+OK   163.jpg -> 163.translated.png (0.26s)
+RENDER 164.jpg start
+OK   164.jpg -> 164.translated.png (0.26s)
+[168/170] current=168.jpg ok=164 skip=0 fail=0 elapsed=07:46
+PREP-CACHE 168.jpg stage=translated texts=7 chars=106
+OVERWRITE 168.jpg -> 168.translated.png
+[169/170] current=169.jpg ok=164 skip=0 fail=0 elapsed=07:46
+PREP-CACHE 169.jpg stage=translated texts=6 chars=169
+OVERWRITE 169.jpg -> 169.translated.png
+[170/170] current=170.jpg ok=164 skip=0 fail=0 elapsed=07:46
+PREP-CACHE 170.jpg stage=translated texts=10 chars=163
+OVERWRITE 170.jpg -> 170.translated.png
+RENDER 165.jpg start
+OK   165.jpg -> 165.translated.png (0.26s)
+RENDER 166.jpg start
+OK   166.jpg -> 166.translated.png (0.14s)
+RENDER 167.jpg start
+OK   167.jpg -> 167.translated.png (0.17s)
+RENDER 168.jpg start
+OK   168.jpg -> 168.translated.png (0.17s)
+RENDER 169.jpg start
+OK   169.jpg -> 169.translated.png (0.14s)
+RENDER 170.jpg start
+OK   170.jpg -> 170.translated.png (0.17s)
+DONE total=170 ok=170 skip=0 fail=0 elapsed=07:47
+RESULT {"summary": {"total": 170, "succeeded": 170, "skipped": 0, "failed": 0, "elapsedSeconds": 467.5651242999593}, "elapsedSeconds": 467.84789600002114, "input": "D:\\github\\translate-reader\\翻译测试日漫\\藤子不二雄\\[藤子不二雄A] 帰ッテキタせぇるすまん 全02巻\\[藤子不二雄A] 帰ッテキタせぇるすまん 第01巻", "output": "D:\\github\\translate-reader\\翻译测试日漫\\藤子不二雄\\[藤子不二雄A] 帰ッテキタせぇるすまん 全02巻\\归来吧！笑面推销员 01 V2", "cacheRoot": "D:\\github\\translate-reader\\translate_manga_cli\\.cache\\v2-vol01-hybrid-real-20260430b", "logPath": "D:\\github\\translate-reader\\translate_manga_cli\\run-vol01-v2-hybrid-real-20260430d.log"}
