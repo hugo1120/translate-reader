@@ -6,7 +6,7 @@ from datetime import datetime
 from pathlib import Path
 
 from src.cli.service import run_batch_translation
-from src.config.settings import load_settings
+from src.config.settings import load_settings, resolve_path_value
 
 
 def _write(log_path: Path, message: str) -> None:
@@ -32,7 +32,10 @@ def _resolve_default_paths() -> tuple[Path, Path]:
         raise ValueError("config/local.json is missing paths.input_dir")
     if not output_value:
         raise ValueError("config/local.json is missing paths.output_dir")
-    return Path(input_value), Path(output_value)
+    project_root = _project_root()
+    resolved_input = resolve_path_value(input_value, project_root=project_root)
+    resolved_output = resolve_path_value(output_value, project_root=project_root)
+    return Path(resolved_input), Path(resolved_output)
 
 
 class FileReporter:

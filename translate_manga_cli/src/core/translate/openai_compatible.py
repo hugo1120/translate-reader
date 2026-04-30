@@ -260,6 +260,15 @@ def _default_ocr_retry_state():
     }
 
 
+def _should_fallback_via_curl(error):
+    if isinstance(error, (openai.APIConnectionError, openai.APITimeoutError)):
+        return True
+    if type(error) is openai.APIError:
+        return True
+    status_code = getattr(error, "status_code", None)
+    return isinstance(status_code, int) and status_code >= 500
+
+
 def _normalize_ocr_retry_state(payload):
     state = _default_ocr_retry_state()
     if isinstance(payload, dict):
@@ -508,7 +517,9 @@ class OpenAICompatibleTranslator:
             )
             content = ((completion.choices or [None])[0].message.content or "").strip()
             return content, getattr(completion, "usage", None)
-        except openai.APIConnectionError:
+        except openai.APIError as error:
+            if not _should_fallback_via_curl(error):
+                raise
             return self._request_completion_via_curl(
                 model=model,
                 base_url=base_url,

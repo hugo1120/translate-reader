@@ -32,3 +32,22 @@ def test_import_list_and_page_detail(client):
     assert detail["page"]["fileName"] == "001.png"
     assert detail["page"]["sourceUrl"].startswith("/data/library/current/pages/")
     assert detail["page"]["translatedUrl"] is None
+
+
+def test_import_library_uses_natural_numeric_order(client):
+    response = client.post(
+        "/api/library/import",
+        data={
+            "files": [
+                (_png_bytes("white"), "10.png"),
+                (_png_bytes("black"), "2.png"),
+                (_png_bytes("gray"), "1.png"),
+            ]
+        },
+        content_type="multipart/form-data",
+    )
+    assert response.status_code == 200
+
+    pages = client.get("/api/library/pages").get_json()["pages"]
+
+    assert [page["fileName"] for page in pages] == ["1.png", "2.png", "10.png"]

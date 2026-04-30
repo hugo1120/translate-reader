@@ -1,7 +1,18 @@
 from pathlib import Path
 
 from src.cli.service import run_batch_translation
-from src.config.settings import load_session_state, load_settings, save_session_state
+from src.config.settings import load_session_state, load_settings, resolve_path_value, save_session_state
+
+
+def _project_root():
+    return Path(__file__).resolve().parent
+
+
+def _resolve_runtime_path(value):
+    resolved = resolve_path_value(value, project_root=_project_root())
+    if resolved:
+        return Path(resolved)
+    return Path(str(value or "").strip())
 
 
 def _prompt_path(label, must_exist=False):
@@ -54,8 +65,8 @@ def main():
     has_reusable_session = bool(session_input and session_output)
 
     if configured_input and configured_output and not has_reusable_session:
-        input_dir = Path(configured_input)
-        output_dir = Path(configured_output)
+        input_dir = _resolve_runtime_path(configured_input)
+        output_dir = _resolve_runtime_path(configured_output)
         layout_mode = default_layout_mode
         if not input_dir.exists() or not input_dir.is_dir():
             raise SystemExit(f"Configured input folder not found: {input_dir}")
@@ -68,8 +79,8 @@ def main():
             run_mode = _prompt_choice("Choose mode (1 reuse, 2 reset)", ["1", "2"])
 
         if run_mode == "1":
-            input_dir = Path(session_input)
-            output_dir = Path(session_output)
+            input_dir = _resolve_runtime_path(session_input)
+            output_dir = _resolve_runtime_path(session_output)
             layout_mode = default_layout_mode
             if not input_dir.exists() or not input_dir.is_dir():
                 raise SystemExit(f"Last input folder not found: {input_dir}")

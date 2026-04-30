@@ -18,3 +18,28 @@ def test_default_log_path_uses_logs_directory(tmp_path, monkeypatch):
 
     assert log_path.parent == project_root / "logs"
     assert log_path.name == "batch-live.log"
+
+
+def test_resolve_default_paths_resolves_relative_config_against_project_root(tmp_path, monkeypatch):
+    project_root = tmp_path / "translate_manga_cli"
+    input_dir = project_root / "input"
+    output_dir = project_root / "output"
+    input_dir.mkdir(parents=True)
+    output_dir.mkdir(parents=True)
+
+    monkeypatch.setattr(run_batch_background_module, "__file__", str(project_root / "run_batch_background.py"))
+    monkeypatch.setattr(
+        run_batch_background_module,
+        "load_settings",
+        lambda: {
+            "paths": {
+                "input_dir": "input",
+                "output_dir": "output",
+            }
+        },
+    )
+
+    resolved_input, resolved_output = run_batch_background_module._resolve_default_paths()
+
+    assert resolved_input == input_dir
+    assert resolved_output == output_dir

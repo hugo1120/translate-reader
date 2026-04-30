@@ -6,13 +6,17 @@ from PIL import Image
 
 from tests.test_constants import TEST_BASE_URL
 from src.cli.cache import BatchStageCache
-from src.cli.service import BatchProgressReporter, build_output_path, run_batch_translation, scan_input_images
+from src.cli.service import BatchProgressReporter, _resolve_cli_settings, build_output_path, run_batch_translation, scan_input_images
 from src.core.translate.openai_compatible import TRANSLATION_PROMPT_SIGNATURE
 
 
 def _save_image(path, color="white"):
     path.parent.mkdir(parents=True, exist_ok=True)
     Image.new("RGB", (24, 24), color).save(path)
+
+
+def _current_preprocess_signature():
+    return _resolve_cli_settings()["preprocess_signature"]
 
 
 def test_build_output_path_uses_translated_png(tmp_path):
@@ -838,6 +842,180 @@ def test_batch_stage_cache_downgrades_stale_translated_stage_to_preprocessed(tmp
     assert loaded["preprocessed"]["originalTexts"] == ["さあ"]
 
 
+def test_run_batch_translation_invalidates_hidden_cache_when_ocr_config_changes(tmp_path, monkeypatch):
+    input_dir = tmp_path / "input"
+    output_dir = tmp_path / "output"
+    workspace_root = tmp_path / "workspace"
+    cache_root = tmp_path / "hidden-cache"
+    source_path = input_dir / "001.jpg"
+    _save_image(source_path)
+
+    class DummySession:
+        def __enter__(self):
+            return "session-token"
+
+        def __exit__(self, exc_type, exc, tb):
+            return False
+
+    preprocess_calls = []
+
+    def fake_preprocess_page(source_path, saber_session=None):
+        preprocess_calls.append(Path(source_path).name)
+        return {
+            "bubbleCoords": [[10, 20, 40, 60]],
+            "bubblePolygons": [[[10, 20], [40, 20], [40, 60], [10, 60]]],
+            "autoDirections": ["vertical"],
+            "textlinesPerBubble": [[]],
+            "bubbleColors": [],
+            "originalTexts": ["001"],
+            "ocrResults": [{"text": "001", "engine": "manga_ocr"}],
+            "rawMask": None,
+        }
+
+    def fake_run_page_pipeline(
+        app,
+        page_id,
+        source_path,
+        model="mimo-v2.5-pro",
+        base_url=TEST_BASE_URL,
+        api_key="",
+        preprocessed_payload=None,
+        translated_texts=None,
+        context_snapshot=None,
+        saber_session=None,
+        translation_payload=None,
+    ):
+        translated_path = Path(app.config["CACHE_ROOT"]) / "pages" / page_id / f"{page_id}.translated.png"
+        _save_image(translated_path, color="blue")
+        return {
+            "pageId": page_id,
+            "translatedImagePath": str(translated_path),
+            "bubbleStates": [],
+            "translatedTexts": translated_texts or [],
+            "translation": translation_payload,
+            "timings": {"total": 0.5},
+        }
+
+    settings_by_engine = {
+        "manga_ocr": {
+            "translation": {
+                "model": "mimo-v2.5-pro",
+                "base_url": TEST_BASE_URL,
+                "api_key": "",
+            },
+            "pipeline": {
+                "overwrite_existing": False,
+                "debug_output": True,
+                "skip_frontmatter": True,
+                "translate_batch_size": 3,
+                "translate_batch_max_chars": 1600,
+                "auto_generate_manga_context": False,
+            },
+            "render": {
+                "layout_mode": "vertical",
+            },
+            "paths": {},
+            "ocr": {
+                "engine": "manga_ocr",
+                "enable_hybrid": False,
+                "secondary_engine": "",
+                "hybrid_threshold": 0.2,
+                "fallback_to_manga_ocr_when_48px_unavailable": True,
+            },
+        },
+        "48px_ocr": {
+            "translation": {
+                "model": "mimo-v2.5-pro",
+                "base_url": TEST_BASE_URL,
+                "api_key": "",
+            },
+            "pipeline": {
+                "overwrite_existing": False,
+                "debug_output": True,
+                "skip_frontmatter": True,
+                "translate_batch_size": 3,
+                "translate_batch_max_chars": 1600,
+                "auto_generate_manga_context": False,
+            },
+            "render": {
+                "layout_mode": "vertical",
+            },
+            "paths": {},
+            "ocr": {
+                "engine": "48px_ocr",
+                "enable_hybrid": True,
+                "secondary_engine": "manga_ocr",
+                "hybrid_threshold": 0.2,
+                "fallback_to_manga_ocr_when_48px_unavailable": True,
+            },
+        },
+    }
+    current_engine = {"value": "manga_ocr"}
+
+    monkeypatch.setattr("src.cli.service.SaberWorkerSession", DummySession)
+    monkeypatch.setattr("src.cli.service.preprocess_page", fake_preprocess_page)
+    monkeypatch.setattr("src.cli.service.translate_texts", lambda texts, model, base_url, context_snapshot=None: [f"zh-{text}" for text in texts])
+    monkeypatch.setattr("src.cli.service.run_page_pipeline", fake_run_page_pipeline)
+    monkeypatch.setattr("src.cli.service.load_settings", lambda project_root=None: settings_by_engine[current_engine["value"]])
+
+    run_batch_translation(
+        input_dir=input_dir,
+        output_dir=output_dir,
+        workspace_root=workspace_root,
+        cache_root=cache_root,
+        reporter=BatchProgressReporter(stream=StringIO()),
+    )
+    preprocess_calls.clear()
+
+    current_engine["value"] = "48px_ocr"
+    run_batch_translation(
+        input_dir=input_dir,
+        output_dir=output_dir,
+        workspace_root=workspace_root,
+        cache_root=cache_root,
+        overwrite_existing=True,
+        reporter=BatchProgressReporter(stream=StringIO()),
+    )
+
+    assert preprocess_calls == ["001.jpg"]
+
+
+def test_run_batch_translation_skips_existing_output_without_preprocess_when_hidden_cache_missing(tmp_path, monkeypatch):
+    input_dir = tmp_path / "input"
+    output_dir = tmp_path / "output"
+    workspace_root = tmp_path / "workspace"
+    _save_image(input_dir / "001.jpg")
+    _save_image(output_dir / "001.translated.png", color="gray")
+
+    class DummySession:
+        def __enter__(self):
+            return "session-token"
+
+        def __exit__(self, exc_type, exc, tb):
+            return False
+
+    monkeypatch.setattr("src.cli.service.SaberWorkerSession", DummySession)
+    monkeypatch.setattr(
+        "src.cli.service.preprocess_page",
+        lambda *args, **kwargs: (_ for _ in ()).throw(AssertionError("preprocess_page should not run")),
+    )
+    monkeypatch.setattr(
+        "src.cli.service.run_page_pipeline",
+        lambda *args, **kwargs: (_ for _ in ()).throw(AssertionError("run_page_pipeline should not run")),
+    )
+
+    summary = run_batch_translation(
+        input_dir=input_dir,
+        output_dir=output_dir,
+        workspace_root=workspace_root,
+        cache_root=tmp_path / "hidden-cache",
+        reporter=BatchProgressReporter(stream=StringIO()),
+    )
+
+    assert summary["skipped"] == 1
+    assert summary["succeeded"] == 0
+
+
 def test_run_batch_translation_batches_page_texts_and_reuses_hidden_cache(tmp_path, monkeypatch):
     input_dir = tmp_path / "input"
     output_dir = tmp_path / "output"
@@ -862,6 +1040,7 @@ def test_run_batch_translation_batches_page_texts_and_reuses_hidden_cache(tmp_pa
         model="mimo-v2.5-pro",
         base_url=TEST_BASE_URL,
         translation_signature=TRANSLATION_PROMPT_SIGNATURE,
+        preprocess_signature=_current_preprocess_signature(),
     ).save_translated(input_dir / "001.jpg", cached_preprocessed, ["缓存译文"])
 
     captured = {
@@ -929,6 +1108,8 @@ def test_run_batch_translation_batches_page_texts_and_reuses_hidden_cache(tmp_pa
         output_dir=output_dir,
         workspace_root=workspace_root,
         cache_root=cache_root,
+        model="mimo-v2.5-pro",
+        base_url=TEST_BASE_URL,
         reporter=BatchProgressReporter(stream=StringIO()),
     )
 
@@ -1406,6 +1587,7 @@ def test_run_batch_translation_backfills_debug_records_for_existing_outputs_from
         model="mimo-v2.5-pro",
         base_url=TEST_BASE_URL,
         translation_signature=TRANSLATION_PROMPT_SIGNATURE,
+        preprocess_signature=_current_preprocess_signature(),
     ).save_translated(source_path, cached_preprocessed, ["来吧"])
 
     class DummySession:
@@ -1434,6 +1616,8 @@ def test_run_batch_translation_backfills_debug_records_for_existing_outputs_from
         output_dir=output_dir,
         workspace_root=workspace_root,
         cache_root=cache_root,
+        model="mimo-v2.5-pro",
+        base_url=TEST_BASE_URL,
         reporter=BatchProgressReporter(stream=StringIO()),
     )
 
@@ -1472,6 +1656,7 @@ def test_run_batch_translation_does_not_flag_blank_existing_output_for_review(tm
         model="mimo-v2.5-pro",
         base_url=TEST_BASE_URL,
         translation_signature=TRANSLATION_PROMPT_SIGNATURE,
+        preprocess_signature=_current_preprocess_signature(),
     ).save_preprocessed(source_path, cached_preprocessed)
 
     class DummySession:
@@ -1501,6 +1686,8 @@ def test_run_batch_translation_does_not_flag_blank_existing_output_for_review(tm
         output_dir=output_dir,
         workspace_root=workspace_root,
         cache_root=cache_root,
+        model="mimo-v2.5-pro",
+        base_url=TEST_BASE_URL,
         reporter=BatchProgressReporter(stream=StringIO()),
     )
 

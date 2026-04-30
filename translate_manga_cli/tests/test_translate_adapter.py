@@ -168,6 +168,89 @@ def test_translate_texts_falls_back_to_curl_on_api_connection_error(monkeypatch)
     assert captured["args"][0].lower().endswith("curl.exe")
 
 
+def test_translate_texts_falls_back_to_curl_on_api_timeout_error(monkeypatch):
+    captured = {}
+
+    class FakeCompletions:
+        def create(self, model, messages, stream, timeout=None, temperature=None):
+            raise openai.APITimeoutError(
+                request=httpx.Request("POST", f"{TEST_BASE_URL}/chat/completions"),
+            )
+
+    class FakeChat:
+        def __init__(self):
+            self.completions = FakeCompletions()
+
+    class FakeOpenAI:
+        def __init__(self, api_key, base_url):
+            self.chat = FakeChat()
+
+    class FakeCompletedProcess:
+        def __init__(self):
+            self.stdout = '{"choices":[{"message":{"content":"<|1|>你好"}}]}'
+            self.stderr = ""
+            self.returncode = 0
+
+    def fake_run(args, capture_output, text, encoding, errors, timeout, check):
+        captured["args"] = args
+        captured["timeout"] = timeout
+        return FakeCompletedProcess()
+
+    monkeypatch.setattr("openai.OpenAI", FakeOpenAI)
+    monkeypatch.setattr("subprocess.run", fake_run)
+
+    result = OpenAICompatibleTranslator().translate_texts(
+        texts=["こんにちは"],
+        model="mimo-v2.5-pro",
+        base_url=TEST_BASE_URL,
+    )
+
+    assert result == ["你好"]
+    assert captured["args"][0].lower().endswith("curl.exe")
+
+
+def test_translate_texts_falls_back_to_curl_on_api_error(monkeypatch):
+    captured = {}
+
+    class FakeCompletions:
+        def create(self, model, messages, stream, timeout=None, temperature=None):
+            raise openai.APIError(
+                message="temporary upstream error",
+                request=httpx.Request("POST", f"{TEST_BASE_URL}/chat/completions"),
+                body=None,
+            )
+
+    class FakeChat:
+        def __init__(self):
+            self.completions = FakeCompletions()
+
+    class FakeOpenAI:
+        def __init__(self, api_key, base_url):
+            self.chat = FakeChat()
+
+    class FakeCompletedProcess:
+        def __init__(self):
+            self.stdout = '{"choices":[{"message":{"content":"<|1|>你好"}}]}'
+            self.stderr = ""
+            self.returncode = 0
+
+    def fake_run(args, capture_output, text, encoding, errors, timeout, check):
+        captured["args"] = args
+        return FakeCompletedProcess()
+
+    monkeypatch.setattr("openai.OpenAI", FakeOpenAI)
+    monkeypatch.setattr("subprocess.run", fake_run)
+
+    result = OpenAICompatibleTranslator().translate_texts(
+        texts=["こんにちは"],
+        model="mimo-v2.5-pro",
+        base_url=TEST_BASE_URL,
+    )
+
+    assert result == ["你好"]
+    assert captured["args"][0].lower().endswith("curl.exe")
+
+
 def test_translate_texts_with_metadata_runs_three_rounds_and_collects_usage(monkeypatch):
     captured = {"messages": []}
 

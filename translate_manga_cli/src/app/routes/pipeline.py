@@ -2,7 +2,7 @@ from flask import Blueprint, current_app, jsonify, request
 from time import perf_counter
 
 from src.core.detection.service import detect_page
-from src.core.editing.service import rerender_single_bubble, update_bubble_state
+from src.core.editing.service import rerender_single_bubble, sync_translation_payload_from_bubbles, update_bubble_state
 from src.core.ocr.service import ocr_page
 from src.core.pipeline.filtering import filter_detection_payload, filter_ocr_payload, load_image_size
 from src.core.pipeline.service import redo_page_inpaint, redo_page_render, run_page_pipeline
@@ -206,6 +206,7 @@ def rerender_bubble():
         payload["translatedTexts"] = [item.get("translatedText", "") for item in bubble_states]
         if "originalTexts" in payload:
             payload["originalTexts"] = [item.get("originalText", "") for item in bubble_states]
+        sync_translation_payload_from_bubbles(payload, bubble_states)
 
     payload = _attach_timing(payload, "rerenderBubble", perf_counter() - started_at)
     CacheStore(current_app).save_result(page_id, payload)

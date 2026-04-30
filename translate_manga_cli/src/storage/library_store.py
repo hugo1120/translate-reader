@@ -3,6 +3,8 @@ import shutil
 import uuid
 from pathlib import Path
 
+from src.core.natural_sort import natural_sort_key
+
 
 IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp"}
 
@@ -18,7 +20,7 @@ class LibraryStore:
 
         pages = []
         valid_files = [file_storage for file_storage in files if Path(file_storage.filename).suffix.lower() in IMAGE_EXTENSIONS]
-        for index, file_storage in enumerate(sorted(valid_files, key=lambda item: item.filename), start=1):
+        for index, file_storage in enumerate(sorted(valid_files, key=lambda item: natural_sort_key(item.filename)), start=1):
             suffix = Path(file_storage.filename).suffix.lower()
             page_id = f"page-{index:04d}"
             target = self.pages_root / f"{page_id}{suffix}"

@@ -154,3 +154,46 @@ def test_main_prompts_for_paths_and_layout_when_user_selects_reset(monkeypatch, 
     assert captured["saved"]["last_input_dir"] == str(input_dir)
     assert captured["saved"]["last_output_dir"] == str(output_dir)
     assert captured["saved"]["last_layout_mode"] == "vertical"
+
+
+def test_main_resolves_configured_relative_paths_against_project_root(monkeypatch, tmp_path):
+    project_root = tmp_path / "translate_manga_cli"
+    input_dir = project_root / "input"
+    output_dir = project_root / "output"
+    input_dir.mkdir(parents=True)
+
+    captured = {}
+    monkeypatch.setattr(batch_translate, "__file__", str(project_root / "batch_translate.py"))
+    monkeypatch.setattr(
+        batch_translate,
+        "load_settings",
+        lambda: {
+            "paths": {
+                "input_dir": "input",
+                "output_dir": "output",
+            },
+        },
+    )
+    monkeypatch.setattr(batch_translate, "load_session_state", lambda: {})
+    monkeypatch.setattr(
+        batch_translate,
+        "_prompt_path",
+        lambda *args, **kwargs: (_ for _ in ()).throw(AssertionError("prompt should not be used")),
+    )
+
+    def fake_run_batch_translation(*, input_dir, output_dir, **kwargs):
+        captured["input_dir"] = Path(input_dir)
+        captured["output_dir"] = Path(output_dir)
+        return {
+            "total": 1,
+            "succeeded": 1,
+            "skipped": 0,
+            "failed": 0,
+        }
+
+    monkeypatch.setattr(batch_translate, "run_batch_translation", fake_run_batch_translation)
+
+    batch_translate.main()
+
+    assert captured["input_dir"] == input_dir
+    assert captured["output_dir"] == output_dir

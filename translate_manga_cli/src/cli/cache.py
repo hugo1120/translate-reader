@@ -7,12 +7,13 @@ CACHE_SCHEMA_VERSION = 1
 
 
 class BatchStageCache:
-    def __init__(self, cache_root, input_dir, model, base_url, translation_signature=None):
+    def __init__(self, cache_root, input_dir, model, base_url, translation_signature=None, preprocess_signature=None):
         self.cache_root = Path(cache_root)
         self.input_dir = Path(input_dir)
         self.model = model
         self.base_url = base_url
         self.translation_signature = str(translation_signature or "").strip() or None
+        self.preprocess_signature = str(preprocess_signature or "").strip() or None
         self.job_root = self.cache_root / self._build_job_key()
         self.pages_root = self.job_root / "pages"
         self.pages_root.mkdir(parents=True, exist_ok=True)
@@ -23,6 +24,7 @@ class BatchStageCache:
                 str(self.input_dir.resolve()).lower(),
                 str(self.model or "").strip(),
                 str(self.base_url or "").strip(),
+                str(self.preprocess_signature or "").strip(),
             ]
         )
         return sha1(raw.encode("utf-8")).hexdigest()[:16]

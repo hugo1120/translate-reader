@@ -41,6 +41,30 @@ def test_update_bubble_state_marks_result_manual_and_syncs_aliases():
     assert result["translatedTexts"][0] == "新译文"
 
 
+def test_update_bubble_state_syncs_translation_payload():
+    result = update_bubble_state(
+        {
+            "translatedTexts": ["旧译文"],
+            "bubbleStates": [{"translatedText": "旧译文"}],
+            "translation": {
+                "translatedTexts": ["旧译文"],
+                "rounds": [
+                    {"name": "draft", "translatedTexts": ["草稿"], "usage": {}},
+                    {"name": "contextual", "translatedTexts": ["旧译文"], "usage": {}},
+                    {"name": "final", "translatedTexts": ["旧译文"], "usage": {}},
+                ],
+            },
+        },
+        bubble_index=0,
+        patch={"translatedText": "新译文"},
+    )
+
+    assert result["translation"]["translatedTexts"] == ["新译文"]
+    assert result["translation"]["rounds"][0]["translatedTexts"] == ["草稿"]
+    assert result["translation"]["rounds"][1]["translatedTexts"] == ["新译文"]
+    assert result["translation"]["rounds"][2]["translatedTexts"] == ["新译文"]
+
+
 def test_rerender_single_bubble_does_not_call_detect_or_translate(monkeypatch):
     called = {"detect": 0, "translate": 0}
 

@@ -1,17 +1,18 @@
+import json
 import shutil
 import tempfile
 import uuid
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from pathlib import Path
-import re
 from time import perf_counter
 
 from src.app import create_app
 from src.cli.cache import BatchStageCache
 from src.cli.debug_artifacts import BatchDebugArtifactWriter
-from src.config.settings import load_settings, resolve_path_value, resolve_pipeline_config, resolve_translation_config
+from src.config.settings import load_settings, resolve_ocr_config, resolve_path_value, resolve_pipeline_config, resolve_translation_config
 from src.core.context.manga_context import load_or_generate_manga_context
+from src.core.natural_sort import natural_sort_key
 from src.core.pipeline.page_classifier import classify_preprocessed_page
 from src.core.pipeline.service import (
     _build_translation_context,
@@ -25,9 +26,6 @@ from src.core.translate.openai_compatible import TRANSLATION_PROMPT_SIGNATURE
 from src.integrations.saber_loader import SaberWorkerSession
 from src.storage.cache_store import CacheStore
 from src.storage.library_store import IMAGE_EXTENSIONS, LibraryStore
-
-
-_NATURAL_SPLIT_PATTERN = re.compile(r"(\d+)")
 
 
 @dataclass
@@ -218,18 +216,8 @@ def scan_input_images(input_dir):
 
     return sorted(
         [path for path in directory.iterdir() if path.is_file() and path.suffix.lower() in IMAGE_EXTENSIONS],
-        key=lambda item: _natural_sort_key(item.name),
+        key=lambda item: natural_sort_key(item.name),
     )
-
-
-def _natural_sort_key(name):
-    parts = _NATURAL_SPLIT_PATTERN.split(str(name).lower())
-    key = []
-    for part in parts:
-        if not part:
-            continue
-        key.append(int(part) if part.isdigit() else part)
-    return key
 
 
 def _resolve_numeric_output_width(image_paths):
@@ -269,6 +257,14 @@ def _default_cache_root():
     return Path(__file__).resolve().parents[2] / ".cache" / "translate_manga_cli"
 
 
+def _build_preprocess_signature(settings):
+    payload = {
+        "version": "preprocess-v1",
+        "ocr": resolve_ocr_config(settings=settings),
+    }
+    return json.dumps(payload, ensure_ascii=False, sort_keys=True)
+
+
 def _resolve_cli_settings():
     settings = load_settings()
     translation = resolve_translation_config(settings=settings)
@@ -287,6 +283,7 @@ def _resolve_cli_settings():
             "workspace_root": resolve_path_value(paths.get("workspace_root")),
             "cache_root": resolve_path_value(paths.get("cache_root")),
         },
+        "preprocess_signature": _build_preprocess_signature(settings),
     }
 
 
@@ -574,6 +571,7 @@ def _prepare_batch(
 
         source_path = Path(page["sourcePath"])
         target_path = build_output_path(source_path, output_dir, numeric_width=numeric_output_width)
+        cached_stage = stage_cache.load_best(source_path)
         reporter.update(
             current_index=current_index,
             total_count=len(pages),
@@ -584,7 +582,25 @@ def _prepare_batch(
             elapsed_seconds=perf_counter() - started_at,
         )
 
-        cached_stage = stage_cache.load_best(source_path)
+        if target_path.exists() and not overwrite_existing and cached_stage is None:
+            counters["skipped"] += 1
+            record = debug_writer.record_page(
+                page=page,
+                page_index=current_index,
+                total_pages=len(pages),
+                source_path=source_path,
+                target_path=target_path,
+                status="skipped-existing",
+                preprocessed_payload=None,
+                translated_texts=None,
+                translation_payload=None,
+                classification=None,
+                manga_context=manga_context_payload,
+            )
+            final_debug_records[page["id"]] = record
+            reporter.log(f"SKIP {page['fileName']} -> {target_path.name} (already exists)")
+            continue
+
         if cached_stage is not None:
             preprocessed_payload = cached_stage["preprocessed"]
             translated_texts = cached_stage.get("translatedTexts")
@@ -747,6 +763,7 @@ def run_batch_translation(
         model=model,
         base_url=base_url,
         translation_signature=TRANSLATION_PROMPT_SIGNATURE,
+        preprocess_signature=cli_config["preprocess_signature"],
     )
     debug_writer = BatchDebugArtifactWriter(output_dir) if pipeline_config["debug_output"] else NullBatchDebugArtifactWriter()
 

@@ -237,3 +237,51 @@ def test_rerender_bubble_route_updates_translated_image_and_bubble_states(client
     assert data["bubbleStates"][0]["translatedText"] == "新译文"
     assert detail["translatedUrl"] == f"/data/cache/pages/{page_id}/{page_id}.translated.png"
     assert data["timings"]["rerenderBubble"] >= 0
+
+
+def test_rerender_bubble_route_syncs_translation_payload(client, monkeypatch):
+    page_id = _import_single_page(client)
+    cache_store = CacheStore(client.application)
+    cache_store.save_result(
+        page_id,
+        {
+            "pageId": page_id,
+            "cleanImagePath": "clean.png",
+            "translatedImagePath": "translated-old.png",
+            "bubbleStates": [{"coords": [10, 20, 60, 90], "translatedText": "旧译文", "originalText": "原文"}],
+            "bubbles": [{"coords": [10, 20, 60, 90], "translatedText": "旧译文", "originalText": "原文"}],
+            "translatedTexts": ["旧译文"],
+            "originalTexts": ["原文"],
+            "translation": {
+                "translatedTexts": ["旧译文"],
+                "rounds": [
+                    {"name": "draft", "translatedTexts": ["草稿"], "usage": {}},
+                    {"name": "contextual", "translatedTexts": ["旧译文"], "usage": {}},
+                    {"name": "final", "translatedTexts": ["旧译文"], "usage": {}},
+                ],
+            },
+            "manualEdited": False,
+        },
+    )
+
+    monkeypatch.setattr(
+        "src.app.routes.pipeline.rerender_single_bubble",
+        lambda clean_image_path, translated_image_path, bubble_states, bubble_index: {
+            "translatedImagePath": f"D:/cache/pages/{page_id}/{page_id}.translated.png",
+            "bubbleStates": [{**bubble_states[0], "translatedText": "新译文"}],
+        },
+        raising=False,
+    )
+
+    response = client.post(
+        "/api/pipeline/rerender-bubble",
+        json={"pageId": page_id, "bubbleIndex": 0},
+    )
+    data = response.get_json()
+    cached = client.get(f"/api/page/{page_id}/result").get_json()["result"]
+
+    assert response.status_code == 200
+    assert data["translation"]["translatedTexts"] == ["新译文"]
+    assert data["translation"]["rounds"][1]["translatedTexts"] == ["新译文"]
+    assert data["translation"]["rounds"][2]["translatedTexts"] == ["新译文"]
+    assert cached["translation"]["translatedTexts"] == ["新译文"]

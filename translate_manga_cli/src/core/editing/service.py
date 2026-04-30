@@ -16,6 +16,27 @@ def _sync_list_field(payload, key, bubble_index, value):
     payload[key] = items
 
 
+def _sync_translation_payload_texts(payload, translated_texts):
+    translation = payload.get("translation")
+    if not isinstance(translation, dict):
+        return
+
+    translation["translatedTexts"] = list(translated_texts or [])
+    rounds = translation.get("rounds") or []
+    for item in rounds:
+        if not isinstance(item, dict):
+            continue
+        if str(item.get("name") or "").strip().lower() == "draft":
+            continue
+        item["translatedTexts"] = list(translated_texts or [])
+
+
+def sync_translation_payload_from_bubbles(payload, bubble_states):
+    translated_texts = [item.get("translatedText", "") for item in bubble_states or []]
+    _sync_translation_payload_texts(payload, translated_texts)
+    return payload
+
+
 def update_bubble_state(result_payload, bubble_index, patch):
     updated = deepcopy(result_payload)
     bubble_states = _clone_bubble_states(updated)
@@ -37,6 +58,7 @@ def update_bubble_state(result_payload, bubble_index, patch):
         _sync_list_field(updated, "translatedTexts", bubble_index, current.get("translatedText"))
     if "originalText" in current:
         _sync_list_field(updated, "originalTexts", bubble_index, current.get("originalText"))
+    _sync_translation_payload_texts(updated, updated.get("translatedTexts", []) or [])
 
     return updated
 

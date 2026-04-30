@@ -129,26 +129,6 @@ def _resolve_auto_font_settings():
     }
 
 
-def _resolve_vertical_auto_font_settings():
-    settings = load_settings()
-    render = settings.get("render") or {}
-    auto_font = (render.get("vertical_layout") or {}).get("auto_font") or {}
-    return {
-        "min_size": int(
-            auto_font.get("min_size", DEFAULT_CLI_VERTICAL_AUTO_FONT_SETTINGS["min_size"])
-            or DEFAULT_CLI_VERTICAL_AUTO_FONT_SETTINGS["min_size"]
-        ),
-        "max_size": int(
-            auto_font.get("max_size", DEFAULT_CLI_VERTICAL_AUTO_FONT_SETTINGS["max_size"])
-            or DEFAULT_CLI_VERTICAL_AUTO_FONT_SETTINGS["max_size"]
-        ),
-        "padding_ratio": float(
-            auto_font.get("padding_ratio", DEFAULT_CLI_VERTICAL_AUTO_FONT_SETTINGS["padding_ratio"])
-            or DEFAULT_CLI_VERTICAL_AUTO_FONT_SETTINGS["padding_ratio"]
-        ),
-    }
-
-
 def _resolve_watermark_style():
     settings = load_settings()
     render = settings.get("render") or {}

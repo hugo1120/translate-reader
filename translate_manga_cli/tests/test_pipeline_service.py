@@ -5,7 +5,22 @@ from PIL import Image, ImageChops
 from src.core.pipeline.service import _build_bubbles, preprocess_page, run_page_pipeline
 
 
-def test_build_bubbles_applies_cli_readability_profile():
+def test_build_bubbles_applies_cli_readability_profile(monkeypatch):
+    monkeypatch.setattr(
+        "src.core.pipeline.service.load_settings",
+        lambda: {
+            "render": {
+                "layout_mode": "horizontal",
+                "font_family": "fonts/思源黑体SourceHanSansK-Bold.TTF",
+                "stroke_enabled": True,
+                "stroke_color": "#FFFFFF",
+                "stroke_width": 1,
+                "line_spacing": 0.84,
+                "text_align": "center",
+            }
+        },
+    )
+
     bubbles = _build_bubbles(
         {
             "bubbleCoords": [[10, 20, 40, 60]],
@@ -31,7 +46,16 @@ def test_build_bubbles_applies_cli_readability_profile():
     assert bubble["textAlign"] == "center"
 
 
-def test_build_bubbles_normalizes_short_direction_codes_for_rendering():
+def test_build_bubbles_normalizes_short_direction_codes_for_rendering(monkeypatch):
+    monkeypatch.setattr(
+        "src.core.pipeline.service.load_settings",
+        lambda: {
+            "render": {
+                "layout_mode": "auto",
+            }
+        },
+    )
+
     bubbles = _build_bubbles(
         {
             "bubbleCoords": [[10, 20, 40, 60], [50, 20, 120, 60]],
@@ -419,6 +443,19 @@ def test_run_page_pipeline_uses_cache_output_paths(app, tmp_path, monkeypatch):
     Image.new("RGB", (200, 300), "white").save(source_path)
 
     monkeypatch.setattr(
+        "src.core.pipeline.service.load_settings",
+        lambda project_root=None: {
+            "render": {
+                "layout_mode": "horizontal",
+                "auto_font": {
+                    "min_size": 16,
+                    "max_size": 72,
+                    "padding_ratio": 0.96,
+                },
+            }
+        },
+    )
+    monkeypatch.setattr(
         "src.core.pipeline.service.detect_page",
         lambda source_path: {
             "bubbleCoords": [[10, 20, 40, 60]],
@@ -585,6 +622,7 @@ def test_run_page_pipeline_applies_render_and_inpaint_config(app, tmp_path, monk
         "src.core.pipeline.service.load_settings",
         lambda project_root=None: {
             "render": {
+                "layout_mode": "horizontal",
                 "font_family": "fonts/custom.ttf",
                 "stroke_enabled": False,
                 "stroke_color": "#111111",
@@ -951,6 +989,20 @@ def test_run_page_pipeline_reuses_preprocessed_payload_and_translated_texts(app,
     captured = {}
     source_path = tmp_path / "page.png"
     Image.new("RGB", (200, 300), "white").save(source_path)
+
+    monkeypatch.setattr(
+        "src.core.pipeline.service.load_settings",
+        lambda project_root=None: {
+            "render": {
+                "layout_mode": "horizontal",
+                "auto_font": {
+                    "min_size": 16,
+                    "max_size": 72,
+                    "padding_ratio": 0.96,
+                },
+            }
+        },
+    )
 
     preprocessed_payload = {
         "bubbleCoords": [[10, 20, 40, 60]],
