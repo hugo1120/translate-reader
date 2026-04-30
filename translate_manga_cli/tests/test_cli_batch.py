@@ -25,6 +25,119 @@ def test_build_output_path_uses_translated_png(tmp_path):
     assert output_path == tmp_path / "out" / "001.translated.png"
 
 
+def test_run_batch_translation_records_run_options_in_debug_summary(tmp_path, monkeypatch):
+    input_dir = tmp_path / "input"
+    output_dir = tmp_path / "output"
+    workspace_root = tmp_path / "workspace"
+    _save_image(input_dir / "001.jpg")
+
+    class DummySession:
+        def __enter__(self):
+            return "session-token"
+
+        def __exit__(self, exc_type, exc, tb):
+            return False
+
+    def fake_preprocess_page(source_path, saber_session=None):
+        return {
+            "bubbleCoords": [[10, 20, 40, 60]],
+            "bubblePolygons": [[[10, 20], [40, 20], [40, 60], [10, 60]]],
+            "autoDirections": ["vertical"],
+            "textlinesPerBubble": [[]],
+            "bubbleColors": [],
+            "originalTexts": ["001"],
+            "ocrResults": [{"text": "001", "engine": "manga_ocr"}],
+            "rawMask": None,
+        }
+
+    def fake_translate_texts_multi_round(texts, model, base_url, api_key="dummy", context_snapshot=None):
+        return {
+            "translatedTexts": ["译文"],
+            "rounds": [],
+            "tokenUsage": {"inputTokens": 1, "outputTokens": 1, "totalTokens": 2, "estimated": False},
+            "ocrRetry": {"shouldRetry": False, "reasons": [], "attempted": False, "applied": False},
+        }
+
+    def fake_run_page_pipeline(
+        app,
+        page_id,
+        source_path,
+        model="mimo-v2.5-pro",
+        base_url=TEST_BASE_URL,
+        api_key="",
+        preprocessed_payload=None,
+        translated_texts=None,
+        context_snapshot=None,
+        saber_session=None,
+        translation_payload=None,
+    ):
+        translated_path = Path(app.config["CACHE_ROOT"]) / "pages" / page_id / f"{page_id}.translated.png"
+        _save_image(translated_path, color="blue")
+        return {
+            "pageId": page_id,
+            "translatedImagePath": str(translated_path),
+            "bubbleStates": [],
+            "translatedTexts": translated_texts or [],
+            "translation": translation_payload,
+            "timings": {"total": 0.5},
+        }
+
+    monkeypatch.setattr("src.cli.service.SaberWorkerSession", DummySession)
+    monkeypatch.setattr("src.cli.service.preprocess_page", fake_preprocess_page)
+    monkeypatch.setattr("src.cli.service.translate_texts_multi_round", fake_translate_texts_multi_round)
+    monkeypatch.setattr("src.cli.service.run_page_pipeline", fake_run_page_pipeline)
+    monkeypatch.setattr(
+        "src.cli.service.load_settings",
+        lambda project_root=None: {
+            "translation": {
+                "model": "config-model",
+                "base_url": TEST_BASE_URL,
+                "api_key": "secret",
+            },
+            "ocr": {
+                "engine": "48px_ocr",
+                "secondary_engine": "manga_ocr",
+                "enable_hybrid": True,
+                "hybrid_threshold": 0.2,
+                "fallback_to_manga_ocr_when_48px_unavailable": True,
+            },
+            "pipeline": {
+                "overwrite_existing": False,
+                "debug_output": True,
+                "skip_frontmatter": True,
+                "translate_batch_size": 3,
+                "translate_batch_max_chars": 1600,
+            },
+            "paths": {},
+            "render": {
+                "layout_mode": "vertical",
+            },
+        },
+    )
+
+    run_batch_translation(
+        input_dir=input_dir,
+        output_dir=output_dir,
+        workspace_root=workspace_root,
+        launch_mode="menu",
+        overwrite_existing=True,
+        layout_mode="vertical",
+    )
+
+    summary_payload = json.loads((output_dir / "_debug" / "summary.json").read_text(encoding="utf-8"))
+
+    assert summary_payload["runOptions"]["inputDir"] == str(input_dir)
+    assert summary_payload["runOptions"]["outputDir"] == str(output_dir)
+    assert summary_payload["runOptions"]["layoutMode"] == "vertical"
+    assert summary_payload["runOptions"]["styleName"] == "Style 2"
+    assert summary_payload["runOptions"]["overwriteExisting"] is True
+    assert summary_payload["runOptions"]["launchMode"] == "menu"
+    assert summary_payload["runOptions"]["translationModel"] == "config-model"
+    assert summary_payload["runOptions"]["ocrEngine"] == "48px_ocr"
+    assert summary_payload["runOptions"]["secondaryOcrEngine"] == "manga_ocr"
+    assert "apiKey" not in summary_payload["runOptions"]
+
+
 def test_build_output_path_zero_pads_pure_numeric_stem_when_width_provided(tmp_path):
     output_path = build_output_path(tmp_path / "1.jpg", tmp_path / "out", numeric_width=3)
 

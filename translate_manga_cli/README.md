@@ -10,6 +10,14 @@
 
 ## 运行方式
 
+交互式菜单入口：
+
+```powershell
+./start_cli.bat
+```
+
+无参数时进入交互菜单；有参数时直接透传给 `batch_translate.py`。
+
 优先使用本地虚拟环境:
 
 ```powershell
@@ -37,6 +45,13 @@
 - `--model`
 - `--base-url`
 - `--api-key`
+
+风格映射：
+
+- `Style 1 = horizontal`
+- `Style 2 = vertical`
+
+更完整的启动说明见 [start.md](./start.md)。
 
 后台跑批并写实时日志:
 

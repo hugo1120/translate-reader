@@ -84,6 +84,10 @@ def _resolve_project_root(project_root=None):
     return Path(project_root) if project_root is not None else Path(__file__).resolve().parents[2]
 
 
+def _session_state_path(project_root=None):
+    return _resolve_project_root(project_root) / "config" / "session.json"
+
+
 def _load_json(path):
     file_path = Path(path)
     if not file_path.exists():
@@ -147,6 +151,61 @@ def load_settings(project_root=None):
     defaults = _load_json(config_root / "defaults.json")
     local = _load_json(config_root / "local.json")
     return _apply_env_overrides(_deep_merge(defaults, local), os.environ)
+
+
+def load_session_state(project_root=None):
+    try:
+        payload = _load_json(_session_state_path(project_root))
+    except (OSError, json.JSONDecodeError, TypeError, ValueError):
+        return {}
+
+    if not isinstance(payload, dict):
+        return {}
+
+    state = {}
+    input_dir = str(payload.get("last_input_dir") or "").strip()
+    output_dir = str(payload.get("last_output_dir") or "").strip()
+    layout_mode = str(payload.get("last_layout_mode") or "").strip()
+    overwrite_existing = payload.get("last_overwrite_existing")
+
+    if input_dir:
+        state["last_input_dir"] = input_dir
+    if output_dir:
+        state["last_output_dir"] = output_dir
+    if layout_mode:
+        state["last_layout_mode"] = layout_mode
+    if isinstance(overwrite_existing, bool):
+        state["last_overwrite_existing"] = overwrite_existing
+
+    return state
+
+
+def save_session_state(
+    *,
+    last_input_dir=None,
+    last_output_dir=None,
+    last_layout_mode=None,
+    last_overwrite_existing=None,
+    project_root=None,
+):
+    session_path = _session_state_path(project_root)
+    session_path.parent.mkdir(parents=True, exist_ok=True)
+
+    payload = load_session_state(project_root=project_root)
+
+    if last_input_dir is not None:
+        payload["last_input_dir"] = Path(last_input_dir).expanduser().resolve().as_posix()
+    if last_output_dir is not None:
+        payload["last_output_dir"] = Path(last_output_dir).expanduser().resolve().as_posix()
+    if last_layout_mode is not None:
+        normalized_layout_mode = str(last_layout_mode).strip()
+        if normalized_layout_mode:
+            payload["last_layout_mode"] = normalized_layout_mode
+    if last_overwrite_existing is not None:
+        payload["last_overwrite_existing"] = bool(last_overwrite_existing)
+
+    session_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    return payload
 
 
 def resolve_path_value(value, project_root=None):

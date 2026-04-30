@@ -74,6 +74,7 @@ def main(argv=None):
             api_key=args.api_key,
             overwrite_existing=True if args.overwrite_existing else None,
             layout_mode=layout_mode,
+            launch_mode="args",
         )
     except Exception as error:
         print(f"Batch translation failed: {error}", file=sys.stderr)

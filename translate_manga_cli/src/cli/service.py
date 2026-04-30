@@ -105,7 +105,7 @@ class NullBatchDebugArtifactWriter:
     def record_page(self, **kwargs):
         return {}
 
-    def finish(self, summary=None, records=None):
+    def finish(self, summary=None, records=None, run_options=None):
         return None
 
 
@@ -205,11 +205,13 @@ def _build_preprocess_signature(settings):
 def _resolve_cli_settings():
     settings = load_settings()
     translation = resolve_translation_config(settings=settings)
+    ocr = resolve_ocr_config(settings=settings)
     paths = settings.get("paths") or {}
     pipeline = resolve_pipeline_config(settings=settings)
     render = settings.get("render") or {}
     return {
         "translation": translation,
+        "ocr": ocr,
         "pipeline": pipeline,
         "render": {
             "layout_mode": str(render.get("layout_mode") or "vertical").strip() or "vertical",
@@ -221,6 +223,28 @@ def _resolve_cli_settings():
             "cache_root": resolve_path_value(paths.get("cache_root")),
         },
         "preprocess_signature": _build_preprocess_signature(settings),
+    }
+
+
+def _layout_style_name(layout_mode):
+    mapping = {
+        "horizontal": "Style 1",
+        "vertical": "Style 2",
+    }
+    return mapping.get(layout_mode, str(layout_mode or "vertical"))
+
+
+def _build_run_options(*, input_dir, output_dir, layout_mode, overwrite_existing, launch_mode, model, ocr_config):
+    return {
+        "inputDir": str(Path(input_dir)),
+        "outputDir": str(Path(output_dir)),
+        "layoutMode": layout_mode,
+        "styleName": _layout_style_name(layout_mode),
+        "overwriteExisting": bool(overwrite_existing),
+        "launchMode": str(launch_mode or "args"),
+        "translationModel": str(model),
+        "ocrEngine": str((ocr_config or {}).get("engine") or ""),
+        "secondaryOcrEngine": str((ocr_config or {}).get("secondary_engine") or ""),
     }
 
 
@@ -646,9 +670,11 @@ def run_batch_translation(
     cache_root=None,
     overwrite_existing=None,
     layout_mode=None,
+    launch_mode="args",
 ):
     cli_config = _resolve_cli_settings()
     translation_config = cli_config["translation"]
+    ocr_config = cli_config["ocr"]
     pipeline_config = cli_config["pipeline"]
     path_config = cli_config["paths"]
     render_config = cli_config["render"]
@@ -667,14 +693,24 @@ def run_batch_translation(
     workspace_root = workspace_root or path_config["workspace_root"]
     cache_root = cache_root or path_config["cache_root"]
     layout_mode = str(layout_mode or render_config["layout_mode"]).strip() or "vertical"
+    input_dir = Path(input_dir)
+    output_dir = Path(output_dir)
 
     reporter = reporter or BatchProgressReporter()
     image_paths = scan_input_images(input_dir)
     if not image_paths:
         raise ValueError("No supported image files found in input folder.")
 
-    output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
+    run_options = _build_run_options(
+        input_dir=input_dir,
+        output_dir=output_dir,
+        layout_mode=layout_mode,
+        overwrite_existing=overwrite_existing,
+        launch_mode=launch_mode,
+        model=model,
+        ocr_config=ocr_config,
+    )
     manga_context_payload = None
     try:
         manga_context_payload = load_or_generate_manga_context(
@@ -702,7 +738,11 @@ def run_batch_translation(
         translation_signature=TRANSLATION_PROMPT_SIGNATURE,
         preprocess_signature=cli_config["preprocess_signature"],
     )
-    debug_writer = BatchDebugArtifactWriter(output_dir) if pipeline_config["debug_output"] else NullBatchDebugArtifactWriter()
+    debug_writer = (
+        BatchDebugArtifactWriter(output_dir, run_options=run_options)
+        if pipeline_config["debug_output"]
+        else NullBatchDebugArtifactWriter()
+    )
 
     temp_kwargs = {"prefix": "translate-manga-cli-"}
     if workspace_root is not None:
@@ -913,7 +953,7 @@ def run_batch_translation(
         "failed": counters["failed"],
         "elapsedSeconds": total_elapsed,
     }
-    debug_writer.finish(summary, records=final_debug_records)
+    debug_writer.finish(summary, records=final_debug_records, run_options=run_options)
     reporter.finish(
         total_count=len(pages),
         succeeded=counters["succeeded"],

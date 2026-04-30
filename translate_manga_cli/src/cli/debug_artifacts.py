@@ -42,7 +42,7 @@ def _normalize_translation_payload(payload, translated_texts):
 
 
 class BatchDebugArtifactWriter:
-    def __init__(self, output_dir):
+    def __init__(self, output_dir, run_options=None):
         self.output_dir = Path(output_dir)
         self.debug_root = self.output_dir / "_debug"
         self.pages_root = self.debug_root / "pages"
@@ -56,6 +56,7 @@ class BatchDebugArtifactWriter:
         self.texts_root.mkdir(parents=True, exist_ok=True)
         self.records = {}
         self.finished_summary = None
+        self.run_options = dict(run_options or {})
 
     def record_page(
         self,
@@ -152,11 +153,13 @@ class BatchDebugArtifactWriter:
         self._flush_index()
         return record
 
-    def finish(self, summary=None, records=None):
+    def finish(self, summary=None, records=None, run_options=None):
         if records is not None:
             self.records = self._normalize_records(records)
             for record in [self.records[index] for index in sorted(self.records)]:
                 self._write_page_files(record)
+        if isinstance(run_options, dict):
+            self.run_options = dict(run_options)
         self.finished_summary = summary or None
         self._flush_index()
 
@@ -289,4 +292,6 @@ class BatchDebugArtifactWriter:
         }
         if isinstance(self.finished_summary, dict):
             payload["runSummary"] = self.finished_summary
+        if isinstance(self.run_options, dict) and self.run_options:
+            payload["runOptions"] = self.run_options
         return payload
