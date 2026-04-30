@@ -17,10 +17,7 @@ if exist "%LOCAL_VENV310%" (
 )
 
 echo Starting Translate Manga CLI...
-echo Mode 1: reuse last input/output and last style
-echo Mode 2: choose input/output again and select style
-echo.
-"%PYTHON_EXE%" "%APP_ENTRY%"
+"%PYTHON_EXE%" "%APP_ENTRY%" %*
 set "EXIT_CODE=%ERRORLEVEL%"
 
 echo.
@@ -29,6 +26,4 @@ if not "%EXIT_CODE%"=="0" (
 ) else (
   echo Translate Manga CLI finished.
 )
-
-pause
 exit /b %EXIT_CODE%

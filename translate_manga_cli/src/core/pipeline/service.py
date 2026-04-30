@@ -12,11 +12,17 @@ from src.core.detection.service import detect_page
 from src.core.inpaint.service import inpaint_page
 from src.core.ocr.service import ocr_page, resolve_saber_ocr_options
 from src.core.pipeline.filtering import filter_detection_payload, filter_ocr_payload, load_image_size
+from src.core.pipeline.runtime import PipelineRuntime
 from src.core.render.service import render_page
+from src.core.translation_payload import (
+    build_legacy_translation_payload as _build_legacy_translation_payload,
+    default_ocr_retry_state as _default_ocr_retry_state,
+    empty_usage as _empty_usage,
+    normalize_ocr_retry_state as _normalize_ocr_retry_state,
+    normalize_translation_payload as _normalize_translation_payload,
+)
 from src.core.translate.openai_compatible import OpenAICompatibleTranslator
 from src.integrations.saber_loader import run_saber_task
-from src.storage.cache_store import CacheStore
-from src.storage.library_store import LibraryStore
 
 
 DEFAULT_CLI_READABILITY_STYLE = {
@@ -71,15 +77,10 @@ def _normalize_layout_direction(value, default="vertical"):
     return default
 
 
-def _resolve_render_style():
+def _resolve_render_style(layout_mode_override=None):
     settings = load_settings()
     render = settings.get("render") or {}
-    from flask import current_app, has_app_context
-
-    override_layout_mode = None
-    if has_app_context():
-        override_layout_mode = current_app.config.get("CLI_LAYOUT_MODE_OVERRIDE")
-    layout_mode = _normalize_layout_direction(override_layout_mode or render.get("layout_mode"), default="auto")
+    layout_mode = _normalize_layout_direction(layout_mode_override or render.get("layout_mode"), default="auto")
     vertical_layout = render.get("vertical_layout") or {}
     font_family = str(render.get("font_family") or DEFAULT_CLI_READABILITY_STYLE["fontFamily"])
     line_spacing = float(render.get("line_spacing", DEFAULT_CLI_READABILITY_STYLE["lineSpacing"]) or DEFAULT_CLI_READABILITY_STYLE["lineSpacing"])
@@ -110,10 +111,10 @@ def _resolve_vertical_render_style():
     }
 
 
-def _resolve_auto_font_settings():
+def _resolve_auto_font_settings(layout_mode_override=None):
     settings = load_settings()
     render = settings.get("render") or {}
-    layout_mode = _normalize_layout_direction(render.get("layout_mode"), default="auto")
+    layout_mode = _normalize_layout_direction(layout_mode_override or render.get("layout_mode"), default="auto")
     auto_font = render.get("auto_font") or {}
     if layout_mode == "vertical":
         auto_font = (render.get("vertical_layout") or {}).get("auto_font") or {}
@@ -348,81 +349,6 @@ def translate_texts(texts, model=None, base_url=None, api_key=None, context_snap
 _DEFAULT_TRANSLATE_TEXTS = translate_texts
 
 
-def _empty_usage():
-    return {
-        "inputTokens": 0,
-        "outputTokens": 0,
-        "totalTokens": 0,
-        "estimated": False,
-    }
-
-
-def _default_ocr_retry_state():
-    return {
-        "shouldRetry": False,
-        "reasons": [],
-        "attempted": False,
-        "applied": False,
-    }
-
-
-def _build_legacy_translation_payload(translated_texts):
-    texts = list(translated_texts or [])
-    return {
-        "translatedTexts": texts,
-        "rounds": [
-            {
-                "name": "final",
-                "translatedTexts": texts,
-                "usage": _empty_usage(),
-            }
-        ],
-        "tokenUsage": _empty_usage(),
-        "ocrRetry": _default_ocr_retry_state(),
-    }
-
-
-def _normalize_ocr_retry_state(payload):
-    state = _default_ocr_retry_state()
-    if isinstance(payload, dict):
-        state["shouldRetry"] = bool(payload.get("shouldRetry"))
-        state["attempted"] = bool(payload.get("attempted"))
-        state["applied"] = bool(payload.get("applied"))
-        state["reasons"] = [str(item) for item in (payload.get("reasons") or []) if str(item or "").strip()]
-    return state
-
-
-def _normalize_translation_payload(payload):
-    if isinstance(payload, dict):
-        translated_texts = list(payload.get("translatedTexts") or [])
-        rounds = []
-        for item in payload.get("rounds") or []:
-            if not isinstance(item, dict):
-                continue
-            rounds.append(
-                {
-                    "name": item.get("name") or "final",
-                    "translatedTexts": list(item.get("translatedTexts") or []),
-                    "usage": dict(item.get("usage") or _empty_usage()),
-                }
-            )
-        if not rounds:
-            rounds = [
-                {
-                    "name": "final",
-                    "translatedTexts": translated_texts,
-                    "usage": _empty_usage(),
-                }
-            ]
-        return {
-            "translatedTexts": translated_texts,
-            "rounds": rounds,
-            "tokenUsage": dict(payload.get("tokenUsage") or _empty_usage()),
-            "ocrRetry": _normalize_ocr_retry_state(payload.get("ocrRetry")),
-        }
-    return _build_legacy_translation_payload(payload or [])
-
-
 def _call_translate_texts_multi_round(*, texts, model, base_url, api_key, context_snapshot):
     attempts = [
         {
@@ -541,14 +467,8 @@ def _resolve_inpaint_method():
     return _resolve_inpaint_config()["method"]
 
 
-def _page_cache_paths(app, page_id):
-    page_cache_dir = Path(app.config["CACHE_ROOT"]) / "pages" / page_id
-    page_cache_dir.mkdir(parents=True, exist_ok=True)
-    return {
-        "pageCacheDir": page_cache_dir,
-        "cleanImagePath": str(page_cache_dir / f"{page_id}.clean.png"),
-        "translatedImagePath": str(page_cache_dir / f"{page_id}.translated.png"),
-    }
+def _page_cache_paths(runtime, page_id):
+    return runtime.page_cache_paths(page_id)
 
 
 def _split_filtered_payload(payload):
@@ -567,8 +487,8 @@ def _split_filtered_payload(payload):
     return detection, ocr
 
 
-def _build_bubbles(detection, ocr, translated_texts):
-    style = _resolve_render_style()
+def _build_bubbles(detection, ocr, translated_texts, *, layout_mode_override=None):
+    style = _resolve_render_style(layout_mode_override=layout_mode_override)
     vertical_style = _resolve_vertical_render_style()
     bubbles = []
     bubble_coords = detection.get("bubbleCoords", []) or []
@@ -617,8 +537,8 @@ def _build_bubbles(detection, ocr, translated_texts):
     return bubbles
 
 
-def _build_translation_context(app, page_id):
-    pages = LibraryStore(app).list_pages()
+def _build_translation_context(runtime, page_id):
+    pages = runtime.list_pages()
     if not pages:
         return {
             "historyPageIds": [],
@@ -626,13 +546,12 @@ def _build_translation_context(app, page_id):
             "glossary": {},
         }
 
-    cache_store = CacheStore(app)
     results_by_page = {}
     for page in pages:
         other_page_id = page.get("id")
         if not other_page_id or other_page_id == page_id:
             continue
-        payload = cache_store.load_result_or_default(other_page_id, default=None)
+        payload = runtime.load_result_or_default(other_page_id, default=None)
         if payload is not None:
             results_by_page[other_page_id] = payload
 
@@ -701,8 +620,8 @@ def _call_ocr_page(image_path, bubble_coords, textlines_per_bubble):
         return ocr_page(image_path, bubble_coords)
 
 
-def redo_page_inpaint(app, page_id, source_path, cached_result, saber_session=None):
-    page_paths = _page_cache_paths(app, page_id)
+def redo_page_inpaint(runtime, page_id, source_path, cached_result, saber_session=None):
+    page_paths = _page_cache_paths(runtime, page_id)
     clean_image_path = cached_result.get("cleanImagePath") or page_paths["cleanImagePath"]
     inpaint_config = _resolve_inpaint_config()
     clean = _call_inpaint_page(
@@ -721,12 +640,12 @@ def redo_page_inpaint(app, page_id, source_path, cached_result, saber_session=No
     return updated
 
 
-def redo_page_render(app, page_id, source_path, cached_result, saber_session=None):
-    page_paths = _page_cache_paths(app, page_id)
+def redo_page_render(runtime, page_id, source_path, cached_result, saber_session=None):
+    page_paths = _page_cache_paths(runtime, page_id)
     updated = dict(cached_result)
     clean_image_path = updated.get("cleanImagePath") or page_paths["cleanImagePath"]
     if not Path(clean_image_path).exists():
-        updated = redo_page_inpaint(app, page_id, source_path, updated, saber_session=saber_session)
+        updated = redo_page_inpaint(runtime, page_id, source_path, updated, saber_session=saber_session)
         clean_image_path = updated["cleanImagePath"]
 
     translated_image_path = updated.get("translatedImagePath") or page_paths["translatedImagePath"]
@@ -743,6 +662,7 @@ def redo_page_render(app, page_id, source_path, cached_result, saber_session=Non
             "ocrResults": updated.get("ocrResults", []) or [],
         },
         updated.get("translatedTexts", []) or [],
+        layout_mode_override=getattr(runtime, "layout_mode", None),
     )
     rendered = render_page(
         clean_image_path,
@@ -750,7 +670,7 @@ def redo_page_render(app, page_id, source_path, cached_result, saber_session=Non
         bubble_states,
         output_path=translated_image_path,
         auto_font_size=True,
-        auto_font_settings=_resolve_auto_font_settings(),
+        auto_font_settings=_resolve_auto_font_settings(layout_mode_override=getattr(runtime, "layout_mode", None)),
         saber_session=saber_session,
     )
     _apply_translation_watermark(rendered.get("translatedImagePath"))
@@ -776,7 +696,7 @@ def _merge_retry_state(original_state, final_state, attempted, applied):
 
 
 def run_page_pipeline(
-    app,
+    runtime: PipelineRuntime,
     page_id,
     source_path,
     model=None,
@@ -819,7 +739,7 @@ def run_page_pipeline(
         detection["bubbleColors"] = color_payload.get("colors", []) if isinstance(color_payload, dict) else []
         color_seconds = perf_counter() - color_started_at
 
-    resolved_context_snapshot = context_snapshot or _build_translation_context(app, page_id)
+    resolved_context_snapshot = context_snapshot or _build_translation_context(runtime, page_id)
     translate_seconds = 0.0
     normalized_translation_payload = _normalize_translation_payload(translation_payload) if translation_payload is not None else None
 
@@ -875,11 +795,17 @@ def run_page_pipeline(
         normalized_translation_payload = normalized_translation_payload or _build_legacy_translation_payload(translated_texts)
         normalized_translation_payload["translatedTexts"] = list(translated_texts or [])
 
-    page_paths = _page_cache_paths(app, page_id)
+    page_paths = _page_cache_paths(runtime, page_id)
     clean_image_path = page_paths["cleanImagePath"]
     translated_image_path = page_paths["translatedImagePath"]
 
-    bubble_states = _build_bubbles(detection, ocr, translated_texts)
+    layout_mode_override = getattr(runtime, "layout_mode", None)
+    bubble_states = _build_bubbles(
+        detection,
+        ocr,
+        translated_texts,
+        layout_mode_override=layout_mode_override,
+    )
     inpaint_config = _resolve_inpaint_config()
 
     inpaint_started_at = perf_counter()
@@ -903,7 +829,7 @@ def run_page_pipeline(
         bubble_states,
         output_path=translated_image_path,
         auto_font_size=True,
-        auto_font_settings=_resolve_auto_font_settings(),
+        auto_font_settings=_resolve_auto_font_settings(layout_mode_override=layout_mode_override),
         saber_session=saber_session,
     )
     _apply_translation_watermark(rendered.get("translatedImagePath"))

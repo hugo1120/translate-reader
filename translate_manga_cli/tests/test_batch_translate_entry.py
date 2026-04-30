@@ -1,9 +1,11 @@
 from pathlib import Path
 
+import pytest
+
 import batch_translate
 
 
-def test_main_uses_configured_paths_without_prompt(monkeypatch, tmp_path):
+def test_main_uses_configured_paths_when_cli_args_omitted(monkeypatch, tmp_path):
     input_dir = tmp_path / "input"
     output_dir = tmp_path / "output"
     input_dir.mkdir()
@@ -17,68 +19,12 @@ def test_main_uses_configured_paths_without_prompt(monkeypatch, tmp_path):
                 "input_dir": str(input_dir),
                 "output_dir": str(output_dir),
             },
-        },
-    )
-    monkeypatch.setattr(
-        batch_translate,
-        "_prompt_path",
-        lambda *args, **kwargs: (_ for _ in ()).throw(AssertionError("prompt should not be used")),
-    )
-    monkeypatch.setattr(batch_translate, "load_session_state", lambda: {})
-
-    def fake_run_batch_translation(*, input_dir, output_dir, **kwargs):
-        captured["input_dir"] = Path(input_dir)
-        captured["output_dir"] = Path(output_dir)
-        return {
-            "total": 1,
-            "succeeded": 1,
-            "skipped": 0,
-            "failed": 0,
-        }
-
-    monkeypatch.setattr(batch_translate, "run_batch_translation", fake_run_batch_translation)
-
-    batch_translate.main()
-
-    assert captured["input_dir"] == input_dir
-    assert captured["output_dir"] == output_dir
-
-
-def test_main_uses_session_paths_when_user_selects_reuse(monkeypatch, tmp_path):
-    input_dir = tmp_path / "input"
-    output_dir = tmp_path / "output"
-    input_dir.mkdir()
-    output_dir.mkdir()
-    captured = {}
-
-    monkeypatch.setattr(
-        batch_translate,
-        "load_settings",
-        lambda: {
-            "paths": {
-                "input_dir": "",
-                "output_dir": "",
-            },
             "render": {
                 "layout_mode": "vertical",
             },
         },
     )
-    monkeypatch.setattr(
-        batch_translate,
-        "load_session_state",
-        lambda: {
-            "last_input_dir": str(input_dir),
-            "last_output_dir": str(output_dir),
-            "last_layout_mode": "vertical",
-        },
-    )
-    monkeypatch.setattr(
-        batch_translate,
-        "_prompt_path",
-        lambda *args, **kwargs: (_ for _ in ()).throw(AssertionError("prompt should not be used")),
-    )
-    monkeypatch.setattr(batch_translate, "_prompt_choice", lambda *args, **kwargs: "1")
+    monkeypatch.setattr(batch_translate.sys, "argv", ["batch_translate.py"])
 
     def fake_run_batch_translation(*, input_dir, output_dir, **kwargs):
         captured["input_dir"] = Path(input_dir)
@@ -92,93 +38,92 @@ def test_main_uses_session_paths_when_user_selects_reuse(monkeypatch, tmp_path):
         }
 
     monkeypatch.setattr(batch_translate, "run_batch_translation", fake_run_batch_translation)
-    monkeypatch.setattr(batch_translate, "save_session_state", lambda **kwargs: captured.update({"saved": kwargs}))
 
-    batch_translate.main()
+    exit_code = batch_translate.main()
 
+    assert exit_code == 0
     assert captured["input_dir"] == input_dir
     assert captured["output_dir"] == output_dir
     assert captured["layout_mode"] == "vertical"
-    assert captured["saved"]["last_layout_mode"] == "vertical"
 
 
-def test_main_prompts_for_paths_and_layout_when_user_selects_reset(monkeypatch, tmp_path):
-    input_dir = tmp_path / "input"
-    output_dir = tmp_path / "output"
+def test_main_prefers_explicit_cli_args_over_config_defaults(monkeypatch, tmp_path):
+    input_dir = tmp_path / "cli-input"
+    output_dir = tmp_path / "cli-output"
     input_dir.mkdir()
-    captured = {"prompt_labels": []}
+    captured = {}
 
     monkeypatch.setattr(
         batch_translate,
         "load_settings",
         lambda: {
             "paths": {
-                "input_dir": "",
-                "output_dir": "",
+                "input_dir": str(tmp_path / "config-input"),
+                "output_dir": str(tmp_path / "config-output"),
             },
             "render": {
                 "layout_mode": "vertical",
             },
         },
     )
-    monkeypatch.setattr(batch_translate, "load_session_state", lambda: {})
-
-    def fake_prompt_path(label, must_exist=False):
-        captured["prompt_labels"].append(label)
-        return input_dir if "Input" in label else output_dir
-
-    choice_values = iter(["2", "1"])
-    monkeypatch.setattr(batch_translate, "_prompt_path", fake_prompt_path)
-    monkeypatch.setattr(batch_translate, "_prompt_choice", lambda *args, **kwargs: next(choice_values))
+    monkeypatch.setattr(
+        batch_translate.sys,
+        "argv",
+        [
+            "batch_translate.py",
+            "--input",
+            str(input_dir),
+            "--output",
+            str(output_dir),
+            "--layout-mode",
+            "horizontal",
+            "--overwrite-existing",
+        ],
+    )
 
     def fake_run_batch_translation(*, input_dir, output_dir, **kwargs):
         captured["input_dir"] = Path(input_dir)
         captured["output_dir"] = Path(output_dir)
         captured["layout_mode"] = kwargs.get("layout_mode")
+        captured["overwrite_existing"] = kwargs.get("overwrite_existing")
         return {
-            "total": 1,
-            "succeeded": 1,
+            "total": 2,
+            "succeeded": 2,
             "skipped": 0,
             "failed": 0,
         }
 
     monkeypatch.setattr(batch_translate, "run_batch_translation", fake_run_batch_translation)
-    monkeypatch.setattr(batch_translate, "save_session_state", lambda **kwargs: captured.update({"saved": kwargs}))
 
-    batch_translate.main()
+    exit_code = batch_translate.main()
 
-    assert captured["prompt_labels"] == ["Input folder", "Output folder"]
+    assert exit_code == 0
     assert captured["input_dir"] == input_dir
     assert captured["output_dir"] == output_dir
-    assert captured["layout_mode"] == "vertical"
-    assert captured["saved"]["last_input_dir"] == str(input_dir)
-    assert captured["saved"]["last_output_dir"] == str(output_dir)
-    assert captured["saved"]["last_layout_mode"] == "vertical"
+    assert captured["layout_mode"] == "horizontal"
+    assert captured["overwrite_existing"] is True
 
 
-def test_main_resolves_configured_relative_paths_against_project_root(monkeypatch, tmp_path):
-    project_root = tmp_path / "translate_manga_cli"
-    input_dir = project_root / "input"
-    output_dir = project_root / "output"
-    input_dir.mkdir(parents=True)
-
+def test_main_supports_positional_input_output(monkeypatch, tmp_path):
+    input_dir = tmp_path / "input"
+    output_dir = tmp_path / "output"
+    input_dir.mkdir()
     captured = {}
-    monkeypatch.setattr(batch_translate, "__file__", str(project_root / "batch_translate.py"))
+
     monkeypatch.setattr(
         batch_translate,
         "load_settings",
         lambda: {
-            "paths": {
-                "input_dir": "input",
-                "output_dir": "output",
+            "paths": {},
+            "render": {
+                "layout_mode": "vertical",
             },
         },
     )
-    monkeypatch.setattr(batch_translate, "load_session_state", lambda: {})
     monkeypatch.setattr(
-        batch_translate,
-        "_prompt_path",
-        lambda *args, **kwargs: (_ for _ in ()).throw(AssertionError("prompt should not be used")),
+        batch_translate.sys,
+        "argv",
+        ["batch_translate.py", str(input_dir), str(output_dir)],
     )
 
     def fake_run_batch_translation(*, input_dir, output_dir, **kwargs):
@@ -193,7 +138,25 @@ def test_main_resolves_configured_relative_paths_against_project_root(monkeypatc
 
     monkeypatch.setattr(batch_translate, "run_batch_translation", fake_run_batch_translation)
 
-    batch_translate.main()
+    exit_code = batch_translate.main()
 
+    assert exit_code == 0
     assert captured["input_dir"] == input_dir
     assert captured["output_dir"] == output_dir
+
+
+def test_main_exits_when_input_and_output_are_unavailable(monkeypatch):
+    monkeypatch.setattr(
+        batch_translate,
+        "load_settings",
+        lambda: {
+            "paths": {},
+            "render": {},
+        },
+    )
+    monkeypatch.setattr(batch_translate.sys, "argv", ["batch_translate.py"])
+
+    with pytest.raises(SystemExit) as error:
+        batch_translate.main()
+
+    assert error.value.code == 2

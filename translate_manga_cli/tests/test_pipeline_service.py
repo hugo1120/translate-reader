@@ -1092,6 +1092,19 @@ def test_run_page_pipeline_passes_context_snapshot_to_translator(app, tmp_path, 
     captured = {}
     source_path = tmp_path / "page.png"
     Image.new("RGB", (200, 300), "white").save(source_path)
+    app.seed_pages(
+        [
+            {"id": "page-0001", "fileName": "001.jpg", "sourcePath": "001.jpg", "translatedPath": None, "status": "idle"},
+            {"id": "page-0002", "fileName": "002.jpg", "sourcePath": "002.jpg", "translatedPath": None, "status": "idle"},
+        ]
+    )
+    app.save_result(
+        "page-0001",
+        {
+            "manualEdited": True,
+            "bubbleStates": [{"originalText": "先輩", "translatedText": "学姐"}],
+        },
+    )
 
     monkeypatch.setattr(
         "src.core.pipeline.service.detect_page",
@@ -1114,34 +1127,10 @@ def test_run_page_pipeline_passes_context_snapshot_to_translator(app, tmp_path, 
     monkeypatch.setattr("src.core.pipeline.service.inpaint_page", lambda *args, **kwargs: {"cleanImagePath": "clean.png"})
     monkeypatch.setattr("src.core.pipeline.service.render_page", lambda *args, **kwargs: {"translatedImagePath": "translated.png"})
 
-    class FakeLibraryStore:
-        def __init__(self, app):
-            self.app = app
-
-        def list_pages(self):
-            return [
-                {"id": "page-0001", "fileName": "001.jpg"},
-                {"id": "page-0002", "fileName": "002.jpg"},
-            ]
-
-    class FakeCacheStore:
-        def __init__(self, app):
-            self.app = app
-
-        def load_result_or_default(self, page_id, default=None):
-            if page_id == "page-0001":
-                return {
-                    "manualEdited": True,
-                    "bubbleStates": [{"originalText": "先輩", "translatedText": "学姐"}],
-                }
-            return default
-
     def fake_translate_texts(texts, model, base_url, context_snapshot=None):
         captured["context_snapshot"] = context_snapshot
         return ["学姐"]
 
-    monkeypatch.setattr("src.core.pipeline.service.LibraryStore", FakeLibraryStore)
-    monkeypatch.setattr("src.core.pipeline.service.CacheStore", FakeCacheStore)
     monkeypatch.setattr("src.core.pipeline.service.translate_texts", fake_translate_texts)
 
     result = run_page_pipeline(app, "page-0002", str(source_path))

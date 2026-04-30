@@ -5,6 +5,10 @@
 - 工作区根目录仍是 `D:/github/translate-reader`，但自 `2026-04-29` 起唯一活跃项目是 `D:/github/translate-reader/translate_manga_cli`。
 - 子目录 `D:/github/translate-reader/translate-reader` 已于 `2026-04-29` 物理删除；新代码、启动脚本、说明文档都不应再把它当成运行前提。
 - `translate_manga_cli` 的主定位是本地漫画整章批处理翻译器，核心流程为 `OCR -> 三轮翻译(draft/contextual/final) -> 擦字 -> 写字 -> 输出译图`。
+- `translate_manga_cli` 自 `2026-04-30` 晚些时候起已彻底收敛为纯 CLI：
+  - 已删除 `app.py`、`src/app/**`、`src/storage/**`、浏览器静态页面和对应 API/Web 测试
+  - 不再依赖 `Flask` / `flask-cors`
+  - 运行入口只保留 `batch_translate.py` 和 `run_batch_background.py`
 - `translate_manga_cli` 的默认配置统一收敛到：
   - `translate_manga_cli/config/defaults.json`
   - `translate_manga_cli/config/local.json`
@@ -51,7 +55,10 @@
   - 单页 `retry-single`
   - 轻量单轮直译（无上下文）
   - 仍失败才回退原图拷贝
-- `batch_translate.py` 现在会优先读取 `config/local.json` 里的 `paths.input_dir` 和 `paths.output_dir`；若为空才回退到命令行输入。
+- `batch_translate.py` 现在是非交互式命令行入口：
+  - 优先级：命令行参数 > `config/local.json` 路径配置
+  - 支持位置参数或 `--input/--output`
+  - 不再维护 `config/session.json`
 - CLI、调试路由、后台批处理脚本现在共用同一套翻译默认值；根目录 `翻译api.txt` 只保留脱敏示例，实际私有接口配置只放 `config/local.json` 或 `TRANSLATE_MANGA_CLI_*` 环境变量。
 - 四段翻译提示词已正式进入配置：
   - `prompts.translation.system`
@@ -72,11 +79,15 @@
   - 前置页 / 目录页轻量跳过
   - OpenAI-compatible 超时与逐页降级重试
 - 最近稳定基线：
-  - `pytest -q`：`99 passed`
+  - `pytest -q`：`116 passed`（`2026-04-30`，纯 CLI 收口后）
   - 真实整本 `[古泉智浩] 死んだ目をした少年`：`188` 页，`897.25s`，约 `4.77s/页`
   - 真实整卷 `[藤子不二雄A] 帰ッテキタせぇるすまん 第01巻`：
     - V2 最终补齐：`170/170`
     - 最后一轮全缓存重渲染耗时：`467.85s`
+  - 真实目录 `D:/github/translate-reader/翻译测试日漫/笑面推销员/笑面推销员 2 layout2 v2 input`：
+    - 新 CLI 入口输出目录：`... output cli-only-20260430`
+    - 汇总：`total=3 ok=3 skip=0 fail=0`
+    - `_debug/summary.json`：`needsReviewPages=[]`
 
 ## 文档列表
 

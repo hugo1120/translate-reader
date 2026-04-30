@@ -84,21 +84,11 @@ def _resolve_project_root(project_root=None):
     return Path(project_root) if project_root is not None else Path(__file__).resolve().parents[2]
 
 
-def _resolve_session_state_path(project_root=None):
-    return _resolve_project_root(project_root) / "config" / "session.json"
-
-
 def _load_json(path):
     file_path = Path(path)
     if not file_path.exists():
         return {}
     return json.loads(file_path.read_text(encoding="utf-8"))
-
-
-def _save_json(path, payload):
-    file_path = Path(path)
-    file_path.parent.mkdir(parents=True, exist_ok=True)
-    file_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
 def _deep_merge(base, override):
@@ -157,26 +147,6 @@ def load_settings(project_root=None):
     defaults = _load_json(config_root / "defaults.json")
     local = _load_json(config_root / "local.json")
     return _apply_env_overrides(_deep_merge(defaults, local), os.environ)
-
-
-def load_session_state(project_root=None):
-    payload = _load_json(_resolve_session_state_path(project_root))
-    return {
-        "last_input_dir": str(payload.get("last_input_dir") or "").strip(),
-        "last_output_dir": str(payload.get("last_output_dir") or "").strip(),
-        "last_layout_mode": str(payload.get("last_layout_mode") or "").strip(),
-    }
-
-
-def save_session_state(*, last_input_dir="", last_output_dir="", last_layout_mode="", project_root=None):
-    _save_json(
-        _resolve_session_state_path(project_root),
-        {
-            "last_input_dir": str(last_input_dir or "").strip(),
-            "last_output_dir": str(last_output_dir or "").strip(),
-            "last_layout_mode": str(last_layout_mode or "").strip(),
-        },
-    )
 
 
 def resolve_path_value(value, project_root=None):

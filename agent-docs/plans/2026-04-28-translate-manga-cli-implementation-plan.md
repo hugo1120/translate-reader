@@ -62,6 +62,16 @@
 - [x] 物理删除退役的 `translate-reader/` 目录
 - [x] 用 `translate_manga_cli/.venv310` 重新安装 `requirements.txt` 并验证 `pytest -q` 为 `91 passed`
 
+## Task 10：纯 CLI 收口
+
+- [x] 删除 `app.py`、`src/app/**`、`src/storage/**` 及对应 API/Web 测试
+- [x] 去掉 `Flask` / `flask-cors` 依赖
+- [x] 把批处理运行时改成显式 `PipelineRuntime`，不再依赖 Flask app/app_context
+- [x] 抽公共 `translation_payload` 归一化逻辑，消除 CLI / pipeline / debug 三处漂移
+- [x] 把 `batch_translate.py` 改成非交互式命令行入口，移除 `session.json`
+- [x] 回归 `pytest -q` 为 `116 passed`
+- [x] 用 `笑面推销员 2 layout2 v2 input` 再跑一次真实 CLI 验证，结果 `ok=3 skip=0 fail=0`
+
 ## Smoke 结果
 
 - 首轮真实 CLI smoke：

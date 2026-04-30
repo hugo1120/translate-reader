@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import sys
+import argparse
 import traceback
 from datetime import datetime
 from pathlib import Path
@@ -61,17 +61,27 @@ class FileReporter:
         )
 
 
-def main() -> int:
-    if len(sys.argv) >= 3:
-        input_dir = Path(sys.argv[1])
-        output_dir = Path(sys.argv[2])
-        log_path = Path(sys.argv[3]) if len(sys.argv) >= 4 else _default_log_path()
-    elif len(sys.argv) == 2:
-        input_dir, output_dir = _resolve_default_paths()
-        log_path = Path(sys.argv[1])
+def _build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(description="后台批量翻译并输出实时日志。")
+    parser.add_argument("input_dir", nargs="?", help="输入图片目录")
+    parser.add_argument("output_dir", nargs="?", help="输出目录")
+    parser.add_argument("--log-path", help="日志文件路径")
+    parser.add_argument("--layout-mode", choices=["horizontal", "vertical", "auto"], help="排版方向")
+    parser.add_argument("--overwrite-existing", action="store_true", help="覆盖已存在输出")
+    return parser
+
+
+def main(argv=None) -> int:
+    parser = _build_parser()
+    args = parser.parse_args(argv)
+
+    if args.input_dir and args.output_dir:
+        input_dir = Path(args.input_dir)
+        output_dir = Path(args.output_dir)
     else:
         input_dir, output_dir = _resolve_default_paths()
-        log_path = _default_log_path()
+
+    log_path = Path(args.log_path) if args.log_path else _default_log_path()
 
     _write(log_path, f"RUN START {datetime.now().isoformat(timespec='seconds')}")
     try:
@@ -79,6 +89,8 @@ def main() -> int:
             input_dir=input_dir,
             output_dir=output_dir,
             reporter=FileReporter(log_path),
+            layout_mode=args.layout_mode,
+            overwrite_existing=True if args.overwrite_existing else None,
         )
     except Exception:
         _write(log_path, "RUN ERROR")

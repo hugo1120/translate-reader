@@ -1,6 +1,12 @@
 import json
 from pathlib import Path
 
+from src.core.translation_payload import (
+    default_ocr_retry_state as _default_ocr_retry_state,
+    empty_usage as _empty_usage,
+    normalize_translation_payload as _normalize_payload,
+)
+
 
 def _normalize_texts(texts):
     normalized = []
@@ -17,51 +23,21 @@ def _base_stem_from_target(target_path):
         return name[: -len(".translated.png")]
     return Path(target_path).stem
 
-
-def _empty_usage():
-    return {
-        "inputTokens": 0,
-        "outputTokens": 0,
-        "totalTokens": 0,
-        "estimated": False,
-    }
-
-
-def _default_ocr_retry_state():
-    return {
-        "shouldRetry": False,
-        "reasons": [],
-        "attempted": False,
-        "applied": False,
-    }
-
-
 def _normalize_translation_payload(payload, translated_texts):
-    if not isinstance(payload, dict):
-        return {
-            "translatedTexts": list(translated_texts or []),
-            "rounds": [],
-            "tokenUsage": _empty_usage(),
-            "ocrRetry": _default_ocr_retry_state(),
-        }
-
-    rounds = []
-    for item in payload.get("rounds") or []:
-        if not isinstance(item, dict):
-            continue
-        rounds.append(
+    normalized = _normalize_payload(payload, translated_texts=translated_texts)
+    return {
+        "translatedTexts": _normalize_texts(normalized.get("translatedTexts") or []),
+        "rounds": [
             {
                 "name": item.get("name") or "final",
                 "translatedTexts": _normalize_texts(item.get("translatedTexts") or []),
                 "usage": dict(item.get("usage") or _empty_usage()),
             }
-        )
-
-    return {
-        "translatedTexts": _normalize_texts(payload.get("translatedTexts") or translated_texts or []),
-        "rounds": rounds,
-        "tokenUsage": dict(payload.get("tokenUsage") or _empty_usage()),
-        "ocrRetry": dict(payload.get("ocrRetry") or _default_ocr_retry_state()),
+            for item in (normalized.get("rounds") or [])
+            if isinstance(item, dict)
+        ],
+        "tokenUsage": dict(normalized.get("tokenUsage") or _empty_usage()),
+        "ocrRetry": dict(normalized.get("ocrRetry") or _default_ocr_retry_state()),
     }
 
 

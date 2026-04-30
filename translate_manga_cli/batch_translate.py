@@ -1,7 +1,9 @@
+import argparse
+import sys
 from pathlib import Path
 
 from src.cli.service import run_batch_translation
-from src.config.settings import load_session_state, load_settings, resolve_path_value, save_session_state
+from src.config.settings import load_settings, resolve_path_value
 
 
 def _project_root():
@@ -12,103 +14,71 @@ def _resolve_runtime_path(value):
     resolved = resolve_path_value(value, project_root=_project_root())
     if resolved:
         return Path(resolved)
-    return Path(str(value or "").strip())
+    return None
 
 
-def _prompt_path(label, must_exist=False):
-    while True:
-        raw = input(f"{label}: ").strip().strip('"').strip("'")
-        if not raw:
-            print("Path cannot be empty.")
-            continue
-
-        path = Path(raw)
-        if must_exist and (not path.exists() or not path.is_dir()):
-            print(f"Folder not found: {path}")
-            continue
-        return path
-
-
-def _prompt_choice(prompt, choices):
-    allowed = {str(item) for item in choices}
-    while True:
-        raw = input(f"{prompt}: ").strip()
-        if raw in allowed:
-            return raw
-        print(f"Please enter one of: {', '.join(sorted(allowed))}")
-
-
-def _resolve_layout_mode(choice, default_layout_mode="vertical"):
-    if choice == "1":
-        return "horizontal"
-    if choice == "2":
-        return "vertical"
-    return default_layout_mode
-
-
-def main():
+def _resolve_default_paths():
     settings = load_settings()
-    path_settings = settings.get("paths") or {}
+    paths = settings.get("paths") or {}
+    return _resolve_runtime_path(paths.get("input_dir")), _resolve_runtime_path(paths.get("output_dir"))
+
+
+def _build_parser():
+    parser = argparse.ArgumentParser(description="批量翻译漫画图片目录。")
+    parser.add_argument("input_dir", nargs="?", help="输入图片目录")
+    parser.add_argument("output_dir", nargs="?", help="输出目录")
+    parser.add_argument("--input", dest="input_dir_option", help="输入图片目录，优先级高于位置参数")
+    parser.add_argument("--output", dest="output_dir_option", help="输出目录，优先级高于位置参数")
+    parser.add_argument("--layout-mode", choices=["horizontal", "vertical", "auto"], help="排版方向")
+    parser.add_argument("--workspace-root", help="临时工作目录根")
+    parser.add_argument("--cache-root", help="隐藏 stage cache 根目录")
+    parser.add_argument("--model", help="翻译模型名")
+    parser.add_argument("--base-url", help="OpenAI-compatible base URL")
+    parser.add_argument("--api-key", help="OpenAI-compatible API key")
+    parser.add_argument("--overwrite-existing", action="store_true", help="覆盖已存在的输出")
+    return parser
+
+
+def _resolve_input_output(args):
+    default_input_dir, default_output_dir = _resolve_default_paths()
+    input_dir = args.input_dir_option or args.input_dir or default_input_dir
+    output_dir = args.output_dir_option or args.output_dir or default_output_dir
+    return input_dir, output_dir
+
+
+def main(argv=None):
+    parser = _build_parser()
+    args = parser.parse_args(argv)
+
+    input_dir, output_dir = _resolve_input_output(args)
+    if input_dir is None or output_dir is None:
+        parser.error("input/output 未提供，且 config/local.json 里也没有 paths.input_dir / paths.output_dir。")
+
+    input_dir = Path(input_dir)
+    output_dir = Path(output_dir)
+    if not input_dir.exists() or not input_dir.is_dir():
+        parser.error(f"输入目录不存在: {input_dir}")
+
+    settings = load_settings()
     render_settings = settings.get("render") or {}
-    session_state = load_session_state()
-
-    print("Translate Manga CLI")
-    print("1. Reuse last input/output")
-    print("2. Choose input/output again")
-    print()
-
-    configured_input = str(path_settings.get("input_dir") or "").strip()
-    configured_output = str(path_settings.get("output_dir") or "").strip()
-    session_input = str(session_state.get("last_input_dir") or "").strip()
-    session_output = str(session_state.get("last_output_dir") or "").strip()
-    default_layout_mode = str(session_state.get("last_layout_mode") or render_settings.get("layout_mode") or "vertical").strip() or "vertical"
-    has_reusable_session = bool(session_input and session_output)
-
-    if configured_input and configured_output and not has_reusable_session:
-        input_dir = _resolve_runtime_path(configured_input)
-        output_dir = _resolve_runtime_path(configured_output)
-        layout_mode = default_layout_mode
-        if not input_dir.exists() or not input_dir.is_dir():
-            raise SystemExit(f"Configured input folder not found: {input_dir}")
-    else:
-        run_mode = "1" if has_reusable_session else "2"
-        if has_reusable_session:
-            print(f"Last input : {session_input}")
-            print(f"Last output: {session_output}")
-            print(f"Last style : {'2' if default_layout_mode == 'vertical' else '1'}")
-            run_mode = _prompt_choice("Choose mode (1 reuse, 2 reset)", ["1", "2"])
-
-        if run_mode == "1":
-            input_dir = _resolve_runtime_path(session_input)
-            output_dir = _resolve_runtime_path(session_output)
-            layout_mode = default_layout_mode
-            if not input_dir.exists() or not input_dir.is_dir():
-                raise SystemExit(f"Last input folder not found: {input_dir}")
-        else:
-            print("Enter the source image folder and the output folder.")
-            print()
-            input_dir = _prompt_path("Input folder", must_exist=True)
-            output_dir = _prompt_path("Output folder", must_exist=False)
-            print()
-            print("Layout style")
-            print("1. Horizontal")
-            print("2. Vertical RTL")
-            layout_mode = _resolve_layout_mode(_prompt_choice("Choose style", ["1", "2"]), default_layout_mode=default_layout_mode)
+    layout_mode = str(args.layout_mode or render_settings.get("layout_mode") or "vertical").strip() or "vertical"
 
     try:
-        summary = run_batch_translation(input_dir=input_dir, output_dir=output_dir, layout_mode=layout_mode)
+        summary = run_batch_translation(
+            input_dir=input_dir,
+            output_dir=output_dir,
+            workspace_root=args.workspace_root,
+            cache_root=args.cache_root,
+            model=args.model,
+            base_url=args.base_url,
+            api_key=args.api_key,
+            overwrite_existing=True if args.overwrite_existing else None,
+            layout_mode=layout_mode,
+        )
     except Exception as error:
-        print()
-        print(f"Batch translation failed: {error}")
-        raise SystemExit(1) from error
+        print(f"Batch translation failed: {error}", file=sys.stderr)
+        return 1
 
-    save_session_state(
-        last_input_dir=str(input_dir),
-        last_output_dir=str(output_dir),
-        last_layout_mode=layout_mode,
-    )
-
-    print()
     print(
         "Summary: "
         f"total={summary['total']} "
@@ -116,7 +86,8 @@ def main():
         f"skip={summary['skipped']} "
         f"fail={summary['failed']}"
     )
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())
