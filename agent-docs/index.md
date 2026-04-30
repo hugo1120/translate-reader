@@ -8,7 +8,7 @@
 - `translate_manga_cli` 自 `2026-04-30` 晚些时候起已彻底收敛为纯 CLI：
   - 已删除 `app.py`、`src/app/**`、`src/storage/**`、浏览器静态页面和对应 API/Web 测试
   - 不再依赖 `Flask` / `flask-cors`
-  - 运行入口只保留 `batch_translate.py` 和 `run_batch_background.py`
+  - 运行入口保留 `batch_translate.py`、`run_batch_background.py` 和 `start_cli.bat`
 - `translate_manga_cli` 的默认配置统一收敛到：
   - `translate_manga_cli/config/defaults.json`
   - `translate_manga_cli/config/local.json`
@@ -58,7 +58,20 @@
 - `batch_translate.py` 现在是非交互式命令行入口：
   - 优先级：命令行参数 > `config/local.json` 路径配置
   - 支持位置参数或 `--input/--output`
-  - 不再维护 `config/session.json`
+- `start_cli.bat` 自 `2026-04-30` 起恢复为双模式入口：
+  - 无参数：进入交互式控制台菜单
+  - 有参数：直接透传给 `batch_translate.py`
+  - 菜单会把最近一次 `输入目录 / 输出目录 / layout_mode / overwrite_existing` 写入 `config/session.json`
+- `_debug/summary.json` 自 `2026-04-30` 起会额外写出 `runOptions`：
+  - `inputDir`
+  - `outputDir`
+  - `layoutMode`
+  - `styleName`
+  - `overwriteExisting`
+  - `launchMode`
+  - `translationModel`
+  - `ocrEngine`
+  - `secondaryOcrEngine`
 - CLI、调试路由、后台批处理脚本现在共用同一套翻译默认值；根目录 `翻译api.txt` 只保留脱敏示例，实际私有接口配置只放 `config/local.json` 或 `TRANSLATE_MANGA_CLI_*` 环境变量。
 - 四段翻译提示词已正式进入配置：
   - `prompts.translation.system`
@@ -99,6 +112,8 @@
   - 适用场景：追踪 CLI 已落地的流水线、性能优化、调试输出和独立化收尾任务。
 - [translate_manga_cli 使用说明](../translate_manga_cli/README.md)
   - 适用场景：人类接手者直接查启动方式、配置方法、输出结构和覆盖重跑。
+- [translate_manga_cli 启动说明](../translate_manga_cli/start.md)
+  - 适用场景：查看交互菜单、纯命令行、样式映射、`reuse/reset` 和覆盖策略的实际用法。
 - [translate_manga_cli 翻译提示词方案](../translate_manga_cli/docs/translation_prompt_scheme.md)
   - 适用场景：调整翻译 prompt、理解 `manga_context.md` 应该写什么。
 - [translate_manga_cli manga_context 生成模板](../translate_manga_cli/docs/manga_context_prompt_template.md)
