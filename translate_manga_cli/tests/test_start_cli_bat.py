@@ -9,7 +9,7 @@ def test_start_cli_bat_without_args_launches_interactive_menu():
     completed = subprocess.run(
         ["cmd", "/c", str(bat_path)],
         cwd=project_root,
-        input="3\n",
+        input="4\n",
         capture_output=True,
         text=True,
         encoding="gbk",
@@ -22,4 +22,5 @@ def test_start_cli_bat_without_args_launches_interactive_menu():
     assert "Translate Manga CLI" in output
     assert "Reuse" in output
     assert "Reset" in output
+    assert "Batch" in output
     assert "Exit" in output

@@ -82,7 +82,8 @@ def _render_menu(stream, state):
     _write_line(stream, f"Current overwrite: {_overwrite_label(state['overwrite_existing'])}")
     _write_line(stream, "1. Reuse 上次配置并开始")
     _write_line(stream, "2. Reset 重新设置并开始")
-    _write_line(stream, "3. Exit")
+    _write_line(stream, "3. Batch mode 批量目录模式")
+    _write_line(stream, "4. Exit")
 
 
 def _prompt_existing_directory(input_func, stream, prompt_text):
@@ -122,13 +123,31 @@ def _prompt_overwrite_existing(input_func, stream):
         _write_line(stream, "覆盖策略只能选 1 或 2。")
 
 
+def _prompt_batch_input_dirs(input_func, stream):
+    _write_line(stream, "Batch mode: 输入多个图片目录，一行一个，直接回车结束。")
+    directories = []
+    while True:
+        raw_value = input_func("批量输入目录: ").strip()
+        if not raw_value:
+            if directories:
+                return directories
+            _write_line(stream, "至少需要一个输入目录。")
+            continue
+
+        candidate = Path(raw_value)
+        if not candidate.exists() or not candidate.is_dir():
+            _write_line(stream, f"输入目录不存在: {candidate}")
+            continue
+        directories.append(candidate)
+
+
 def _can_reuse(state):
     input_dir = state.get("input_dir")
     output_dir = state.get("output_dir")
     return bool(input_dir and output_dir and input_dir.exists() and input_dir.is_dir())
 
 
-def _run_translation(state, stream, project_root):
+def _run_translation(state, stream, project_root, *, launch_mode="menu"):
     save_session_state(
         last_input_dir=state["input_dir"],
         last_output_dir=state["output_dir"],
@@ -142,7 +161,7 @@ def _run_translation(state, stream, project_root):
         reporter=BatchProgressReporter(stream=stream),
         overwrite_existing=state["overwrite_existing"],
         layout_mode=state["layout_mode"],
-        launch_mode="menu",
+        launch_mode=launch_mode,
     )
     _write_line(
         stream,
@@ -151,6 +170,57 @@ def _run_translation(state, stream, project_root):
         f"ok={summary['succeeded']} "
         f"skip={summary['skipped']} "
         f"fail={summary['failed']}",
+    )
+    return summary
+
+
+def _run_batch_mode(input_func, stream, project_root):
+    input_dirs = _prompt_batch_input_dirs(input_func, stream)
+    layout_mode = _prompt_layout_mode(input_func, stream)
+    overwrite_existing = _prompt_overwrite_existing(input_func, stream)
+
+    book_total = len(input_dirs)
+    book_succeeded = 0
+    book_failed = 0
+    page_total = 0
+    page_succeeded = 0
+    page_skipped = 0
+    page_failed = 0
+
+    for index, input_dir in enumerate(input_dirs, start=1):
+        state = {
+            "input_dir": input_dir,
+            "output_dir": input_dir / "out",
+            "layout_mode": layout_mode,
+            "overwrite_existing": overwrite_existing,
+        }
+        _write_line(stream, f"BATCH [{index}/{book_total}] input={state['input_dir']}")
+        _write_line(stream, f"BATCH [{index}/{book_total}] output={state['output_dir']}")
+        try:
+            summary = _run_translation(state, stream, project_root, launch_mode="menu-batch")
+            book_succeeded += 1
+            page_total += int(summary["total"])
+            page_succeeded += int(summary["succeeded"])
+            page_skipped += int(summary["skipped"])
+            page_failed += int(summary["failed"])
+            _write_line(
+                stream,
+                f"BATCH [{index}/{book_total}] done total={summary['total']} ok={summary['succeeded']} skip={summary['skipped']} fail={summary['failed']}",
+            )
+        except Exception as error:
+            book_failed += 1
+            _write_line(stream, f"BATCH [{index}/{book_total}] failed error={error}")
+
+    _write_line(
+        stream,
+        "Batch summary: "
+        f"books={book_total} "
+        f"ok={book_succeeded} "
+        f"fail={book_failed} "
+        f"pages={page_total} "
+        f"page_ok={page_succeeded} "
+        f"page_skip={page_skipped} "
+        f"page_fail={page_failed}",
     )
 
 
@@ -187,6 +257,13 @@ def run_interactive_menu(input_func=input, output_stream=None, project_root=None
             continue
 
         if choice == "3":
+            try:
+                _run_batch_mode(input_func, output_stream, project_root)
+            except Exception as error:
+                _write_line(output_stream, f"Batch mode failed: {error}")
+            continue
+
+        if choice == "4":
             return 0
 
         _write_line(output_stream, "无效选项，请重新输入。")

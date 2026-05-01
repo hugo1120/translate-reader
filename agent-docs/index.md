@@ -62,6 +62,11 @@
   - 无参数：进入交互式控制台菜单
   - 有参数：直接透传给 `batch_translate.py`
   - 菜单会把最近一次 `输入目录 / 输出目录 / layout_mode / overwrite_existing` 写入 `config/session.json`
+- `start_cli.bat` 自 `2026-05-01` 起的交互菜单支持 `Batch mode`：
+  - 一行一个粘贴多个输入目录
+  - 整批共用一次样式和覆盖策略
+  - 每本输出目录自动使用 `<input_dir>/out`
+  - 逐一本顺序运行，单本失败不阻塞后续目录
 - `_debug/summary.json` 自 `2026-04-30` 起会额外写出 `runOptions`：
   - `inputDir`
   - `outputDir`
