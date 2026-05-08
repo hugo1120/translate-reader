@@ -111,6 +111,8 @@
 
 ### 活跃文档
 
+- [2026-05-08 V4 readability 设计](./specs/2026-05-08-v4-readability-design.md)
+  - 适用场景：调整 `translate_manga_cli` 的嵌字可读性策略；理解新的黑字双样式默认、亮度/复杂度决策链路和回归样本。
 - [2026-04-28 translate_manga_cli 设计](./specs/2026-04-28-translate-manga-cli-design.md)
   - 适用场景：理解 CLI 的目标边界、运行方式，以及 `2026-04-29` 之后的独立化方向。
 - [2026-04-28 translate_manga_cli 实施计划](./plans/2026-04-28-translate-manga-cli-implementation-plan.md)
