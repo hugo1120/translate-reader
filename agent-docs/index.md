@@ -2,16 +2,18 @@
 
 ## 全局关键记忆
 
-- 工作区根目录仍是 `D:/github/translate-reader`，但自 `2026-04-29` 起唯一活跃项目是 `D:/github/translate-reader/translate_manga_cli`。
+- 工作区根目录仍是 `D:/github/translate-reader`；自 `2026-05-08` 起当前重构活跃项目是 `D:/github/translate-reader/translate_manga_v2`，后续开发和 GitHub 同步只以 V2 为准。
+- `translate_manga_cli` 已于 `2026-05-09` 从仓库删除；旧版可运行副本保留在本机 `translate_manga_v1/`，但该目录被 `.gitignore` 整目录忽略，不参与同步。
 - 子目录 `D:/github/translate-reader/translate-reader` 已于 `2026-04-29` 物理删除；新代码、启动脚本、说明文档都不应再把它当成运行前提。
-- `translate_manga_cli` 的主定位是本地漫画整章批处理翻译器，核心流程为 `OCR -> 三轮翻译(draft/contextual/final) -> 擦字 -> 写字 -> 输出译图`。
-- `translate_manga_cli` 自 `2026-04-30` 晚些时候起已彻底收敛为纯 CLI：
-  - 已删除 `app.py`、`src/app/**`、`src/storage/**`、浏览器静态页面和对应 API/Web 测试
-  - 不再依赖 `Flask` / `flask-cors`
-  - 运行入口保留 `batch_translate.py`、`run_batch_background.py` 和 `start_cli.bat`
-- `translate_manga_cli` 的默认配置统一收敛到：
-  - `translate_manga_cli/config/defaults.json`
-  - `translate_manga_cli/config/local.json`
+- `translate_manga_v2` 的主定位是本地漫画整章/整卷批处理翻译器，核心流程为 `OCR -> 三轮翻译(draft/contextual/final) -> 擦字 -> 写字 -> 输出译图`。
+- `translate_manga_v2` 是从 `translate_manga_cli` 独立复制并重构的新目录：
+  - 应用包为 `src/translate_manga/**`
+  - Saber vendor 在 `translate_manga_v2/vendor/Saber-Translator`
+  - 入口保留 `start_cli.bat`、`batch_translate.py`、`run_batch_background.py`
+  - 私有 `config/local.json` 已复制但被 `.gitignore` 忽略
+- `translate_manga_v2` 的默认配置统一收敛到：
+  - `translate_manga_v2/config/defaults.json`
+  - `translate_manga_v2/config/local.json`
 - 配置优先级固定为：`defaults.json < local.json < TRANSLATE_MANGA_CLI_* 环境变量 < Python 调用参数`。
 - 当前推荐用户只改 `config/local.json` 中这些组：
   - `paths`
@@ -22,32 +24,32 @@
   - `inpaint`
   - `render`
   - `runtime`
-- `translate_manga_cli` 自 `2026-04-30` 起默认 OCR 策略改为 `48px_ocr + manga_ocr hybrid`：
+- `translate_manga_v2` 继承并保留 `48px_ocr + manga_ocr hybrid` OCR 策略：
   - 主 OCR：`ocr.engine`
   - 低置信/空结果回退：`ocr.secondary_engine`
   - 当前默认：`48px_ocr -> manga_ocr`
   - 若 48px 模型缺失，会自动回退到纯 `manga_ocr`
-- `translate_manga_cli` 自 `2026-04-30` 起默认嵌字可读性策略改为 V3 自适应：
-  - 深色底：`白字 + 黑描边 1px`
-  - 浅色底：`黑字 + 白描边 1px`
-  - 极小框：关闭描边，避免糊成块
-- `translate_manga_cli` 自 `2026-04-30` 起支持每本漫画目录根的 `manga_context.md` / `manga_context.txt`：
+- `translate_manga_v2` 继承并保留 V4 readability 嵌字可读性策略：
+  - 全局文字颜色固定为 `#111111`
+  - 仅输出 `black + white stroke 1px` 与 `black + no stroke`
+  - 小框优先关闭描边；亮度、背景复杂度和颜色可信度共同决定是否启用白描边
+- `translate_manga_v2` 支持当前卷目录根的 `manga_context.md` / `manga_context.txt`：
   - 有就直接读入三轮翻译
   - 没有时默认尝试自动生成 `manga_context.md`
   - 失败时降级为空上下文，不阻塞整本翻译
   - `_debug/pages/*.json` 会记录本页实际使用的漫画背景内容、文件路径和是否自动生成
-- `translate_manga_cli` 的 `排版2` 当前是独立竖排布局分支：
+- `translate_manga_v2` 的 `排版2` 当前是独立竖排布局分支：
   - 只在 `render.layout_mode=vertical` 时启用
   - 目标是“整块居中 + 列均衡 + 竖排去空格/断句”
   - 不影响 `排版1` 横排逻辑
-- Saber 48px OCR 模型当前已手动补齐到：
-  - `D:/github/translate-reader/Saber-Translator/models/ocr_48px/ocr_ar_48px.ckpt`
-  - `D:/github/translate-reader/Saber-Translator/models/ocr_48px/alphabet-all-v7.txt`
-- `translate_manga_cli` 自 `2026-04-30` 起支持按 Saber 操作单独放宽超时：
+- `translate_manga_v2` vendor 内的 Saber 48px OCR 模型已补齐到：
+  - `D:/github/translate-reader/translate_manga_v2/vendor/Saber-Translator/models/ocr_48px/ocr_ar_48px.ckpt`
+  - `D:/github/translate-reader/translate_manga_v2/vendor/Saber-Translator/models/ocr_48px/alphabet-all-v7.txt`
+- `translate_manga_v2` 支持按 Saber 操作单独放宽超时：
   - 配置键：`runtime.saber_operation_timeout_seconds`
   - 当前默认仅放宽：`preprocess: 90.0`
   - 目的：避免 `48px OCR + 颜色提取` 在长文页上被通用 `45s` 超时提前打断
-- `translate_manga_cli` 自 `2026-04-30` 起的 Saber 单次 subprocess fallback 不再把完整 payload 挂在命令行参数上：
+- `translate_manga_v2` 的 Saber 单次 subprocess fallback 不把完整 payload 挂在命令行参数上：
   - 现改为 `stdin` 传 JSON payload
   - 目的：避免 Windows 在长 `rawMask` / 大 payload 时触发 `WinError 206`
 - 批处理翻译失败恢复顺序已扩展为：
@@ -58,15 +60,27 @@
 - `batch_translate.py` 现在是非交互式命令行入口：
   - 优先级：命令行参数 > `config/local.json` 路径配置
   - 支持位置参数或 `--input/--output`
-- `start_cli.bat` 自 `2026-04-30` 起恢复为双模式入口：
+- `translate_manga_v2/start_cli.bat` 当前是双模式入口：
   - 无参数：进入交互式控制台菜单
   - 有参数：直接透传给 `batch_translate.py`
-  - 菜单会把最近一次 `输入目录 / 输出目录 / layout_mode / overwrite_existing` 写入 `config/session.json`
-- `start_cli.bat` 自 `2026-05-01` 起的交互菜单支持 `Batch mode`：
-  - 一行一个粘贴多个输入目录
-  - 整批共用一次样式和覆盖策略
-  - 每本输出目录自动使用 `<input_dir>/out`
-  - 逐一本顺序运行，单本失败不阻塞后续目录
+  - 当前菜单为 `继续上次任务 / 新建任务 / 扫描并纠正错误 / 退出`
+  - 新建任务支持一行一个或多行粘贴多个输入目录，可拆分连在一起的 Windows 盘符路径
+  - 输出目录固定为每个输入目录下的 `out`
+  - 完整翻译默认跳过已有输出；纠错重跑只覆盖 `_debug` 标记的问题页
+  - 菜单会把上一次多目录任务和 `layout_mode` 写入 `config/session.json`
+- `translate_manga_v2` 自 `2026-05-08` 起支持书系 Profile：
+  - `D:/漫画/德川家康/01` 识别为书系 `德川家康`、卷 `01`
+  - 书系提示词保存在 `<书系目录>/_translation_profile/series_profile.md`
+  - 同目录还会创建 `glossary.tsv`、`characters.tsv`、`translation_memory.json`
+  - 当前卷 `manga_context.md` 优先；缺省时使用书系 profile，后续卷自动继承
+- `translate_manga_v2` 自 `2026-05-08` 起支持批后纠错闭环：
+  - `_debug/failed-translations.tsv`
+  - `_debug/review-pages.txt`
+  - `_debug/final-review-report.txt`
+  - `--retry-review-pages`
+  - 菜单 `扫描并纠正错误`
+  - retry 会读取 `_debug/pages/*.json` 中前后页正常译文作为上下文，过滤翻译失败占位符
+  - 新 debug 记录包含 `preprocessedPayload`，后续 retry 可优先走 `PREP-DEBUG`
 - `_debug/summary.json` 自 `2026-04-30` 起会额外写出 `runOptions`：
   - `inputDir`
   - `outputDir`
@@ -77,16 +91,15 @@
   - `translationModel`
   - `ocrEngine`
   - `secondaryOcrEngine`
-- CLI、调试路由、后台批处理脚本现在共用同一套翻译默认值；根目录 `翻译api.txt` 只保留脱敏示例，实际私有接口配置只放 `config/local.json` 或 `TRANSLATE_MANGA_CLI_*` 环境变量。
+- CLI 菜单、参数入口、后台批处理脚本现在共用同一套翻译默认值；根目录 `翻译api.txt` 只保留脱敏示例，实际私有接口配置只放 `config/local.json` 或 `TRANSLATE_MANGA_CLI_*` 环境变量。
 - 四段翻译提示词已正式进入配置：
   - `prompts.translation.system`
   - `prompts.translation.rounds.draft`
   - `prompts.translation.rounds.contextual`
   - `prompts.translation.rounds.final`
   - `local.json` 留空时回退到 `defaults.json`
-- Saber 仍作为同级外部依赖存在：`D:/github/translate-reader/Saber-Translator`。
-- `translate_manga_cli` 自身的运行时解释器优先找本地 `.venv310`，不应再回退到 `translate-reader/.venv*`。
-- `translate_manga_cli/.venv310` 已在 `2026-04-29` 按 `requirements.txt` 重建并验证通过：`python -m pytest -q` 为 `91 passed`。
+- 旧 `Saber-Translator` 仍作为同级外部基线存在；`translate_manga_v2` 默认使用自己的 `vendor/Saber-Translator`。
+- `translate_manga_v2` 自身的运行时解释器优先找本地 `.venv310`，不应再回退到 `translate-reader/.venv*`。
 - 为兼容过渡，代码层仍接受少量旧前缀 `TRANSLATE_READER_*`，但文档只推荐 `TRANSLATE_MANGA_CLI_*`。
 - 批处理能力当前已覆盖：
   - 自然排序扫描输入图片
@@ -96,9 +109,14 @@
   - `_debug/` 调试产物
   - 前置页 / 目录页轻量跳过
   - OpenAI-compatible 超时与逐页降级重试
-- 最近稳定基线：
+- `translate_manga_v2` 当前验证基线（2026-05-08）：
+  - `.venv310/Scripts/python.exe -m pytest --ignore=tests/test_cli_batch.py -q`：`110 passed`
+  - `.venv310/Scripts/python.exe -m pytest tests/test_book_profile.py tests/test_manga_context_service.py tests/test_cli_menu.py -q`：`14 passed`
+  - `.venv310/Scripts/python.exe -m compileall -q src/translate_manga/core/context src/translate_manga/cli/menu.py`
+- 旧 `translate_manga_cli` 历史稳定基线，仅供回溯：
   - `pytest -q`：`116 passed`（`2026-04-30`，纯 CLI 收口后）
   - 真实整本 `[古泉智浩] 死んだ目をした少年`：`188` 页，`897.25s`，约 `4.77s/页`
+- 跨阶段真实样本基线：
   - 真实整卷 `[藤子不二雄A] 帰ッテキタせぇるすまん 第01巻`：
     - V2 最终补齐：`170/170`
     - 最后一轮全缓存重渲染耗时：`467.85s`
@@ -111,23 +129,29 @@
 
 ### 活跃文档
 
+- [工作区 README](../README.md)
+  - 适用场景：第一次接手本仓库时确认当前活跃项目、目录定位、V2 启动入口和验证基线。
+- [translate_manga_v2 使用说明](../translate_manga_v2/README.md)
+  - 适用场景：直接查 V2 运行方式、输出结构、批后纠错和书系 Profile。
+- [translate_manga_v2 启动说明](../translate_manga_v2/start.md)
+  - 适用场景：查看交互菜单、批量输入、固定输出到 `out`、样式映射和覆盖策略。
+- [translate_manga_v2 重构计划](../translate_manga_v2/docs/refactor_plan.md)
+  - 适用场景：理解 V2 当前架构边界、已完成阶段、后续 Phase 3-6 优化方向和验证命令。
+- [translate_manga_v2 翻译提示词方案](../translate_manga_v2/docs/translation_prompt_scheme.md)
+  - 适用场景：调整翻译 prompt、理解当前卷 `manga_context.md` 与书系 `_translation_profile` 的注入优先级。
+- [translate_manga_v2 profile 生成模板](../translate_manga_v2/docs/manga_context_prompt_template.md)
+  - 适用场景：用 AI 生成书系 `series_profile.md` 或当前卷 `manga_context.md`。
 - [2026-05-08 V4 readability 设计](./specs/2026-05-08-v4-readability-design.md)
-  - 适用场景：调整 `translate_manga_cli` 的嵌字可读性策略；理解新的黑字双样式默认、亮度/复杂度决策链路和回归样本。
-- [2026-04-28 translate_manga_cli 设计](./specs/2026-04-28-translate-manga-cli-design.md)
-  - 适用场景：理解 CLI 的目标边界、运行方式，以及 `2026-04-29` 之后的独立化方向。
-- [2026-04-28 translate_manga_cli 实施计划](./plans/2026-04-28-translate-manga-cli-implementation-plan.md)
-  - 适用场景：追踪 CLI 已落地的流水线、性能优化、调试输出和独立化收尾任务。
-- [translate_manga_cli 使用说明](../translate_manga_cli/README.md)
-  - 适用场景：人类接手者直接查启动方式、配置方法、输出结构和覆盖重跑。
-- [translate_manga_cli 启动说明](../translate_manga_cli/start.md)
-  - 适用场景：查看交互菜单、纯命令行、样式映射、`reuse/reset` 和覆盖策略的实际用法。
-- [translate_manga_cli 翻译提示词方案](../translate_manga_cli/docs/translation_prompt_scheme.md)
-  - 适用场景：调整翻译 prompt、理解 `manga_context.md` 应该写什么。
-- [translate_manga_cli manga_context 生成模板](../translate_manga_cli/docs/manga_context_prompt_template.md)
-  - 适用场景：用 AI 生成每本漫画的 `manga_context.md` 首版。
+  - 适用场景：理解 V4 readability 的黑字双样式默认、亮度/复杂度决策链路和回归样本。
+- [2026-05-08 V4 readability 实施计划](./plans/2026-05-08-v4-readability-implementation-plan.md)
+  - 适用场景：历史记录，追踪 V4 readability 从旧 CLI 到 V2 的实现步骤和验证记录。
 
 ### 历史文档
 
+- [2026-04-28 translate_manga_cli 设计](./specs/2026-04-28-translate-manga-cli-design.md)
+  - 适用场景：历史记录，理解旧 CLI 的目标边界、运行方式，以及 V2 的来源。
+- [2026-04-28 translate_manga_cli 实施计划](./plans/2026-04-28-translate-manga-cli-implementation-plan.md)
+  - 适用场景：历史记录，追踪旧 CLI 已落地的流水线、性能优化、调试输出和独立化收尾任务。
 - [2026-04-28 translate-reader 本地 Web 机翻阅读器首版设计](./specs/2026-04-28-translate-reader-local-web-reader-design.md)
   - 适用场景：仅供回溯早期 Web 阅读器方案；当前不是活跃实现目标。
 - [2026-04-28 translate-reader 阅读器增强与人工微调设计](./specs/2026-04-28-translate-reader-reader-enhancement-design.md)

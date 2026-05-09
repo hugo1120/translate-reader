@@ -1,4 +1,6 @@
-# translate_manga_cli V4 readability 设计
+# V4 readability 设计
+
+> 历史背景：本文最初面向旧 `translate_manga_cli` 编写；当前实现和后续维护以 `translate_manga_v2` 为准。
 
 ## 目标
 
@@ -213,6 +215,12 @@
 - 复杂背景上的黑字可读性不下降
 - 同页混排时，样式差异应表现为“合理补偿”，而不是明显风格跳变
 - 相关单测通过，样本页人工观感检查通过
+
+## 落地状态
+
+- `2026-05-08` 起，V4 readability 已在代码层替换 V3，成为新的全局默认嵌字可读性策略。
+- 输出样式固定收敛为 `black + white stroke` 与 `black + no stroke`。
+- 样本页人工观感检查仍需在确认可调用本地批处理和翻译接口后执行。
 
 ## 风险与控制
 

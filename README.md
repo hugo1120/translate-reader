@@ -1,255 +1,115 @@
-# translate_manga_cli
+# translate-reader 工作区
 
-本地漫画整章批处理翻译器。主流程是 `OCR -> 翻译 -> 擦字 -> 写字`，输出最终译图，适合直接跑一整话或一整卷日漫生肉。
+当前活跃项目是 `D:/github/translate-reader/translate_manga_v2`。后续开发和 GitHub 同步只以 V2 为准；旧 `translate_manga_cli` 已删除，`translate_manga_v1` 仅作本机备用，不参与同步。
 
-## 当前形态
+## 目录定位
 
-- 主入口：`batch_translate.py`
-- 双击启动：项目内 `translate_manga_cli/start_cli.bat`
-- 默认只保留最终译图，文件名为 `*.translated.png`
-- 默认跳过已有译图；可用 `overwrite_existing=True` 覆盖重跑
-- 默认 OCR 策略：`48px_ocr + manga_ocr hybrid`
-- 前置页 / 目录 / 无字页会自动复制原图，避免空跑和卡顿
-- 输出目录默认附带 `_debug/`，用于复查 OCR、译文、页型和耗时
-- 支持每本漫画目录放 `manga_context.md` 作为整本翻译背景
-- 如果目录里没有背景文件，默认会尝试自动生成；失败时会自动降级为空上下文，不阻塞主流程
-- CLI 会记住上次使用的输入目录、输出目录和排版样式，保存在本地 `translate_manga_cli/config/session.json`
-- 当前默认排版样式是 `2`：竖排右到左；可在启动时切换到样式 `1`：横排
-- 运行日志默认写到 `translate_manga_cli/logs/`，历史日志归档到 `translate_manga_cli/logs/archive/`
+- `translate_manga_v2/`：当前重构版漫画批量翻译器。
+- `translate_manga_v1/`：旧 CLI 的本机备用副本，已被 `.gitignore` 整目录忽略。
+- `Saber-Translator/`：旧同级 Saber 基线；V2 默认使用自己的 `translate_manga_v2/vendor/Saber-Translator`。
+- `agent-docs/`：长期设计、计划和项目记忆索引。
+- `翻译测试日漫/`：本地真实样本与用户测试数据。
 
-## 依赖关系
+## 当前主流程
 
-`translate_manga_cli` 现在独立运行，不再依赖 `translate-reader/` 目录。
+`translate_manga_v2` 是纯命令行本地漫画整章/整卷翻译器，主链路为：
 
-仍保留的外部依赖只有：
+```text
+OCR -> 三轮翻译(draft/contextual/final) -> 擦字 -> 写字 -> 输出译图
+```
 
-- 同级 `../Saber-Translator`
-- 本项目自己的 Python 环境，推荐 `translate_manga_cli/.venv310`
+当前不包含 Web API、浏览器界面或本地阅读器壳。
 
-首次在新机器或新目录准备环境时，可直接执行：
+## 快速启动
 
 ```powershell
-C:/Python310/python.exe -m venv "D:/github/translate-reader/translate_manga_cli/.venv310"
-D:/github/translate-reader/translate_manga_cli/.venv310/Scripts/python.exe -m pip install -r "D:/github/translate-reader/translate_manga_cli/requirements.txt"
+cd "D:/github/translate-reader/translate_manga_v2"
+./start_cli.bat
 ```
 
-`start_cli.bat` 会按这个顺序找解释器：
+无参数时进入交互菜单：
 
-1. `translate_manga_cli/.venv310/Scripts/python.exe`
-2. `translate_manga_cli/.venv/Scripts/python.exe`
-3. 系统 `python`
+- `继续上次任务`：复用上次保存的一个或多个输入目录，继续跑未完成内容。
+- `新建任务`：重新输入一个或多个漫画目录，输出固定到每个输入目录下的 `out`。
+- `扫描并纠正错误`：扫描已有 `_debug` 记录，只覆盖重跑失败/需复查页面。
+- `退出`
 
-## 配置文件
+有参数时，`start_cli.bat` 会直接透传给 `batch_translate.py`：
 
-默认配置：
-
-- `config/defaults.json`
-
-用户本地覆盖：
-
-- `config/local.json`
-
-配置优先级：
-
-- `defaults.json`
-- `local.json`
-- `TRANSLATE_MANGA_CLI_*` 环境变量
-- Python 调用参数
-
-最常改的字段在 `config/local.json`：
-
-```json
-{
-  "paths": {
-    "input_dir": "D:/manga/input",
-    "output_dir": "D:/manga/output",
-    "workspace_root": "",
-    "cache_root": ""
-  },
-  "translation": {
-    "model": "mimo-v2.5-pro",
-    "base_url": "https://your-openai-compatible-base-url/v1",
-    "api_key": ""
-  },
-  "ocr": {
-    "engine": "",
-    "enable_hybrid": true,
-    "secondary_engine": "",
-    "hybrid_threshold": 0.2,
-    "fallback_to_manga_ocr_when_48px_unavailable": true
-  },
-  "pipeline": {
-    "manga_context_file_names": ["manga_context.md", "manga_context.txt"],
-    "auto_generate_manga_context": true
-  },
-  "prompts": {
-    "translation": {
-      "system": "",
-      "rounds": {
-        "draft": "",
-        "contextual": "",
-        "final": ""
-      }
-    }
-  }
-}
+```powershell
+./start_cli.bat --input "D:/path/to/input" --output "D:/path/to/input/out" --layout-mode vertical
 ```
 
-还支持这些配置组：
+更完整说明见 `translate_manga_v2/start.md`。
 
-- `ocr`
-  - `engine`
-  - `enable_hybrid`
-  - `secondary_engine`
-  - `hybrid_threshold`
-  - `fallback_to_manga_ocr_when_48px_unavailable`
-- `pipeline`
-  - `overwrite_existing`
-  - `debug_output`
-  - `skip_frontmatter`
-  - `translate_batch_size`
-  - `translate_batch_max_chars`
-  - `manga_context_file_names`
-  - `auto_generate_manga_context`
-- `prompts`
-  - `translation.system`
-  - `translation.rounds.draft`
-  - `translation.rounds.contextual`
-  - `translation.rounds.final`
-  - 留空时会回退到 `config/defaults.json` 的默认提示词
-- `inpaint`
-  - `method`
-  - `mask_dilate_size`
-  - `mask_box_expand_ratio`
-- `render`
-  - `font_family`
-  - `stroke_enabled`
-  - `stroke_color`
-  - `stroke_width`
-  - `line_spacing`
-  - `text_align`
-  - `auto_font`
-- `runtime`
-  - `saber_session_timeout_seconds`
-  - `saber_subprocess_timeout_seconds`
-  - `saber_operation_timeout_seconds`
-    - 例如可单独给 `preprocess` 放宽超时, 避免 48px OCR + 颜色提取在长文页上被 `45s` 提前打断
+## 配置
 
-批处理翻译失败恢复顺序现在是：
+V2 配置优先级：
 
-1. 正常多轮批量翻译
-2. 单页 `retry-single`
-3. 轻量单轮直译，无上下文
-
-这样在线 API 偶发超时时，不会优先直接回退成原图拷贝。
-
-## 使用方式
-
-### 1. 双击直接跑
-
-双击：
-
-- `translate_manga_cli/start_cli.bat`
-
-启动后会进入一个很轻的 CLI 入口：
-
-- `1` 复用上次输入目录、输出目录和上次样式
-- `2` 重新输入输入目录、输出目录，并手动选择样式
-
-样式定义：
-
-- `1` 横排
-- `2` 竖排右到左
-
-默认样式是 `2`。上次使用的输入目录、输出目录和样式会写入本地 `translate_manga_cli/config/session.json`。
-
-### 2. Python 调用
-
-```python
-from pathlib import Path
-from src.cli.service import run_batch_translation
-
-summary = run_batch_translation(
-    input_dir=Path(r"D:/input"),
-    output_dir=Path(r"D:/output"),
-    overwrite_existing=True,
-)
-print(summary)
+```text
+config/defaults.json < config/local.json < TRANSLATE_MANGA_CLI_* 环境变量 < 命令行参数
 ```
 
-## 输出规则
+私有接口、模型和本机路径放在：
 
-- 默认输出：`<原文件名>.translated.png`
-- 纯数字文件名会自动补零，例如 `1.jpg -> 001.translated.png`
-- 默认不保留中间 clean 图
-- 输出目录会生成 `_debug/`
+```text
+translate_manga_v2/config/local.json
+```
 
-`_debug/` 里的主要文件：
+该文件被 `.gitignore` 忽略，不应写入公开文档或提交记录。
 
-- `pages/*.json`：每页 OCR、译文、页型、耗时、状态
-- `texts/*.ocr.txt`：每页 OCR 文本
-- `texts/*.translation.txt`：每页最终译文
-- `texts/*.{draft,contextual,final}.translation.txt`：三轮翻译各轮结果
-- `pages.jsonl`：整本页级清单
-- `book.ocr.txt` / `book.translation.txt`：整本合并文本
-- `review-pages.txt`：需要人工复查的页
-- `summary.json`：整本汇总
-- `pages/*.json` 还会记录本页实际使用的 `mangaContext`、背景文件路径、是否自动生成
+## 输出和纠错
 
-## 漫画背景提示词
+默认输出：
 
-推荐在每本漫画输入目录根放：
+```text
+<输入目录>/out/*.translated.png
+```
 
-- `manga_context.md`
+调试与复查产物：
 
-建议内容：
+- `_debug/pages/*.json`：每页 OCR、译文、页型、耗时和状态。
+- `_debug/review-pages.txt`：需要复查/重跑的页。
+- `_debug/failed-translations.tsv`：失败或疑似失败页清单。
+- `_debug/final-review-report.txt`：最终复查报告和残留问题。
+- `_debug/summary.json`：本次跑批汇总与运行选项。
 
-- 作品名、作者、题材
-- 主角/常驻角色标准译名
-- 时代感和说话口吻
-- 标点习惯
-- 避免事项
+完整翻译结束后会自动扫描失败页并最多重试 5 轮；菜单里的 `扫描并纠正错误` 可对已有输出反复补救。
 
-这个文件会注入三轮翻译，优先解决：
+## 书系 Profile
 
-- 称呼前后不一致
-- 成年向作品被翻成少年漫口气
-- 标点过多、语气过躁
+当输入目录最后一段是卷号时，程序会把上一级识别为书系根目录：
 
-当前工作流是：
+```text
+D:/漫画/德川家康/01 -> 书系: 德川家康, 卷: 01
+D:/漫画/德川家康/02 -> 书系: 德川家康, 卷: 02
+```
 
-- 有 `manga_context.md` / `manga_context.txt` 就直接读取并用于翻译
-- 没有时，如果 `auto_generate_manga_context=true`，会根据目录名和当前翻译模型自动生成一个 `manga_context.md`
-- 自动生成失败时会降级为空上下文，不中断整本翻译
+书系提示词和术语文件保存在：
 
-当前还没有单独实现“联网搜索漫画资料再生成背景文件”的流程。现在的自动生成属于本地提示词生成，不会额外去网上查资料。
+```text
+<书系目录>/_translation_profile/
+  series_profile.md
+  glossary.tsv
+  characters.tsv
+  translation_memory.json
+```
 
-## 环境变量
+翻译时优先使用当前卷 `manga_context.md`；如果不存在，就复用书系 `series_profile.md`。
 
-推荐统一改 `config/local.json`。如果需要临时覆盖，可用：
+## V2 开发基线
 
-- `TRANSLATE_MANGA_CLI_INPUT_DIR`
-- `TRANSLATE_MANGA_CLI_OUTPUT_DIR`
-- `TRANSLATE_MANGA_CLI_OCR_ENGINE`
-- `TRANSLATE_MANGA_CLI_OCR_ENABLE_HYBRID`
-- `TRANSLATE_MANGA_CLI_OCR_SECONDARY_ENGINE`
-- `TRANSLATE_MANGA_CLI_OCR_HYBRID_THRESHOLD`
-- `TRANSLATE_MANGA_CLI_MODEL`
-- `TRANSLATE_MANGA_CLI_BASE_URL`
-- `TRANSLATE_MANGA_CLI_API_KEY`
-- `TRANSLATE_MANGA_CLI_INPAINT_METHOD`
-- `TRANSLATE_MANGA_CLI_SABER_PYTHON`
-- `TRANSLATE_MANGA_CLI_SABER_SESSION_TIMEOUT_SECONDS`
-- `TRANSLATE_MANGA_CLI_SABER_SUBPROCESS_TIMEOUT_SECONDS`
+常用验证命令：
 
-兼容过渡期仍接受少量旧前缀 `TRANSLATE_READER_*`，但不建议继续用。
+```powershell
+cd "D:/github/translate-reader/translate_manga_v2"
+./.venv310/Scripts/python.exe -m pytest --ignore=tests/test_cli_batch.py -q
+./.venv310/Scripts/python.exe -m pytest tests/test_book_profile.py tests/test_manga_context_service.py tests/test_cli_menu.py -q
+./.venv310/Scripts/python.exe -m compileall -q src/translate_manga/core/context src/translate_manga/cli/menu.py
+```
 
-## 已验证基线
+`2026-05-08` 验证基线：
 
-- `pytest -q`：`99 passed`
-- 真实整本重跑基线：
-  - 输入：`[古泉智浩] 死んだ目をした少年`
-  - 总页数：`188`
-  - 结果：`succeeded=188 skipped=0 failed=0`
-  - 总耗时：`897.25s`
-  - 平均：约 `4.77s/页`
+- `pytest --ignore=tests/test_cli_batch.py -q`：`110 passed`
+- `pytest tests/test_book_profile.py tests/test_manga_context_service.py tests/test_cli_menu.py -q`：`14 passed`
+- `compileall`：通过
