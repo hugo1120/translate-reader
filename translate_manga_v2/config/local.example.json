@@ -1,0 +1,22 @@
+{
+  "paths": {
+    "input_dir": "",
+    "output_dir": "",
+    "workspace_root": "",
+    "cache_root": "",
+    "saber_root": "vendor/Saber-Translator",
+    "saber_python": ""
+  },
+  "translation": {
+    "model": "mimo-v2.5-pro",
+    "base_url": "https://your-openai-compatible-base-url/v1",
+    "api_key": "",
+    "request_timeout_seconds": 90.0,
+    "curl_timeout_seconds": 95
+  },
+  "pipeline": {
+    "translation_quality": "high",
+    "debug_flush_interval": 25,
+    "color_fast_mode": true
+  }
+}

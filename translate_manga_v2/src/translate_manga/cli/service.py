@@ -1,0 +1,1464 @@
+import csv
+import json
+import shutil
+import tempfile
+import uuid
+from concurrent.futures import ThreadPoolExecutor
+from dataclasses import dataclass
+from hashlib import sha1
+from pathlib import Path
+from time import perf_counter
+
+from translate_manga.cli.cache import BatchStageCache
+from translate_manga.cli.debug_artifacts import BatchDebugArtifactWriter
+from translate_manga.config.paths import find_project_root
+from translate_manga.config.settings import (
+    load_settings,
+    resolve_ocr_config,
+    resolve_path_value,
+    resolve_pipeline_config,
+    resolve_translation_config,
+    resolve_translation_prompt_config,
+)
+from translate_manga.core.context.manga_context import load_or_generate_manga_context
+from translate_manga.core.natural_sort import natural_sort_key
+from translate_manga.core.styles import resolve_style_profile
+from translate_manga.core.pipeline.page_classifier import classify_preprocessed_page
+from translate_manga.core.pipeline.runtime import IMAGE_EXTENSIONS, PipelineRuntime
+from translate_manga.core.pipeline.service import (
+    _build_translation_context,
+    preprocess_page,
+    run_page_pipeline,
+    translate_texts as pipeline_translate_texts,
+    translate_texts_multi_round as pipeline_translate_texts_multi_round,
+)
+from translate_manga.core.translation_payload import (
+    build_legacy_translation_payload as _build_legacy_translation_payload,
+    default_ocr_retry_state as _default_ocr_retry_state,
+    empty_usage as _empty_usage,
+    normalize_translation_payload as _normalize_translation_payload,
+)
+from translate_manga.core.pipeline.filtering import load_image_size
+from translate_manga.core.translate.openai_compatible import TRANSLATION_FAILURE_TEXT, TRANSLATION_PROMPT_SIGNATURE
+from translate_manga.integrations.saber_loader import SaberWorkerSession
+
+
+@dataclass
+class PreparedPage:
+    page: dict
+    source_path: Path
+    target_path: Path
+    preprocessed_payload: dict
+    classification: dict | None = None
+    translated_texts: list[str] | None = None
+    translation_payload: dict | None = None
+    translation_seconds: float = 0.0
+
+
+def translate_texts(texts, model, base_url, api_key=None, context_snapshot=None):
+    return pipeline_translate_texts(
+        texts=texts,
+        model=model,
+        base_url=base_url,
+        api_key=api_key,
+        context_snapshot=context_snapshot,
+    )
+
+
+_DEFAULT_TRANSLATE_TEXTS = translate_texts
+
+
+def translate_texts_multi_round(texts, model, base_url, api_key=None, context_snapshot=None):
+    if translate_texts is not _DEFAULT_TRANSLATE_TEXTS:
+        attempts = [
+            {
+                "texts": texts,
+                "model": model,
+                "base_url": base_url,
+                "api_key": api_key,
+                "context_snapshot": context_snapshot,
+            },
+            {
+                "texts": texts,
+                "model": model,
+                "base_url": base_url,
+                "context_snapshot": context_snapshot,
+            },
+            {
+                "texts": texts,
+                "model": model,
+                "base_url": base_url,
+            },
+        ]
+        last_error = None
+        translated = None
+        for kwargs in attempts:
+            try:
+                translated = translate_texts(**kwargs)
+                break
+            except TypeError as error:
+                last_error = error
+                error_text = str(error)
+                if "unexpected keyword argument" not in error_text and "required keyword-only argument" not in error_text:
+                    raise
+        if translated is None:
+            raise last_error
+        return _build_legacy_translation_payload(translated)
+    return pipeline_translate_texts_multi_round(
+        texts=texts,
+        model=model,
+        base_url=base_url,
+        api_key=api_key,
+        context_snapshot=context_snapshot,
+    )
+
+
+class NullBatchDebugArtifactWriter:
+    def record_page(self, **kwargs):
+        return {}
+
+    def finish(self, summary=None, records=None, run_options=None):
+        return None
+
+
+def format_seconds(seconds):
+    if seconds < 60:
+        return f"{seconds:.2f}s"
+    minutes = int(seconds // 60)
+    remain = int(seconds % 60)
+    return f"{minutes:02d}:{remain:02d}"
+
+
+class BatchProgressReporter:
+    def __init__(self, stream=None):
+        import sys
+
+        self.stream = stream or sys.stdout
+        self._has_progress_line = False
+
+    def update(self, current_index, total_count, current_name, succeeded, skipped, failed, elapsed_seconds):
+        message = (
+            f"[{current_index}/{total_count}] current={current_name} "
+            f"ok={succeeded} skip={skipped} fail={failed} elapsed={format_seconds(elapsed_seconds)}"
+        )
+        self.stream.write(f"\r{message}")
+        self.stream.flush()
+        self._has_progress_line = True
+
+    def log(self, message):
+        if self._has_progress_line:
+            self.stream.write("\n")
+        self.stream.write(f"{message}\n")
+        self.stream.flush()
+        self._has_progress_line = False
+
+    def finish(self, total_count, succeeded, skipped, failed, elapsed_seconds):
+        self.log(
+            f"DONE total={total_count} ok={succeeded} skip={skipped} fail={failed} elapsed={format_seconds(elapsed_seconds)}"
+        )
+
+
+def scan_input_images(input_dir):
+    directory = Path(input_dir)
+    if not directory.exists() or not directory.is_dir():
+        raise ValueError(f"Input folder not found: {directory}")
+
+    return sorted(
+        [path for path in directory.iterdir() if path.is_file() and path.suffix.lower() in IMAGE_EXTENSIONS],
+        key=lambda item: natural_sort_key(item.name),
+    )
+
+
+def _resolve_numeric_output_width(image_paths):
+    widths = [len(path.stem) for path in image_paths if path.stem.isdigit()]
+    return max(widths) if widths else None
+
+
+def _normalize_output_stem(source_path, numeric_width=None):
+    stem = Path(source_path).stem
+    if numeric_width and stem.isdigit():
+        return stem.zfill(int(numeric_width))
+    return stem
+
+
+def build_output_path(source_path, output_dir, numeric_width=None):
+    stem = _normalize_output_stem(source_path, numeric_width=numeric_width)
+    return Path(output_dir) / f"{stem}.translated.png"
+
+
+def find_missing_output_page_names(image_paths, output_dir, numeric_width=None):
+    image_paths = list(image_paths or [])
+    if numeric_width is None:
+        numeric_width = _resolve_numeric_output_width(image_paths)
+    missing = set()
+    for image_path in image_paths:
+        source_path = Path(image_path)
+        if not build_output_path(source_path, output_dir, numeric_width=numeric_width).exists():
+            missing.add(source_path.name)
+    return missing
+
+
+def _load_retry_review_page_names(output_dir, image_paths=None, numeric_width=None):
+    debug_root = Path(output_dir) / "_debug"
+    failed_tsv_path = debug_root / "failed-translations.tsv"
+    names = set()
+
+    if failed_tsv_path.exists():
+        with failed_tsv_path.open("r", encoding="utf-8", newline="") as handle:
+            reader = csv.DictReader(handle, delimiter="\t")
+            for row in reader:
+                source_name = str((row or {}).get("sourceName") or "").strip()
+                if source_name:
+                    names.add(source_name)
+
+    review_pages_path = debug_root / "review-pages.txt"
+    if review_pages_path.exists():
+        for line in review_pages_path.read_text(encoding="utf-8").splitlines():
+            source_name = line.split("\t", 1)[0].strip()
+            if source_name:
+                names.add(source_name)
+
+    pages_root = debug_root / "pages"
+    if pages_root.exists():
+        for page_json_path in pages_root.glob("*.json"):
+            try:
+                record = json.loads(page_json_path.read_text(encoding="utf-8"))
+            except (OSError, json.JSONDecodeError):
+                continue
+            if _debug_record_needs_retry(record):
+                source_name = str(record.get("sourceName") or "").strip()
+                if source_name:
+                    names.add(source_name)
+
+    names.update(find_missing_output_page_names(image_paths or [], output_dir, numeric_width=numeric_width))
+    return names
+
+
+def _debug_record_needs_retry(record):
+    if not isinstance(record, dict):
+        return False
+    if record.get("needsReview"):
+        return True
+    if str(record.get("status") or "").strip().lower() == "failed":
+        return True
+
+    reasons = []
+    reasons.extend(record.get("reviewReasons") or [])
+    ocr_retry = record.get("ocrRetry")
+    if isinstance(ocr_retry, dict):
+        reasons.extend(ocr_retry.get("reasons") or [])
+    translation = record.get("translation")
+    if isinstance(translation, dict):
+        translation_retry = translation.get("ocrRetry")
+        if isinstance(translation_retry, dict):
+            reasons.extend(translation_retry.get("reasons") or [])
+
+    if any(str(reason or "").strip() == "translation_failed" for reason in reasons):
+        return True
+
+    translated_texts = list(record.get("translatedTexts") or [])
+    if isinstance(translation, dict):
+        translated_texts.extend(translation.get("translatedTexts") or [])
+        for round_payload in translation.get("rounds") or []:
+            if isinstance(round_payload, dict):
+                translated_texts.extend(round_payload.get("translatedTexts") or [])
+    return any(str(text or "").strip() == TRANSLATION_FAILURE_TEXT for text in translated_texts)
+
+
+def _load_existing_debug_records(output_dir):
+    pages_root = Path(output_dir) / "_debug" / "pages"
+    records = {}
+    if not pages_root.exists():
+        return records
+
+    for page_json_path in pages_root.glob("*.json"):
+        try:
+            record = json.loads(page_json_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        source_name = str(record.get("sourceName") or "").strip()
+        if source_name:
+            records[source_name] = record
+    return records
+
+
+def _debug_record_translated_texts(record):
+    translated_texts = list((record or {}).get("translatedTexts") or [])
+    translation = (record or {}).get("translation")
+    if isinstance(translation, dict):
+        translated_texts.extend(translation.get("translatedTexts") or [])
+        for round_payload in translation.get("rounds") or []:
+            if isinstance(round_payload, dict):
+                translated_texts.extend(round_payload.get("translatedTexts") or [])
+    normalized = []
+    for text in translated_texts:
+        value = str(text or "").strip()
+        if value and value != TRANSLATION_FAILURE_TEXT and value not in normalized:
+            normalized.append(value)
+    return normalized
+
+
+def _debug_record_to_context_result(record):
+    if not isinstance(record, dict) or _debug_record_needs_retry(record):
+        return None
+
+    translated_texts = _debug_record_translated_texts(record)
+    if not translated_texts:
+        return None
+
+    original_texts = [str(text or "").strip() for text in (record.get("originalTexts") or [])]
+    bubble_states = []
+    max_count = max(len(original_texts), len(translated_texts))
+    for index in range(max_count):
+        original = original_texts[index] if index < len(original_texts) else ""
+        translated = translated_texts[index] if index < len(translated_texts) else ""
+        if not translated:
+            continue
+        bubble_states.append({"originalText": original, "translatedText": translated})
+
+    if not bubble_states:
+        return None
+    return {
+        "manualEdited": False,
+        "originalTexts": original_texts,
+        "translatedTexts": translated_texts,
+        "bubbleStates": bubble_states,
+        "bubbles": bubble_states,
+    }
+
+
+def _seed_runtime_context_from_debug(runtime, all_pages, debug_records_by_source, retry_page_names):
+    retry_page_names = set(retry_page_names or set())
+    for page in all_pages:
+        source_name = str(page.get("fileName") or "").strip()
+        if not source_name or source_name in retry_page_names:
+            continue
+        result = _debug_record_to_context_result((debug_records_by_source or {}).get(source_name))
+        if result is not None:
+            runtime.save_result(page["id"], result)
+
+
+def _debug_record_to_preprocessed_payload(record):
+    if not isinstance(record, dict):
+        return None
+    payload = record.get("preprocessedPayload")
+    if not isinstance(payload, dict):
+        return None
+    if not payload.get("bubbleCoords"):
+        return None
+
+    normalized = {
+        "bubbleCoords": payload.get("bubbleCoords") or [],
+        "bubblePolygons": payload.get("bubblePolygons") or [],
+        "autoDirections": payload.get("autoDirections") or [],
+        "textlinesPerBubble": payload.get("textlinesPerBubble") or [],
+        "bubbleColors": payload.get("bubbleColors") or [],
+        "originalTexts": payload.get("originalTexts") or record.get("originalTexts") or [],
+        "ocrResults": payload.get("ocrResults") or [],
+        "rawMask": payload.get("rawMask"),
+    }
+    timings = payload.get("timings")
+    if isinstance(timings, dict):
+        normalized["timings"] = timings
+    return normalized
+
+
+def _merge_context_items(base_items, extra_items):
+    merged = list(base_items or [])
+    for item in extra_items or []:
+        value = str(item or "").strip()
+        if value and value != TRANSLATION_FAILURE_TEXT and value not in merged:
+            merged.append(value)
+    return merged
+
+
+def _augment_context_with_debug_neighbors(context_snapshot, all_pages, current_page_id, debug_records_by_source, retry_page_names, window=3):
+    snapshot = dict(context_snapshot or {})
+    page_ids = [page.get("id") for page in all_pages]
+    if current_page_id not in page_ids:
+        return snapshot
+
+    current_index = page_ids.index(current_page_id)
+    start_index = max(0, current_index - int(window))
+    end_index = min(len(all_pages), current_index + int(window) + 1)
+    retry_page_names = set(retry_page_names or set())
+    extra_translations = []
+    glossary = dict(snapshot.get("glossary") or {})
+
+    for page in all_pages[start_index:end_index]:
+        if page.get("id") == current_page_id:
+            continue
+        source_name = str(page.get("fileName") or "").strip()
+        if not source_name or source_name in retry_page_names:
+            continue
+        result = _debug_record_to_context_result((debug_records_by_source or {}).get(source_name))
+        if result is None:
+            continue
+        for bubble in result.get("bubbleStates") or []:
+            original = str(bubble.get("originalText") or "").strip()
+            translated = str(bubble.get("translatedText") or "").strip()
+            if not translated or translated == TRANSLATION_FAILURE_TEXT:
+                continue
+            extra_translations.append(translated)
+            if original and original not in glossary:
+                glossary[original] = translated
+
+    snapshot["confirmedTranslations"] = _merge_context_items(snapshot.get("confirmedTranslations") or [], extra_translations)
+    snapshot["glossary"] = glossary
+    return snapshot
+
+
+def _build_pages(image_paths):
+    pages = []
+    for index, image_path in enumerate(image_paths, start=1):
+        pages.append(
+            {
+                "id": f"page-{index:04d}",
+                "pageIndex": index,
+                "fileName": image_path.name,
+                "sourcePath": str(image_path),
+                "translatedPath": None,
+                "status": "idle",
+                "cacheKey": str(uuid.uuid4()),
+            }
+        )
+    return pages
+
+
+def _default_cache_root():
+    return find_project_root(__file__) / ".cache" / "translate_manga_cli"
+
+
+def _build_style_ocr_config(ocr_config, style_profile=None):
+    resolved = dict(ocr_config or {})
+    style_profile = style_profile or {}
+    if style_profile.get("source_language"):
+        resolved["source_language"] = style_profile["source_language"]
+    if style_profile.get("reading_order"):
+        resolved["reading_order"] = style_profile["reading_order"]
+    for key, value in ((style_profile.get("ocr") or {}).items()):
+        resolved[key] = value
+    return resolved
+
+
+def _build_preprocess_signature(settings, style_profile=None):
+    payload = {
+        "version": "preprocess-v1",
+        "ocr": _build_style_ocr_config(resolve_ocr_config(settings=settings), style_profile=style_profile),
+        "reading_order": (style_profile or {}).get("reading_order"),
+    }
+    return json.dumps(payload, ensure_ascii=False, sort_keys=True)
+
+
+def _normalize_translation_quality(value):
+    quality = str(value or "high").strip().lower()
+    return quality if quality in {"fast", "balanced", "high"} else "high"
+
+
+def _build_translation_signature(settings, style_profile=None, manga_context_payload=None, translation_quality=None):
+    prompt_profile = (style_profile or {}).get("prompt_profile", "default")
+    prompt_config = resolve_translation_prompt_config(settings=settings, prompt_profile=prompt_profile)
+    if translation_quality is None:
+        translation_quality = resolve_pipeline_config(settings=settings).get("translation_quality", "high")
+    payload = {
+        "version": TRANSLATION_PROMPT_SIGNATURE,
+        "promptProfile": prompt_profile,
+        "promptConfig": prompt_config,
+        "translationQuality": _normalize_translation_quality(translation_quality),
+        "mangaContext": str((manga_context_payload or {}).get("content") or "").strip(),
+    }
+    digest = sha1(json.dumps(payload, ensure_ascii=False, sort_keys=True).encode("utf-8")).hexdigest()[:16]
+    return f"{TRANSLATION_PROMPT_SIGNATURE}:{digest}"
+
+
+def _resolve_cli_settings():
+    settings = load_settings()
+    translation = resolve_translation_config(settings=settings)
+    ocr = resolve_ocr_config(settings=settings)
+    paths = settings.get("paths") or {}
+    pipeline = resolve_pipeline_config(settings=settings)
+    render = settings.get("render") or {}
+    default_style_profile = resolve_style_profile(layout_mode=str(render.get("layout_mode") or "vertical").strip() or "vertical")
+    return {
+        "translation": translation,
+        "ocr": ocr,
+        "pipeline": pipeline,
+        "render": {
+            "layout_mode": str(render.get("layout_mode") or "vertical").strip() or "vertical",
+        },
+        "paths": {
+            "input_dir": resolve_path_value(paths.get("input_dir")),
+            "output_dir": resolve_path_value(paths.get("output_dir")),
+            "workspace_root": resolve_path_value(paths.get("workspace_root")),
+            "cache_root": resolve_path_value(paths.get("cache_root")),
+        },
+        "settings": settings,
+        "preprocess_signature": _build_preprocess_signature(settings, style_profile=default_style_profile),
+    }
+
+
+def _layout_style_name(layout_mode):
+    mapping = {
+        "horizontal": "Style 1",
+        "vertical": "Style 2",
+    }
+    return mapping.get(layout_mode, str(layout_mode or "vertical"))
+
+
+def _style_name(style_profile, layout_mode):
+    mapping = {
+        "style1": "Style 1",
+        "style2": "Style 2",
+        "style3": "Style 3",
+    }
+    return mapping.get((style_profile or {}).get("style_id"), _layout_style_name(layout_mode))
+
+
+def _build_run_options(
+    *,
+    input_dir,
+    output_dir,
+    layout_mode,
+    overwrite_existing,
+    launch_mode,
+    model,
+    ocr_config,
+    retry_review_pages=False,
+    style_profile=None,
+    translation_quality="high",
+):
+    style_profile = style_profile or resolve_style_profile(layout_mode=layout_mode)
+    return {
+        "inputDir": str(Path(input_dir)),
+        "outputDir": str(Path(output_dir)),
+        "layoutMode": layout_mode,
+        "styleId": style_profile.get("style_id"),
+        "styleName": _style_name(style_profile, layout_mode),
+        "sourceLanguage": style_profile.get("source_language", "japanese"),
+        "readingOrder": style_profile.get("reading_order"),
+        "promptProfile": style_profile.get("prompt_profile", "default"),
+        "translationQuality": _normalize_translation_quality(translation_quality),
+        "overwriteExisting": bool(overwrite_existing),
+        "retryReviewPages": bool(retry_review_pages),
+        "launchMode": str(launch_mode or "args"),
+        "translationModel": str(model),
+        "ocrEngine": str((ocr_config or {}).get("engine") or ""),
+        "secondaryOcrEngine": str((ocr_config or {}).get("secondary_engine") or ""),
+    }
+
+
+def _call_translate_texts_multi_round(*, texts, model, base_url, api_key=None, context_snapshot=None):
+    attempts = [
+        {
+            "model": model,
+            "base_url": base_url,
+            "api_key": api_key,
+            "context_snapshot": context_snapshot,
+        },
+        {
+            "model": model,
+            "base_url": base_url,
+            "context_snapshot": context_snapshot,
+        },
+        {
+            "model": model,
+            "base_url": base_url,
+        },
+    ]
+    last_error = None
+    for kwargs in attempts:
+        try:
+            return translate_texts_multi_round(texts, **kwargs)
+        except TypeError as error:
+            last_error = error
+            error_text = str(error)
+            if "unexpected keyword argument" not in error_text and "required keyword-only argument" not in error_text:
+                raise
+    raise last_error
+
+
+def _call_run_page_pipeline(
+    runtime,
+    page_id,
+    source_path,
+    *,
+    model,
+    base_url,
+    api_key,
+    preprocessed_payload,
+    translated_texts,
+    context_snapshot,
+    saber_session,
+    translation_payload,
+):
+    attempts = [
+        {
+            "model": model,
+            "base_url": base_url,
+            "api_key": api_key,
+            "preprocessed_payload": preprocessed_payload,
+            "translated_texts": translated_texts,
+            "context_snapshot": context_snapshot,
+            "saber_session": saber_session,
+            "translation_payload": translation_payload,
+        },
+        {
+            "model": model,
+            "base_url": base_url,
+            "preprocessed_payload": preprocessed_payload,
+            "translated_texts": translated_texts,
+            "context_snapshot": context_snapshot,
+            "saber_session": saber_session,
+            "translation_payload": translation_payload,
+        },
+        {
+            "model": model,
+            "base_url": base_url,
+            "api_key": api_key,
+            "preprocessed_payload": preprocessed_payload,
+            "translated_texts": translated_texts,
+            "context_snapshot": context_snapshot,
+            "saber_session": saber_session,
+        },
+        {
+            "model": model,
+            "base_url": base_url,
+            "preprocessed_payload": preprocessed_payload,
+            "translated_texts": translated_texts,
+            "context_snapshot": context_snapshot,
+            "saber_session": saber_session,
+        },
+    ]
+    last_error = None
+    for kwargs in attempts:
+        try:
+            return run_page_pipeline(
+                runtime,
+                page_id,
+                source_path,
+                **kwargs,
+            )
+        except TypeError as error:
+            last_error = error
+            error_text = str(error)
+            if "api_key" not in error_text and "translation_payload" not in error_text:
+                raise
+    raise last_error
+
+
+def _call_preprocess_page(source_path, *, saber_session=None, ocr_options=None):
+    try:
+        return preprocess_page(source_path, saber_session=saber_session, ocr_options=ocr_options)
+    except TypeError as error:
+        error_text = str(error)
+        if "unexpected keyword argument" not in error_text:
+            raise
+    try:
+        return preprocess_page(source_path, saber_session=saber_session)
+    except TypeError as error:
+        if "unexpected keyword argument" not in str(error):
+            raise
+        return preprocess_page(source_path)
+
+
+def _count_page_chars(preprocessed_payload):
+    texts = preprocessed_payload.get("originalTexts", []) or []
+    return sum(len((text or "").strip()) for text in texts)
+
+
+def _count_page_texts(preprocessed_payload):
+    return len(preprocessed_payload.get("originalTexts", []) or [])
+
+
+def _translation_weight(item):
+    return max(1, _count_page_chars(item.preprocessed_payload) or _count_page_texts(item.preprocessed_payload) or 1)
+
+
+def _assign_batch_translation_seconds(prepared_pages, elapsed_seconds):
+    elapsed_seconds = max(0.0, float(elapsed_seconds or 0.0))
+    total_weight = sum(_translation_weight(item) for item in prepared_pages)
+    if total_weight <= 0:
+        return
+    for item in prepared_pages:
+        item.translation_seconds = elapsed_seconds * (_translation_weight(item) / total_weight)
+
+
+def _with_batch_translation_timing(payload, translation_seconds):
+    if not isinstance(payload, dict):
+        return payload
+    updated = dict(payload)
+    timings = dict(updated.get("timings") if isinstance(updated.get("timings"), dict) else {})
+    translation_seconds = max(0.0, float(translation_seconds or 0.0))
+    if translation_seconds > 0:
+        timings["translate"] = max(float(timings.get("translate", 0.0) or 0.0), translation_seconds)
+
+    stage_total = 0.0
+    for field in ("detect", "ocr", "color", "translate", "inpaint", "render"):
+        try:
+            stage_total += max(0.0, float(timings.get(field, 0.0) or 0.0))
+        except (TypeError, ValueError):
+            continue
+    if stage_total > 0:
+        timings["total"] = max(float(timings.get("total", 0.0) or 0.0), stage_total)
+    updated["timings"] = timings
+    return updated
+
+
+def _has_translation_context(context_snapshot):
+    if not isinstance(context_snapshot, dict):
+        return False
+    if context_snapshot.get("confirmedTranslations") or context_snapshot.get("glossary"):
+        return True
+    for key in ("mangaContext", "sourceLanguage", "promptPreset", "promptProfile", "readingOrder"):
+        if str(context_snapshot.get(key) or "").strip():
+            return True
+    return False
+
+
+def _usage_share(usage, weight, total_weight):
+    usage = dict(usage or _empty_usage())
+    if total_weight <= 0:
+        return usage
+
+    ratio = weight / total_weight
+    return {
+        "inputTokens": int(round((usage.get("inputTokens", 0) or 0) * ratio)),
+        "outputTokens": int(round((usage.get("outputTokens", 0) or 0) * ratio)),
+        "totalTokens": int(round((usage.get("totalTokens", 0) or 0) * ratio)),
+        "estimated": bool(usage.get("estimated")),
+    }
+
+
+def _slice_translation_payload(payload, start, count, weight, total_weight):
+    normalized = _normalize_translation_payload(payload)
+    rounds = []
+    for item in normalized.get("rounds") or []:
+        rounds.append(
+            {
+                "name": item.get("name") or "final",
+                "translatedTexts": list((item.get("translatedTexts") or [])[start : start + count]),
+                "usage": _usage_share(item.get("usage"), weight, total_weight),
+            }
+        )
+
+    return {
+        "translatedTexts": list((normalized.get("translatedTexts") or [])[start : start + count]),
+        "rounds": rounds,
+        "tokenUsage": _usage_share(normalized.get("tokenUsage"), weight, total_weight),
+        "ocrRetry": dict(normalized.get("ocrRetry") or _default_ocr_retry_state()),
+    }
+
+
+def _translate_batch(prepared_pages, model, base_url, api_key, context_snapshot):
+    pending_pages = [item for item in prepared_pages if item.translated_texts is None]
+    if not pending_pages:
+        return {}
+
+    flat_texts = []
+    spans = []
+    weights = []
+    for item in pending_pages:
+        texts = item.preprocessed_payload.get("originalTexts", []) or []
+        spans.append((item.page["id"], len(flat_texts), len(texts)))
+        weights.append(max(1, _count_page_chars(item.preprocessed_payload) or len(texts) or 1))
+        flat_texts.extend(texts)
+
+    translate_kwargs = {
+        "model": model,
+        "base_url": base_url,
+        "api_key": api_key,
+    }
+    if _has_translation_context(context_snapshot):
+        translate_kwargs["context_snapshot"] = context_snapshot
+
+    translated_flat_payload = _normalize_translation_payload(
+        _call_translate_texts_multi_round(texts=flat_texts, **translate_kwargs)
+    )
+    translated_by_page = {}
+    total_weight = sum(weights)
+    for index, (page_id, start, count) in enumerate(spans):
+        translated_by_page[page_id] = _slice_translation_payload(
+            translated_flat_payload,
+            start,
+            count,
+            weights[index],
+            total_weight,
+        )
+    return translated_by_page
+
+
+def _copy_original_page(source_path, target_path):
+    target_path.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(source_path, target_path)
+
+
+def _translate_pages_individually(prepared_pages, model, base_url, api_key, context_snapshot, reporter):
+    translated_by_page = {}
+    failures = {}
+
+    for item in prepared_pages:
+        if item.translated_texts is not None:
+            translated_by_page[item.page["id"]] = item.translation_payload or _build_legacy_translation_payload(item.translated_texts)
+            continue
+
+        reporter.log(f"TRANSLATE retry-single {item.page['fileName']}")
+        try:
+            translated_by_page.update(_translate_batch([item], model, base_url, api_key, context_snapshot))
+        except Exception as error:
+            reporter.log(f"TRANSLATE retry-single fail {item.page['fileName']} error={error}")
+            try:
+                translated_by_page[item.page["id"]] = _translate_page_lightweight(
+                    item,
+                    model,
+                    base_url,
+                    api_key,
+                    context_snapshot,
+                    reporter,
+                )
+            except Exception as fallback_error:
+                failures[item.page["id"]] = fallback_error
+                reporter.log(f"TRANSLATE fallback-light fail {item.page['fileName']} error={fallback_error}")
+
+    return translated_by_page, failures
+
+
+def _translate_page_lightweight(item, model, base_url, api_key, context_snapshot, reporter):
+    reporter.log(f"TRANSLATE fallback-light {item.page['fileName']}")
+    texts = item.preprocessed_payload.get("originalTexts", []) or []
+    lightweight_context = context_snapshot if _has_translation_context(context_snapshot) else None
+    attempts = [
+        {
+            "texts": texts,
+            "model": model,
+            "base_url": base_url,
+            "api_key": api_key,
+            "context_snapshot": lightweight_context,
+        },
+        {
+            "texts": texts,
+            "model": model,
+            "base_url": base_url,
+            "context_snapshot": lightweight_context,
+        },
+        {
+            "texts": texts,
+            "model": model,
+            "base_url": base_url,
+        },
+    ]
+    last_error = None
+    translated = None
+    for kwargs in attempts:
+        try:
+            translated = translate_texts(**kwargs)
+            break
+        except TypeError as error:
+            last_error = error
+            error_text = str(error)
+            if "unexpected keyword argument" not in error_text and "required keyword-only argument" not in error_text:
+                raise
+        except Exception as error:
+            last_error = error
+            break
+
+    if translated is None:
+        raise last_error or RuntimeError("lightweight translation failed")
+
+    return _build_legacy_translation_payload(translated)
+
+
+def _prepare_batch(
+    pages,
+    start_index,
+    output_dir,
+    numeric_output_width,
+    overwrite_existing,
+    final_debug_records,
+    reporter,
+    counters,
+    started_at,
+    stage_cache,
+    saber_session,
+    debug_writer,
+    manga_context_payload,
+    skip_frontmatter,
+    translate_batch_size,
+    translate_batch_max_chars,
+    ocr_options=None,
+    force_retranslate=False,
+    debug_total_pages=None,
+    debug_records_by_source=None,
+):
+    prepared_pages = []
+    batch_chars = 0
+    record_total_pages = int(debug_total_pages or len(pages))
+
+    while start_index < len(pages) and len(prepared_pages) < translate_batch_size:
+        page = pages[start_index]
+        current_index = start_index + 1
+        page_index = int(page.get("pageIndex") or current_index)
+        start_index += 1
+
+        source_path = Path(page["sourcePath"])
+        target_path = build_output_path(source_path, output_dir, numeric_width=numeric_output_width)
+        cached_stage = stage_cache.load_best(source_path)
+        reporter.update(
+            current_index=current_index,
+            total_count=len(pages),
+            current_name=page["fileName"],
+            succeeded=counters["succeeded"],
+            skipped=counters["skipped"],
+            failed=counters["failed"],
+            elapsed_seconds=perf_counter() - started_at,
+        )
+
+        if target_path.exists() and not overwrite_existing and cached_stage is None:
+            counters["skipped"] += 1
+            record = debug_writer.record_page(
+                page=page,
+                page_index=page_index,
+                total_pages=record_total_pages,
+                source_path=source_path,
+                target_path=target_path,
+                status="skipped-existing",
+                preprocessed_payload=None,
+                translated_texts=None,
+                translation_payload=None,
+                classification=None,
+                manga_context=manga_context_payload,
+            )
+            final_debug_records[page["id"]] = record
+            reporter.log(f"SKIP {page['fileName']} -> {target_path.name} (already exists)")
+            continue
+
+        if cached_stage is not None:
+            preprocessed_payload = cached_stage["preprocessed"]
+            translated_texts = cached_stage.get("translatedTexts")
+            translation_payload = cached_stage.get("translationPayload")
+            if force_retranslate and cached_stage.get("stage") == "translated":
+                translated_texts = None
+                translation_payload = None
+            reporter.log(
+                f"PREP-CACHE {page['fileName']} "
+                f"stage={cached_stage.get('stage', 'preprocessed')} "
+                f"texts={_count_page_texts(preprocessed_payload)} "
+                f"chars={_count_page_chars(preprocessed_payload)}"
+            )
+        else:
+            preprocessed_payload = None
+            if force_retranslate and debug_records_by_source:
+                preprocessed_payload = _debug_record_to_preprocessed_payload(
+                    debug_records_by_source.get(page["fileName"])
+                )
+            if preprocessed_payload is not None:
+                stage_cache.save_preprocessed(source_path, preprocessed_payload)
+                translated_texts = None
+                translation_payload = None
+                reporter.log(
+                    f"PREP-DEBUG {page['fileName']} "
+                    f"texts={_count_page_texts(preprocessed_payload)} "
+                    f"chars={_count_page_chars(preprocessed_payload)}"
+                )
+            else:
+                reporter.log(f"PREP {page['fileName']} start")
+                try:
+                    preprocessed_payload = _call_preprocess_page(
+                        page["sourcePath"],
+                        saber_session=saber_session,
+                        ocr_options=ocr_options,
+                    )
+                except Exception as error:
+                    _copy_original_page(source_path, target_path)
+                    counters["failed"] += 1
+                    record = debug_writer.record_page(
+                        page=page,
+                        page_index=page_index,
+                        total_pages=record_total_pages,
+                        source_path=source_path,
+                        target_path=target_path,
+                        status="failed",
+                        preprocessed_payload=None,
+                        translated_texts=[],
+                        translation_payload=None,
+                        classification=None,
+                        manga_context=manga_context_payload,
+                        error=error,
+                    )
+                    final_debug_records[page["id"]] = record
+                    reporter.log(f"FAIL-PREP {page['fileName']} -> {target_path.name} ({error})")
+                    continue
+                stage_cache.save_preprocessed(source_path, preprocessed_payload)
+                translated_texts = None
+                translation_payload = None
+                timings = preprocessed_payload.get("timings", {}) if isinstance(preprocessed_payload.get("timings"), dict) else {}
+                prep_seconds = float(timings.get("total", 0.0) or 0.0)
+                reporter.log(
+                    f"PREP {page['fileName']} done "
+                    f"bubbles={len(preprocessed_payload.get('bubbleCoords', []) or [])} "
+                    f"texts={_count_page_texts(preprocessed_payload)} "
+                    f"chars={_count_page_chars(preprocessed_payload)} "
+                    f"({format_seconds(prep_seconds) if prep_seconds > 0 else 'n/a'})"
+                )
+
+        classification = None
+        if preprocessed_payload is not None:
+            classification = classify_preprocessed_page(
+                page_index=page_index,
+                total_pages=record_total_pages,
+                image_size=load_image_size(source_path),
+                preprocessed_payload=preprocessed_payload,
+                skip_frontmatter=skip_frontmatter,
+            )
+
+        if target_path.exists() and not overwrite_existing:
+            counters["skipped"] += 1
+            record = debug_writer.record_page(
+                page=page,
+                page_index=page_index,
+                total_pages=record_total_pages,
+                source_path=source_path,
+                target_path=target_path,
+                status="skipped-existing",
+                preprocessed_payload=preprocessed_payload,
+                translated_texts=translated_texts,
+                translation_payload=translation_payload,
+                classification=classification,
+                manga_context=manga_context_payload,
+            )
+            final_debug_records[page["id"]] = record
+            reporter.log(f"SKIP {page['fileName']} -> {target_path.name} (already exists)")
+            continue
+        if target_path.exists() and overwrite_existing:
+            reporter.log(f"OVERWRITE {page['fileName']} -> {target_path.name}")
+
+        if not classification.get("should_translate", True):
+            _copy_original_page(source_path, target_path)
+            counters["succeeded"] += 1
+            record = debug_writer.record_page(
+                page=page,
+                page_index=page_index,
+                total_pages=record_total_pages,
+                source_path=source_path,
+                target_path=target_path,
+                status="copied",
+                preprocessed_payload=preprocessed_payload,
+                translated_texts=[],
+                translation_payload=None,
+                classification=classification,
+                manga_context=manga_context_payload,
+            )
+            final_debug_records[page["id"]] = record
+            reporter.log(
+                f"COPY {page['fileName']} -> {target_path.name} ({classification.get('skip_reason') or classification.get('page_type')})"
+            )
+            continue
+
+        prepared_pages.append(
+            PreparedPage(
+                page=page,
+                source_path=source_path,
+                target_path=target_path,
+                preprocessed_payload=preprocessed_payload,
+                classification=classification,
+                translated_texts=translated_texts,
+                translation_payload=translation_payload,
+            )
+        )
+        batch_chars += _count_page_chars(preprocessed_payload)
+        if batch_chars >= translate_batch_max_chars:
+            break
+
+    return prepared_pages, start_index
+
+
+def run_batch_translation(
+    input_dir=None,
+    output_dir=None,
+    workspace_root=None,
+    reporter=None,
+    model=None,
+    base_url=None,
+    api_key=None,
+    cache_root=None,
+    overwrite_existing=None,
+    layout_mode=None,
+    style_id=None,
+    launch_mode="args",
+    retry_review_pages=False,
+):
+    cli_config = _resolve_cli_settings()
+    translation_config = cli_config["translation"]
+    ocr_config = cli_config["ocr"]
+    pipeline_config = cli_config["pipeline"]
+    path_config = cli_config["paths"]
+    render_config = cli_config["render"]
+
+    input_dir = input_dir or path_config["input_dir"]
+    output_dir = output_dir or path_config["output_dir"]
+    if input_dir is None or output_dir is None:
+        raise ValueError("Input folder and output folder must be provided either by arguments or config.")
+
+    model = model or translation_config["model"]
+    base_url = base_url or translation_config["base_url"]
+    if api_key is None:
+        api_key = translation_config["api_key"]
+    if overwrite_existing is None:
+        overwrite_existing = pipeline_config["overwrite_existing"]
+    translation_quality = pipeline_config.get("translation_quality", "high")
+    workspace_root = workspace_root or path_config["workspace_root"]
+    cache_root = cache_root or path_config["cache_root"]
+    style_profile = resolve_style_profile(style_id, layout_mode=layout_mode or render_config["layout_mode"])
+    layout_mode = style_profile["layout_mode"]
+    style_ocr_config = _build_style_ocr_config(ocr_config, style_profile=style_profile)
+    input_dir = Path(input_dir)
+    output_dir = Path(output_dir)
+
+    reporter = reporter or BatchProgressReporter()
+    all_image_paths = scan_input_images(input_dir)
+    if not all_image_paths:
+        raise ValueError("No supported image files found in input folder.")
+    all_pages = _build_pages(all_image_paths)
+    image_paths = list(all_image_paths)
+    pages = list(all_pages)
+    existing_debug_records = {}
+    numeric_output_width = _resolve_numeric_output_width(all_image_paths)
+
+    retry_page_names = set()
+    if retry_review_pages:
+        retry_page_names = _load_retry_review_page_names(
+            output_dir,
+            image_paths=all_image_paths,
+            numeric_width=numeric_output_width,
+        )
+        if not retry_page_names:
+            raise ValueError(f"No review pages found in: {output_dir / '_debug'}")
+        pages = [page for page in all_pages if page["fileName"] in retry_page_names]
+        image_paths = [Path(page["sourcePath"]) for page in pages]
+        if not pages:
+            raise ValueError("Review page list does not match any source image in input folder.")
+        overwrite_existing = True
+        existing_debug_records = _load_existing_debug_records(output_dir)
+
+    output_dir.mkdir(parents=True, exist_ok=True)
+    run_options = _build_run_options(
+        input_dir=input_dir,
+        output_dir=output_dir,
+        layout_mode=layout_mode,
+        overwrite_existing=overwrite_existing,
+        launch_mode=launch_mode,
+        model=model,
+        ocr_config=style_ocr_config,
+        retry_review_pages=retry_review_pages,
+        style_profile=style_profile,
+        translation_quality=translation_quality,
+    )
+    manga_context_payload = None
+    try:
+        manga_context_payload = load_or_generate_manga_context(
+            input_dir,
+            auto_generate=pipeline_config.get("auto_generate_manga_context", True),
+            pipeline_config=pipeline_config,
+        )
+    except Exception:
+        manga_context_payload = None
+
+    started_at = perf_counter()
+    counters = {
+        "succeeded": 0,
+        "skipped": 0,
+        "failed": 0,
+    }
+    final_debug_records = {}
+    debug_total_pages = len(all_pages) if retry_review_pages else len(pages)
+    stage_cache = BatchStageCache(
+        cache_root=cache_root or _default_cache_root(),
+        input_dir=input_dir,
+        model=model,
+        base_url=base_url,
+        translation_signature=_build_translation_signature(
+            cli_config["settings"],
+            style_profile=style_profile,
+            manga_context_payload=manga_context_payload,
+            translation_quality=translation_quality,
+        ),
+        preprocess_signature=_build_preprocess_signature(cli_config["settings"], style_profile=style_profile),
+    )
+    debug_writer = (
+        BatchDebugArtifactWriter(
+            output_dir,
+            run_options=run_options,
+            flush_interval=pipeline_config.get("debug_flush_interval", 25),
+        )
+        if pipeline_config["debug_output"]
+        else NullBatchDebugArtifactWriter()
+    )
+
+    temp_kwargs = {"prefix": "translate-manga-cli-"}
+    if workspace_root is not None:
+        workspace_parent = Path(workspace_root)
+        workspace_parent.mkdir(parents=True, exist_ok=True)
+        temp_kwargs["dir"] = str(workspace_parent)
+
+    with tempfile.TemporaryDirectory(**temp_kwargs) as data_root:
+        runtime = PipelineRuntime(
+            data_root,
+            layout_mode=layout_mode,
+            style_id=style_profile["style_id"],
+            source_language=style_profile.get("source_language"),
+            prompt_profile=style_profile.get("prompt_profile"),
+            reading_order=style_profile.get("reading_order"),
+            ocr_options=style_ocr_config,
+            font_family=style_profile.get("font_family"),
+        )
+        runtime.seed_pages(all_pages if retry_review_pages else pages)
+        if retry_review_pages:
+            _seed_runtime_context_from_debug(runtime, all_pages, existing_debug_records, retry_page_names)
+
+        next_index = 0
+        with SaberWorkerSession() as saber_session, ThreadPoolExecutor(max_workers=1) as executor:
+            current_batch, next_index = _prepare_batch(
+                pages,
+                next_index,
+                output_dir,
+                numeric_output_width,
+                overwrite_existing,
+                final_debug_records,
+                reporter,
+                counters,
+                started_at,
+                stage_cache,
+                saber_session,
+                debug_writer,
+                manga_context_payload,
+                pipeline_config["skip_frontmatter"],
+                pipeline_config["translate_batch_size"],
+                pipeline_config["translate_batch_max_chars"],
+                force_retranslate=retry_review_pages,
+                debug_total_pages=debug_total_pages,
+                debug_records_by_source=existing_debug_records,
+                ocr_options=style_ocr_config,
+            )
+
+            while current_batch:
+                batch_context_snapshot = _build_translation_context(runtime, current_batch[0].page["id"])
+                if retry_review_pages:
+                    batch_context_snapshot = _augment_context_with_debug_neighbors(
+                        batch_context_snapshot,
+                        all_pages,
+                        current_batch[0].page["id"],
+                        existing_debug_records,
+                        retry_page_names,
+                    )
+                batch_context_snapshot = {
+                    **batch_context_snapshot,
+                    "mangaContext": str((manga_context_payload or {}).get("content") or "").strip(),
+                    "sourceLanguage": style_profile.get("source_language", "japanese"),
+                    "promptPreset": style_profile.get("prompt_profile", "default"),
+                    "readingOrder": style_profile.get("reading_order"),
+                    "translationQuality": translation_quality,
+                }
+                translation_future = None
+                translation_started_at = None
+                pending_items = [item for item in current_batch if item.translated_texts is None]
+                pending_names = [item.page["fileName"] for item in pending_items]
+                if pending_items:
+                    translation_started_at = perf_counter()
+                    reporter.log(
+                        f"TRANSLATE start pages={', '.join(pending_names)} "
+                        f"texts={sum(_count_page_texts(item.preprocessed_payload) for item in pending_items)} "
+                        f"chars={sum(_count_page_chars(item.preprocessed_payload) for item in pending_items)}"
+                    )
+                    translation_future = executor.submit(
+                        _translate_batch,
+                        current_batch,
+                        model,
+                        base_url,
+                        api_key,
+                        batch_context_snapshot,
+                    )
+
+                next_batch, next_index = _prepare_batch(
+                    pages,
+                    next_index,
+                    output_dir,
+                    numeric_output_width,
+                    overwrite_existing,
+                    final_debug_records,
+                    reporter,
+                    counters,
+                    started_at,
+                    stage_cache,
+                    saber_session,
+                    debug_writer,
+                    manga_context_payload,
+                    pipeline_config["skip_frontmatter"],
+                    pipeline_config["translate_batch_size"],
+                    pipeline_config["translate_batch_max_chars"],
+                    force_retranslate=retry_review_pages,
+                    debug_total_pages=debug_total_pages,
+                    debug_records_by_source=existing_debug_records,
+                    ocr_options=style_ocr_config,
+                )
+
+                translated_by_page = {}
+                translation_failures = {}
+                if translation_future is not None:
+                    try:
+                        translated_by_page = translation_future.result()
+                        translation_elapsed = perf_counter() - translation_started_at
+                        _assign_batch_translation_seconds(pending_items, translation_elapsed)
+                        reporter.log(
+                            f"TRANSLATE done pages={', '.join(pending_names)} "
+                            f"({format_seconds(translation_elapsed)})"
+                        )
+                    except Exception as error:
+                        translation_elapsed = perf_counter() - translation_started_at
+                        reporter.log(
+                            f"TRANSLATE fail pages={', '.join(pending_names)} "
+                            f"({format_seconds(translation_elapsed)}) "
+                            f"error={error}"
+                        )
+                        translated_by_page, translation_failures = _translate_pages_individually(
+                            current_batch,
+                            model,
+                            base_url,
+                            api_key,
+                            batch_context_snapshot,
+                            reporter,
+                        )
+                        _assign_batch_translation_seconds(
+                            pending_items,
+                            perf_counter() - translation_started_at,
+                        )
+
+                for item in current_batch:
+                    page_started_at = perf_counter()
+                    reporter.log(f"RENDER {item.page['fileName']} start")
+
+                    if item.translated_texts is None:
+                        if item.page["id"] in translation_failures:
+                            _copy_original_page(item.source_path, item.target_path)
+                            counters["failed"] += 1
+                            record = debug_writer.record_page(
+                                page=item.page,
+                                page_index=int(item.page.get("pageIndex") or str(item.page["id"]).split("-")[-1]),
+                                total_pages=debug_total_pages,
+                                source_path=item.source_path,
+                                target_path=item.target_path,
+                                status="failed",
+                                preprocessed_payload=_with_batch_translation_timing(
+                                    item.preprocessed_payload,
+                                    item.translation_seconds,
+                                ),
+                                translated_texts=[],
+                                translation_payload=item.translation_payload,
+                                classification=item.classification,
+                                manga_context=manga_context_payload,
+                                error=translation_failures[item.page["id"]],
+                            )
+                            final_debug_records[item.page["id"]] = record
+                            reporter.log(
+                                f"FALLBACK-COPY {item.page['fileName']} -> {item.target_path.name} "
+                                f"(translate failed: {translation_failures[item.page['id']]})"
+                            )
+                            continue
+
+                        item.translation_payload = _normalize_translation_payload(
+                            translated_by_page.get(item.page["id"], [])
+                        )
+                        item.translated_texts = item.translation_payload.get("translatedTexts") or []
+                        stage_cache.save_translated(
+                            item.source_path,
+                            item.preprocessed_payload,
+                            item.translated_texts,
+                            item.translation_payload,
+                        )
+
+                    try:
+                        result = _call_run_page_pipeline(
+                            runtime,
+                            item.page["id"],
+                            item.page["sourcePath"],
+                            model=model,
+                            base_url=base_url,
+                            api_key=api_key,
+                            preprocessed_payload=item.preprocessed_payload,
+                            translated_texts=item.translated_texts,
+                            context_snapshot=batch_context_snapshot,
+                            saber_session=saber_session,
+                            translation_payload=item.translation_payload,
+                        )
+                        result = _with_batch_translation_timing(result, item.translation_seconds)
+                        if item.translation_payload is not None and not isinstance(result.get("translation"), dict):
+                            result = dict(result)
+                            result["translation"] = item.translation_payload
+                            result["ocrRetry"] = dict(item.translation_payload.get("ocrRetry") or _default_ocr_retry_state())
+                        runtime.save_result(item.page["id"], result)
+                        runtime.update_translated_path(item.page["id"], result["translatedImagePath"])
+                        shutil.copyfile(result["translatedImagePath"], item.target_path)
+                        counters["succeeded"] += 1
+                        record = debug_writer.record_page(
+                            page=item.page,
+                            page_index=int(item.page.get("pageIndex") or str(item.page["id"]).split("-")[-1]),
+                            total_pages=debug_total_pages,
+                            source_path=item.source_path,
+                            target_path=item.target_path,
+                            status="translated",
+                            preprocessed_payload=item.preprocessed_payload,
+                            translated_texts=item.translated_texts,
+                            translation_payload=item.translation_payload,
+                            classification=item.classification,
+                            manga_context=manga_context_payload,
+                            result=result,
+                        )
+                        final_debug_records[item.page["id"]] = record
+                        reporter.log(
+                            f"OK   {item.page['fileName']} -> {item.target_path.name} "
+                            f"({format_seconds(perf_counter() - page_started_at)})"
+                        )
+                    except Exception as error:
+                        counters["failed"] += 1
+                        record = debug_writer.record_page(
+                            page=item.page,
+                            page_index=int(item.page.get("pageIndex") or str(item.page["id"]).split("-")[-1]),
+                            total_pages=debug_total_pages,
+                            source_path=item.source_path,
+                            target_path=item.target_path,
+                            status="failed",
+                            preprocessed_payload=item.preprocessed_payload,
+                            translated_texts=item.translated_texts,
+                            translation_payload=item.translation_payload,
+                            classification=item.classification,
+                            manga_context=manga_context_payload,
+                            error=error,
+                        )
+                        final_debug_records[item.page["id"]] = record
+                        reporter.log(f"FAIL {item.page['fileName']} ({error})")
+
+                current_batch = next_batch
+
+    total_elapsed = perf_counter() - started_at
+    summary = {
+        "total": len(pages),
+        "succeeded": counters["succeeded"],
+        "skipped": counters["skipped"],
+        "failed": counters["failed"],
+        "elapsedSeconds": total_elapsed,
+    }
+    records_for_finish = final_debug_records
+    if retry_review_pages:
+        merged_records = dict(existing_debug_records)
+        for record in final_debug_records.values():
+            source_name = str(record.get("sourceName") or "").strip()
+            if source_name:
+                merged_records[source_name] = record
+        records_for_finish = list(merged_records.values())
+    debug_writer.finish(summary, records=records_for_finish, run_options=run_options)
+    reporter.finish(
+        total_count=len(pages),
+        succeeded=counters["succeeded"],
+        skipped=counters["skipped"],
+        failed=counters["failed"],
+        elapsed_seconds=total_elapsed,
+    )
+    return summary

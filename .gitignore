@@ -6,6 +6,10 @@ __pycache__/
 Saber-Translator/
 immersive-translate-1.26.6-patched/
 翻译测试日漫/
+翻译测试英漫/
+测试翻译/
+机翻成品/
+Release/
 翻译api.txt
 
 translate_manga_cli/.cache/
@@ -13,6 +17,7 @@ translate_manga_cli/.pytest_cache/
 translate_manga_cli/.venv/
 translate_manga_cli/.venv310/
 translate_manga_cli/config/local.json
+translate_manga_cli/config/local*.json
 translate_manga_cli/config/session.json
 translate_manga_cli/data/
 translate_manga_cli/logs/
@@ -49,3 +54,20 @@ translate_manga_cli_xiaomi/*.stderr.log
 translate_manga_cli_xiaomi/*.stdout.log
 translate_manga_cli_xiaomi/_tmp*.py
 translate_manga_cli_xiaomi/tmp*.py
+
+Translator Manga V2/
+translate_manga_v2/.cache/
+translate_manga_v2/.pytest_cache/
+translate_manga_v2/.venv/
+translate_manga_v2/.venv310/
+translate_manga_v2/__pycache__/
+translate_manga_v2/config/local.json
+translate_manga_v2/config/local*.json
+!translate_manga_v2/config/local.example.json
+translate_manga_v2/config/session.json
+translate_manga_v2/data/
+translate_manga_v2/logs/
+translate_manga_v2/smoke/
+translate_manga_v2/*.log
+translate_manga_v2/*.stderr.log
+translate_manga_v2/*.stdout.log
