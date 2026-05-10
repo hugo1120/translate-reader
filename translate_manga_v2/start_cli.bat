@@ -15,7 +15,11 @@ if exist "%LOCAL_VENV310%" (
 ) else if exist "%LOCAL_VENV%" (
   set "PYTHON_EXE=%LOCAL_VENV%"
 ) else (
-  set "PYTHON_EXE=python"
+  echo Translate Manga V2 dependencies are not installed.
+  echo Please run setup_windows.bat first, then run start_cli.bat again.
+  echo.
+  if "%TRANSLATE_MANGA_NO_PAUSE%"=="" pause
+  exit /b 1
 )
 
 echo Starting Translate Manga V2...
@@ -30,6 +34,7 @@ echo.
 if not "%EXIT_CODE%"=="0" (
   echo Translate Manga V2 stopped with exit code %EXIT_CODE%.
   if "%EXIT_CODE%"=="2" if not "%~1"=="" call :print_usage_hint
+  if "%TRANSLATE_MANGA_NO_PAUSE%"=="" pause
 ) else (
   echo Translate Manga V2 finished.
 )

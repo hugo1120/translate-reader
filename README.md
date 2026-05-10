@@ -1,91 +1,200 @@
-# translate-reader 工作区
+# Translate Manga V2
 
-当前活跃项目是 `D:/github/translate-reader/translate_manga_v2`。后续开发和 GitHub 同步只以 V2 为准；旧 `translate_manga_cli` 已删除，`translate_manga_v1` 仅作本机备用，不参与同步。
+本仓库当前活跃项目是 `translate_manga_v2`：一个本地命令行漫画汉化工具，用于把日漫、英漫图片目录批量翻译成中文译图。
 
-## 目录定位
+后续开发和 GitHub 同步只以 `translate_manga_v2/` 为准。旧 `translate_manga_cli/` 已删除；`translate_manga_v1/` 仅作本机备用旧版，已被 `.gitignore` 整目录忽略。
 
-- `translate_manga_v2/`：当前重构版漫画批量翻译器。
-- `translate_manga_v1/`：旧 CLI 的本机备用副本，已被 `.gitignore` 整目录忽略。
-- `Saber-Translator/`：旧同级 Saber 基线；V2 默认使用自己的 `translate_manga_v2/vendor/Saber-Translator`。
-- `agent-docs/`：长期设计、计划和项目记忆索引。
-- `翻译测试日漫/`：本地真实样本与用户测试数据。
+## 核心能力
 
-## 当前主流程
+- 批量翻译单本或多本漫画目录，输出到每本目录下的 `out`。
+- 支持中断后继续，默认跳过已生成的译图。
+- 支持批后自动复查，最多重试失败页、疑似坏页和缺失输出页。
+- 支持菜单入口和命令行入口。
+- 支持日漫横排、日漫竖排、英漫横排三种样式。
+- 支持书系 Profile：同一作品后续卷可复用背景、人名、术语和称呼。
+- 输出 `_debug` 调试记录，方便定位 OCR、翻译、渲染和失败页。
+- 本地私有 API 配置不进 Git，不进 Release 包。
 
-`translate_manga_v2` 是纯命令行本地漫画整章/整卷翻译器，主链路为：
+主链路：
 
 ```text
-OCR -> 三轮翻译(draft/contextual/final) -> 擦字 -> 写字 -> 输出译图
+图片目录 -> OCR/检测 -> 翻译 -> 擦字 -> 写字 -> 输出译图 -> 复查/纠错
 ```
 
-当前不包含 Web API、浏览器界面或本地阅读器壳。
+## 技术栈
 
-## 快速启动
+- Python 3.10+
+- Windows batch 入口：`start_cli.bat`、`setup_windows.bat`
+- CLI 应用包：`translate_manga_v2/src/translate_manga`
+- 图像处理：Pillow
+- 翻译接口：OpenAI-compatible API
+- OCR / 检测 / 擦字 / 渲染底座：`vendor/Saber-Translator`
+- 日漫 OCR：48px OCR + manga_ocr fallback
+- 英漫 OCR：PaddleOCR English ONNX
+- 测试：pytest
+
+## 目录说明
+
+```text
+translate-reader/
+  translate_manga_v2/       # 当前主项目，开发和同步目标
+  Release/                  # 本地打包产物，不进 Git
+  agent-docs/               # 设计、计划和长期记忆
+  translate_manga_v1/       # 本机备用旧版，不进 Git
+```
+
+`translate_manga_v2/` 主要文件：
+
+```text
+start_cli.bat               # 推荐入口
+setup_windows.bat           # 首次安装依赖
+batch_translate.py          # 命令行批量翻译入口
+run_batch_background.py     # 后台跑批日志入口
+config/defaults.json        # 默认配置
+config/local.example.json   # 本机配置模板，不含密钥
+src/translate_manga/        # 应用源码
+vendor/Saber-Translator/    # OCR、检测、擦字、渲染依赖
+```
+
+## Release 包使用
+
+普通使用者推荐使用 Release 包，不需要理解源码结构。
+
+拿到压缩包后，先解压到任意目录，例如：
+
+```text
+<解压目录>/translate_manga_v2_windows
+```
+
+进入解压后的目录，按顺序执行：
+
+```bat
+setup_windows.bat
+```
+
+它会创建 `.venv310` 并安装依赖。完成后复制配置模板：
+
+```text
+config/local.example.json -> config/local.json
+```
+
+编辑 `config/local.json`，填写翻译 API：
+
+```json
+{
+  "translation": {
+    "model": "mimo-v2.5-pro",
+    "base_url": "https://your-openai-compatible-base-url/v1",
+    "api_key": "your-api-key"
+  }
+}
+```
+
+然后运行：
+
+```bat
+start_cli.bat
+```
+
+注意：
+
+- `base_url` 通常需要以 `/v1` 结尾。
+- `model` 必须是你的接口支持的模型名。
+- `config/local.json` 包含 API key，不要发给别人。
+- Release 包不包含 `config/local.json`、缓存、日志、虚拟环境和本地 session。
+
+## 交互菜单
+
+在 Release 解压目录中运行：
 
 ```powershell
-cd "D:/github/translate-reader/translate_manga_v2"
 ./start_cli.bat
 ```
 
-无参数时进入交互菜单：
+菜单选项：
 
-- `继续上次任务`：复用上次保存的一个或多个输入目录，继续跑未完成内容。
-- `新建任务`：重新输入一个或多个漫画目录，输出固定到每个输入目录下的 `out`。
-- `扫描并纠正错误`：扫描已有 `_debug` 记录，只覆盖重跑失败/需复查页面。
+- `继续上次任务`：复用上次保存的一个或多个输入目录。
+- `新建任务`：重新输入单本或多本漫画目录。
+- `扫描并纠正错误`：读取 `_debug`，只重跑失败、需复查或缺失输出的页面。
 - `退出`
 
-有参数时，`start_cli.bat` 会直接透传给 `batch_translate.py`：
+新建任务输入规则：
+
+- 一行一个漫画目录。
+- 直接回车结束输入。
+- 可粘贴多行路径。
+- 输出固定为每个输入目录下的 `out`。
+
+例如：
+
+```text
+C:/Manga/徳川家康/01 -> C:/Manga/徳川家康/01/out
+C:/Manga/徳川家康/02 -> C:/Manga/徳川家康/02/out
+```
+
+## 样式
+
+| 样式 | 用途 | 排版 | OCR / Prompt |
+| --- | --- | --- | --- |
+| Style 1 | 日漫横排 | 横排，左到右，黑体 | 日语 |
+| Style 2 | 日漫竖排 | 竖排，右到左，圆体 | 日语 |
+| Style 3 | 英漫横排 | 横排，左到右，圆体 | 英语 |
+
+命令行推荐使用 `--style-id 1|2|3`。旧参数 `--layout-mode horizontal|vertical|auto` 仍兼容。
+
+## 命令行用法
+
+在 Release 解压目录中：
 
 ```powershell
-./start_cli.bat --input "D:/path/to/input" --output "D:/path/to/input/out" --layout-mode vertical
+./start_cli.bat --input "C:/Manga/Book/01" --output "C:/Manga/Book/01/out" --style-id 2
 ```
 
-更完整说明见 `translate_manga_v2/start.md`。
+只重跑复查页：
 
-## 配置
+```powershell
+./start_cli.bat --input "C:/Manga/Book/01" --output "C:/Manga/Book/01/out" --style-id 2 --retry-review-pages
+```
 
-V2 配置优先级：
+后台跑批并写日志：
+
+```powershell
+./.venv310/Scripts/python.exe ./run_batch_background.py "C:/Manga/Book/01" "C:/Manga/Book/01/out" --log-path "./logs/batch-live.log" --style-id 2
+```
+
+## 输出结构
 
 ```text
-config/defaults.json < config/local.json < TRANSLATE_MANGA_CLI_* 环境变量 < 命令行参数
+out/
+  *.translated.png
+  _debug/
+    pages/*.json
+    texts/*.ocr.txt
+    texts/*.translation.txt
+    review-pages.txt
+    failed-translations.tsv
+    final-review-report.txt
+    summary.json
 ```
 
-私有接口、模型和本机路径放在：
+常用排查文件：
 
-```text
-translate_manga_v2/config/local.json
-```
-
-该文件被 `.gitignore` 忽略，不应写入公开文档或提交记录。
-
-## 输出和纠错
-
-默认输出：
-
-```text
-<输入目录>/out/*.translated.png
-```
-
-调试与复查产物：
-
-- `_debug/pages/*.json`：每页 OCR、译文、页型、耗时和状态。
-- `_debug/review-pages.txt`：需要复查/重跑的页。
-- `_debug/failed-translations.tsv`：失败或疑似失败页清单。
-- `_debug/final-review-report.txt`：最终复查报告和残留问题。
-- `_debug/summary.json`：本次跑批汇总与运行选项。
-
-完整翻译结束后会自动扫描失败页并最多重试 5 轮；菜单里的 `扫描并纠正错误` 可对已有输出反复补救。
+- `_debug/review-pages.txt`：需要复查的页面。
+- `_debug/failed-translations.tsv`：失败或疑似失败清单。
+- `_debug/final-review-report.txt`：最终复查报告、耗时汇总和残留问题。
+- `_debug/pages/*.json`：单页 OCR、译文、状态、耗时和上下文。
 
 ## 书系 Profile
 
-当输入目录最后一段是卷号时，程序会把上一级识别为书系根目录：
+程序会按输入路径自动识别书系和卷号：
 
 ```text
-D:/漫画/德川家康/01 -> 书系: 德川家康, 卷: 01
-D:/漫画/德川家康/02 -> 书系: 德川家康, 卷: 02
+C:/Manga/徳川家康/01 -> 书系: 徳川家康, 卷: 01
+C:/Manga/徳川家康/02 -> 书系: 徳川家康, 卷: 02
+C:/Manga/卡姆依传    -> 书系: 卡姆依传
 ```
 
-书系提示词和术语文件保存在：
+书系文件位置：
 
 ```text
 <书系目录>/_translation_profile/
@@ -95,21 +204,105 @@ D:/漫画/德川家康/02 -> 书系: 德川家康, 卷: 02
   translation_memory.json
 ```
 
-翻译时优先使用当前卷 `manga_context.md`；如果不存在，就复用书系 `series_profile.md`。
+翻译时优先使用当前卷的 `manga_context.md`；没有时复用书系 `series_profile.md`。你可以手工维护 `glossary.tsv` 和 `characters.tsv`，后续卷会自动继承。
 
-## V2 开发基线
+## 配置
 
-常用验证命令：
+配置优先级：
 
-```powershell
-cd "D:/github/translate-reader/translate_manga_v2"
-./.venv310/Scripts/python.exe -m pytest --ignore=tests/test_cli_batch.py -q
-./.venv310/Scripts/python.exe -m pytest tests/test_book_profile.py tests/test_manga_context_service.py tests/test_cli_menu.py -q
-./.venv310/Scripts/python.exe -m compileall -q src/translate_manga/core/context src/translate_manga/cli/menu.py
+```text
+config/defaults.json < config/local.json < TRANSLATE_MANGA_CLI_* 环境变量 < 命令行参数
 ```
 
-`2026-05-08` 验证基线：
+本机私有配置写在：
 
-- `pytest --ignore=tests/test_cli_batch.py -q`：`110 passed`
-- `pytest tests/test_book_profile.py tests/test_manga_context_service.py tests/test_cli_menu.py -q`：`14 passed`
-- `compileall`：通过
+```text
+config/local.json
+```
+
+常用性能配置：
+
+```json
+{
+  "pipeline": {
+    "translation_quality": "high",
+    "debug_flush_interval": 25,
+    "color_fast_mode": true
+  }
+}
+```
+
+`translation_quality` 可选：
+
+- `high`：默认，质量优先。
+- `balanced`：速度和质量折中。
+- `fast`：快速扫图或预览。
+
+## 源码开发
+
+首次开发环境：
+
+```powershell
+cd translate_manga_v2
+./setup_windows.bat
+```
+
+常用验证：
+
+```powershell
+./.venv310/Scripts/python.exe -m pytest --ignore=tests/test_cli_batch.py -q
+./.venv310/Scripts/python.exe -m pytest tests/test_book_profile.py tests/test_manga_context_service.py tests/test_cli_menu.py -q
+./.venv310/Scripts/python.exe -m compileall -q src/translate_manga
+```
+
+## GitHub 同步边界
+
+应该同步：
+
+- `translate_manga_v2/src/**`
+- `translate_manga_v2/tests/**`
+- `translate_manga_v2/config/defaults.json`
+- `translate_manga_v2/config/local.example.json`
+- `translate_manga_v2/*.bat`
+- `translate_manga_v2/*.py`
+- `README.md`
+- `agent-docs/**`
+
+不应同步：
+
+- `config/local.json`
+- `config/session.json`
+- `.venv310/`
+- `.cache/`
+- `logs/`
+- `Release/`
+- 测试漫画素材目录
+- API key 或任何私有接口配置
+
+## 常见问题
+
+`start_cli.bat` 提示依赖未安装：
+
+```text
+Translate Manga V2 dependencies are not installed.
+Please run setup_windows.bat first.
+```
+
+先运行 `setup_windows.bat`，完成后再运行 `start_cli.bat`。
+
+API 报错：
+
+- 检查 `config/local.json` 是否存在。
+- 检查 `translation.base_url` 是否以 `/v1` 结尾。
+- 检查 `translation.api_key` 是否正确。
+- 检查 `translation.model` 是否是接口支持的模型名。
+
+英文漫画识别差：
+
+- 使用 `Style 3`。
+- Style 1/2 是日漫配置，不适合英文漫画。
+
+有页面没翻译或翻译错：
+
+- 菜单选择 `扫描并纠正错误`。
+- 或命令行添加 `--retry-review-pages`。
