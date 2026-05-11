@@ -28,8 +28,11 @@
 - 完整翻译默认跳过已有输出，适合中断后继续。
 - 菜单“扫描并纠正错误”和命令行 `--retry-review-pages` 只覆盖 `_debug` 标记的问题页，以及源图存在但输出缺失的页。
 - `_debug/failed-translations.tsv`、`_debug/review-pages.txt`、`_debug/pages/*.json` 都是返工来源。
+- 输入扫描只包含当前输入目录下的直接图片文件；支持 `.jpg/.jpeg/.png/.webp`，扩展名大小写不敏感，不递归子目录。
+- 图片顺序使用 `translate_manga.core.natural_sort.natural_sort_key()`，必须稳定支持 `1,2,10,100`、补零数字页和 `cover.jpg + 00001.jpg` 混合命名。
 - 翻译缓存签名包含提示词 profile、实际提示词配置和 `manga_context` 内容；提示词或书系背景变化后，应重新翻译而不是复用旧译文缓存。
 - 预处理缓存签名包含 OCR 配置、语言和阅读方向；OCR/样式变动后应重新 PREP/OCR。
+- 手动修补模型拒翻或敏感词失败页时，不能只覆盖最终 PNG；必须同步更新 `_debug/pages/*.json`、`_debug/texts/*.translation.txt`、`review-pages.txt`、`failed-translations.tsv`、`summary.json` 和 stage cache，否则下一次扫描会继续把旧失败占位符当成待重跑页。
 
 ## 常用验证
 

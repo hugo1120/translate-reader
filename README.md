@@ -124,6 +124,9 @@ start_cli.bat
 - 直接回车结束输入。
 - 可粘贴多行路径。
 - 输出固定为每个输入目录下的 `out`。
+- 只扫描输入目录下的直接图片文件，不递归子目录。
+- 支持 `.jpg`、`.jpeg`、`.png`、`.webp`，扩展名大小写不敏感。
+- 图片按自然顺序处理，例如 `1, 2, 3, 10, 11, 100`；`cover.jpg` 会稳定排在纯数字页前。
 
 例如：
 
@@ -250,8 +253,7 @@ cd translate_manga_v2
 常用验证：
 
 ```powershell
-./.venv310/Scripts/python.exe -m pytest --ignore=tests/test_cli_batch.py -q
-./.venv310/Scripts/python.exe -m pytest tests/test_book_profile.py tests/test_manga_context_service.py tests/test_cli_menu.py -q
+./.venv310/Scripts/python.exe -m pytest -q
 ./.venv310/Scripts/python.exe -m compileall -q src/translate_manga
 ```
 
@@ -306,3 +308,4 @@ API 报错：
 
 - 菜单选择 `扫描并纠正错误`。
 - 或命令行添加 `--retry-review-pages`。
+- 如果同一页多轮后仍显示 `translation_failed` / `translation_failure_placeholder`，通常是翻译 API 拒翻或超时。人工修补时必须同时更新输出图、`_debug/pages/*.json`、`_debug/texts/*.translation.txt`、`review-pages.txt`、`failed-translations.tsv`、`summary.json` 和 stage cache，否则下次扫描会继续把它当失败页重跑。

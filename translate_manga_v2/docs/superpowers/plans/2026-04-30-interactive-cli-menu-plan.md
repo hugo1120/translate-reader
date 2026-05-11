@@ -182,10 +182,10 @@ Expected: 命令、样式和行为描述一致
 Run: `python -m pytest -q tests/test_cli_menu.py tests/test_start_cli_bat.py tests/test_batch_translate_entry.py tests/test_cli_batch.py`
 Expected: PASS
 
-- [ ] **Step 2: 跑全量测试**
+- [x] **Step 2: 跑全量测试**
 
 Run: `python -m pytest -q`
-Expected: PASS
+Expected: PASS。2026-05-11 当前 V2 全量回归为 `.venv310/Scripts/python.exe -m pytest -q`，结果 `184 passed`。
 
 - [x] **Step 3: 用菜单模式验证真实目录**
 

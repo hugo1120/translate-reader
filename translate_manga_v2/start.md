@@ -39,6 +39,15 @@ D:/book-a/item/image -> D:/book-a/item/image/out
 D:/book-b/item/image -> D:/book-b/item/image/out
 ```
 
+### 图片扫描和排序
+
+- 只扫描输入目录下的直接图片文件，不递归子目录
+- 支持 `.jpg`、`.jpeg`、`.png`、`.webp`，扩展名大小写不敏感
+- 其它文件会被忽略
+- 处理顺序使用自然排序：`1.jpg, 2.jpg, 10.jpg, 100.jpg`
+- 同一个页号不同补零时短文件名优先：`1.jpg, 01.jpg, 001.jpg`
+- `cover.jpg` 这类非数字文件会稳定排在纯数字页前
+
 完整翻译默认跳过已有输出，适合中断后继续。完整翻译结束后会自动扫描 `_debug` 和缺失输出图，最多重试 5 轮需要复查/失败/未生成的页；纠错重跑会覆盖这些失败页和缺输出页。
 
 纠错重跑会读取旧 `_debug/pages/*.json` 里前后页的正常译文作为翻译上下文；新生成的 debug 记录还会保存可复用预处理摘要，后续纠错会优先复用它，减少重复 OCR/PREP。
@@ -131,6 +140,8 @@ config/session.json
 - `_debug/review-pages.txt`：需要复查的页名和原因
 - `_debug/failed-translations.tsv`：失败页 TSV 清单，菜单纠错和 `--retry-review-pages` 会优先使用它
 - `_debug/final-review-report.txt`：最终复查报告，包含阶段耗时汇总、残留问题页和页面耗时 Top 10
+
+如果同一页多轮后仍是 `translation_failed` / `translation_failure_placeholder`，通常是翻译 API 对内容拒翻、超时或返回失败占位符。人工修补时不能只覆盖最终 PNG；需要同步更新该页 `_debug/pages/*.json`、`_debug/texts/*.translation.txt`、整本 `review-pages.txt`、`failed-translations.tsv`、`summary.json` 和隐藏 stage cache，否则后续扫描会继续把它当失败页。
 
 ## 书系 Profile
 

@@ -10,6 +10,7 @@
 - 交互菜单已收敛为 `继续上次任务 / 新建任务 / 扫描并纠正错误 / 退出` 四项。
 - 输出目录固定为每个输入目录下的 `out`；完整翻译默认跳过已有输出，纠错重跑只覆盖 `_debug` 标记的问题页。
 - `_debug` 已支持 `failed-translations.tsv`、`review-pages.txt`、`final-review-report.txt` 和 `preprocessedPayload`。
+- 输入扫描已固定为当前目录直接图片文件，支持 `.jpg/.jpeg/.png/.webp` 大小写扩展名，并使用稳定自然排序处理 `1,2,10,100`、补零页和 `cover.jpg + 00001.jpg` 混合命名。
 - 批量输入支持拆分连在一起的 Windows 盘符路径，并自动识别书系/卷号，生成或复用 `<书系目录>/_translation_profile/series_profile.md`。
 - 已支持三个明确样式：Style 1 日漫横排、Style 2 日漫竖排、Style 3 英文欧美漫画横排。Style 3 使用 PaddleOCR English ONNX、英文提示词和 LTR 阅读顺序。
 - 后台入口 `run_batch_background.py` 已支持 `--style-id` 与 `--retry-review-pages`，和主 CLI 参数保持一致。
@@ -149,3 +150,9 @@ translate_manga_v2/
 - `.venv310/Scripts/python.exe -m compileall -q src batch_translate.py run_batch_background.py`
 - `cmd /c start_cli.bat --help`
 - `"4" | cmd /c start_cli.bat`：菜单可正常退出
+
+## 2026-05-11 当前验证命令
+
+- `.venv310/Scripts/python.exe -m pytest -q`：`184 passed`
+- 真实目录 `翻译测试日漫/东京大麻特区：被称为大麻王的男人/03`：扫描出 `164` 张，顺序为 `cover.jpg, 00001.jpg ... 00163.jpg`
+- 真实目录 `翻译测试日漫/东京大麻特区：被称为大麻王的男人/02`：`0_00014.jpg` 至 `0_00019.jpg` 已用人工译文重嵌，`needsReviewPages=0`

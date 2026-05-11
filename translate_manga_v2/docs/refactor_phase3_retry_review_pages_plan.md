@@ -131,8 +131,11 @@ Expected: 能列出含 `tokugawa#01_010.jpg` 的返工清单。
 - 只读扫描 `D:/github/translate-reader/翻译测试日漫/德川家康/01/out`，识别出 11 个需要重跑的源图，包含旧 debug 回退扫描发现的 `tokugawa#01_591.jpg`。
 - 后续增强已补齐：`_debug/final-review-report.txt`、菜单最多 5 轮自动纠错、纠错时注入邻近页正常译文，以及新 debug 记录中的 `preprocessedPayload` / `PREP-DEBUG` 复用路径。
 - 2026-05-09 补齐：返工入口会同时检查缺失输出页；后台入口 `run_batch_background.py` 也支持 `--retry-review-pages` 和 `--style-id`。
+- 2026-05-11 补齐：缺失输出页扫描和输入扫描统一使用稳定自然排序，已覆盖 `cover.jpg + 00001.jpg`、`1/2/10/100`、补零数字页和大小写 `.JPG/.PNG/.WebP`。
+- 2026-05-11 实跑修补：`东京大麻特区：被称为大麻王的男人/02` 中 `0_00014.jpg` 至 `0_00019.jpg` 因敏感词触发翻译失败占位符，已用人工译文重嵌；修补时同步更新最终 PNG、`_debug/pages/*.json`、`_debug/texts/*.translation.txt`、`review-pages.txt`、`failed-translations.tsv`、`summary.json` 和 stage cache，避免下次扫描继续重跑。
 - 验证命令：
   - `.venv310/Scripts/python.exe -m pytest tests/test_cli_batch.py::test_debug_writer_flags_translation_failure_placeholders tests/test_cli_batch.py::test_run_batch_translation_retry_review_pages_only_processes_failed_translation_list tests/test_batch_translate_entry.py -q`，结果 `7 passed`
   - 2026-05-09 全量回归：`.venv310/Scripts/python.exe -m pytest -q`，结果 `169 passed`
+  - 2026-05-11 全量回归：`.venv310/Scripts/python.exe -m pytest -q`，结果 `184 passed`
   - `.venv310/Scripts/python.exe -m compileall -q src batch_translate.py run_batch_background.py`
   - `start_cli.bat --help`

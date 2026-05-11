@@ -81,6 +81,12 @@
   - 菜单 `扫描并纠正错误`
   - retry 会读取 `_debug/pages/*.json` 中前后页正常译文作为上下文，过滤翻译失败占位符
   - 新 debug 记录包含 `preprocessedPayload`，后续 retry 可优先走 `PREP-DEBUG`
+- `translate_manga_v2` 的输入图片扫描规则自 `2026-05-11` 起固定为：
+  - 只扫描输入目录下的直接文件，不递归子目录
+  - 支持 `.jpg/.jpeg/.png/.webp`，扩展名大小写不敏感
+  - 统一使用 `natural_sort_key()`，稳定支持 `1,2,10,100`、补零数字页和 `cover.jpg + 00001.jpg` 混合命名
+  - 缺失输出页扫描也按同一自然顺序报告
+- 若翻译 API 对敏感内容返回 `translation_failed` / `translation_failure_placeholder`，人工修补时必须同时更新最终 PNG、`_debug/pages/*.json`、`_debug/texts/*.translation.txt`、`review-pages.txt`、`failed-translations.tsv`、`summary.json` 和 stage cache；只改 PNG 会在下次扫描中被旧 debug/cache 重新标记为失败。
 - `_debug/summary.json` 自 `2026-04-30` 起会额外写出 `runOptions`：
   - `inputDir`
   - `outputDir`
@@ -113,6 +119,10 @@
   - `.venv310/Scripts/python.exe -m pytest --ignore=tests/test_cli_batch.py -q`：`110 passed`
   - `.venv310/Scripts/python.exe -m pytest tests/test_book_profile.py tests/test_manga_context_service.py tests/test_cli_menu.py -q`：`14 passed`
   - `.venv310/Scripts/python.exe -m compileall -q src/translate_manga/core/context src/translate_manga/cli/menu.py`
+- `translate_manga_v2` 当前验证基线（2026-05-11）：
+  - `.venv310/Scripts/python.exe -m pytest -q`：`184 passed`
+  - 真实目录 `翻译测试日漫/东京大麻特区：被称为大麻王的男人/03` 可扫描出 `164` 张，顺序为 `cover.jpg, 00001.jpg ... 00163.jpg`
+  - 真实目录 `翻译测试日漫/东京大麻特区：被称为大麻王的男人/02` 的 `0_00014.jpg` 至 `0_00019.jpg` 已通过人工译文重嵌并清空 review 状态
 - 旧 `translate_manga_cli` 历史稳定基线，仅供回溯：
   - `pytest -q`：`116 passed`（`2026-04-30`，纯 CLI 收口后）
   - 真实整本 `[古泉智浩] 死んだ目をした少年`：`188` 页，`897.25s`，约 `4.77s/页`
