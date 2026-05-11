@@ -12,6 +12,7 @@ from translate_manga.cli.service import (
 from translate_manga.config.paths import find_project_root
 from translate_manga.config.settings import load_session_state, load_settings, resolve_path_value, save_session_state
 from translate_manga.core.context.book_profile import split_pasted_paths
+from translate_manga.core.natural_sort import natural_sort_key
 from translate_manga.core.styles import normalize_style_id, resolve_style_profile
 from translate_manga.core.translate.openai_compatible import TRANSLATION_FAILURE_TEXT
 
@@ -402,7 +403,7 @@ def _collect_missing_output_entries(input_dir, output_dir):
 
     return [
         {"sourceName": source_name, "reviewReasons": ["missing_output"]}
-        for source_name in sorted(find_missing_output_page_names(image_paths, output_dir))
+        for source_name in sorted(find_missing_output_page_names(image_paths, output_dir), key=natural_sort_key)
     ]
 
 

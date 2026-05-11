@@ -10,5 +10,8 @@ def natural_sort_key(value):
     for part in parts:
         if not part:
             continue
-        key.append(int(part) if part.isdigit() else part)
+        if part.isdigit():
+            key.append((1, int(part), len(part), part))
+        else:
+            key.append((0, part))
     return key

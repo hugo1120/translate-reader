@@ -17,6 +17,7 @@ from translate_manga.cli.service import (
     scan_input_images,
 )
 from translate_manga.core.context.manga_context import find_existing_manga_context
+from translate_manga.core.natural_sort import natural_sort_key
 from translate_manga.core.styles import resolve_style_profile
 from translate_manga.core.translate.openai_compatible import TRANSLATION_FAILURE_TEXT, TRANSLATION_PROMPT_SIGNATURE
 
@@ -184,6 +185,36 @@ def test_scan_input_images_uses_natural_numeric_order(tmp_path):
     image_paths = scan_input_images(input_dir)
 
     assert [path.name for path in image_paths] == ["1.jpg", "2.jpg", "10.jpg", "100.jpg"]
+
+
+def test_natural_sort_key_orders_equal_numbers_with_shorter_padding_first():
+    names = ["001.jpg", "010.jpg", "01.jpg", "1.jpg", "10.jpg"]
+
+    assert sorted(names, key=natural_sort_key) == ["1.jpg", "01.jpg", "001.jpg", "10.jpg", "010.jpg"]
+
+
+def test_scan_input_images_accepts_supported_extensions_case_insensitively(tmp_path):
+    input_dir = tmp_path / "input"
+    _save_image(input_dir / "001.JPG")
+    _save_image(input_dir / "002.PnG")
+    _save_image(input_dir / "003.WebP")
+    (input_dir / "004.txt").write_text("not an image", encoding="utf-8")
+
+    image_paths = scan_input_images(input_dir)
+
+    assert [path.name for path in image_paths] == ["001.JPG", "002.PnG", "003.WebP"]
+
+
+def test_scan_input_images_handles_cover_and_zero_padded_numeric_names(tmp_path):
+    input_dir = tmp_path / "input"
+    _save_image(input_dir / "00002.jpg")
+    _save_image(input_dir / "cover.jpg")
+    _save_image(input_dir / "00010.jpg")
+    _save_image(input_dir / "00001.jpg")
+
+    image_paths = scan_input_images(input_dir)
+
+    assert [path.name for path in image_paths] == ["cover.jpg", "00001.jpg", "00002.jpg", "00010.jpg"]
 
 
 def test_run_batch_translation_skips_existing_outputs_and_copies_translated_image(tmp_path, monkeypatch):

@@ -380,6 +380,48 @@ def test_menu_scan_and_fix_detects_missing_output_pages(monkeypatch, tmp_path):
     assert "未发现遗留错误" in combined_output
 
 
+def test_menu_scan_and_fix_detects_missing_cover_and_zero_padded_numeric_pages(monkeypatch, tmp_path):
+    project_root = tmp_path / "project"
+    config_root = project_root / "config"
+    config_root.mkdir(parents=True)
+    input_dir = tmp_path / "book" / "01"
+    output_dir = input_dir / "out"
+    input_dir.mkdir(parents=True)
+    for name in ["cover.jpg", "00001.jpg", "00002.jpg"]:
+        (input_dir / name).write_bytes(b"source")
+    config_root.joinpath("session.json").write_text(
+        json.dumps({"last_input_dirs": [input_dir.as_posix()], "last_layout_mode": "vertical"}, ensure_ascii=False),
+        encoding="utf-8",
+    )
+    prompts = iter(["3", "1", "4"])
+    captured_calls = []
+    output_lines = []
+
+    monkeypatch.setattr(menu, "load_settings", lambda project_root=None: _stub_settings())
+
+    def fake_run_batch_translation(**kwargs):
+        captured_calls.append(kwargs)
+        for source_name in ["cover", "00001", "00002"]:
+            (output_dir / f"{source_name}.translated.png").parent.mkdir(parents=True, exist_ok=True)
+            (output_dir / f"{source_name}.translated.png").write_bytes(b"translated")
+        return _summary(total=3, succeeded=3)
+
+    monkeypatch.setattr(menu, "run_batch_translation", fake_run_batch_translation)
+
+    exit_code = menu.run_interactive_menu(
+        input_func=lambda prompt="": next(prompts),
+        output_stream=menu._MemoryStream(output_lines),
+        project_root=project_root,
+    )
+
+    assert exit_code == 0
+    assert len(captured_calls) == 1
+    assert captured_calls[0]["retry_review_pages"] is True
+    combined_output = "".join(output_lines)
+    assert "RETRY [1/1] round=1/5 review_pages=3" in combined_output
+    assert "未发现遗留错误" in combined_output
+
+
 def test_menu_missing_output_scan_uses_numeric_output_padding(monkeypatch, tmp_path):
     project_root = tmp_path / "project"
     config_root = project_root / "config"
@@ -420,6 +462,18 @@ def test_menu_missing_output_scan_uses_numeric_output_padding(monkeypatch, tmp_p
     combined_output = "".join(output_lines)
     assert "RETRY [1/1] round=1/5 review_pages=1" in combined_output
     assert "未发现遗留错误" in combined_output
+
+
+def test_collect_missing_output_entries_uses_natural_order(tmp_path):
+    input_dir = tmp_path / "book"
+    output_dir = input_dir / "out"
+    input_dir.mkdir(parents=True)
+    for name in ["10.jpg", "1.jpg", "2.jpg"]:
+        (input_dir / name).write_bytes(b"source")
+
+    entries = menu._collect_missing_output_entries(input_dir, output_dir)
+
+    assert [entry["sourceName"] for entry in entries] == ["1.jpg", "2.jpg", "10.jpg"]
 
 
 def test_menu_full_translation_auto_retries_review_pages_until_clean(monkeypatch, tmp_path):
