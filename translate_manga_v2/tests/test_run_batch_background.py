@@ -66,13 +66,45 @@ def test_main_passes_style_and_retry_options_to_batch_translation(tmp_path, monk
             "--log-path",
             str(log_path),
             "--style-id",
-            "3",
-            "--retry-review-pages",
+            "auto",
+            "--retry-quality-review-pages",
         ]
     )
 
     assert result == 0
     assert captured["input_dir"] == input_dir
     assert captured["output_dir"] == output_dir
-    assert captured["style_id"] == "3"
+    assert captured["style_id"] == "auto"
     assert captured["retry_review_pages"] is True
+    assert captured["retry_quality_review_pages"] is True
+
+
+def test_main_passes_multimodal_style_to_batch_translation(tmp_path, monkeypatch):
+    input_dir = tmp_path / "input"
+    output_dir = tmp_path / "output"
+    log_path = tmp_path / "batch.log"
+    input_dir.mkdir()
+    output_dir.mkdir()
+    captured = {}
+
+    def fake_run_batch_translation(**kwargs):
+        captured.update(kwargs)
+        return {"total": 1, "succeeded": 1, "skipped": 0, "failed": 0}
+
+    monkeypatch.setattr(run_batch_background_module, "run_batch_translation", fake_run_batch_translation)
+
+    result = run_batch_background_module.main(
+        [
+            str(input_dir),
+            str(output_dir),
+            "--log-path",
+            str(log_path),
+            "--style-id",
+            "M",
+        ]
+    )
+
+    assert result == 0
+    assert captured["input_dir"] == input_dir
+    assert captured["output_dir"] == output_dir
+    assert captured["style_id"] == "M"

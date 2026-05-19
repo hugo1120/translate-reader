@@ -7,6 +7,7 @@ from translate_manga.core.translate.openai_compatible import (
     SABER_BATCH_SYSTEM_TEMPLATE,
     _build_batch_messages,
     _parse_numbered_translations,
+    is_translation_failure_text,
 )
 
 
@@ -77,6 +78,47 @@ def test_translate_texts_includes_context_snapshot(monkeypatch):
 def test_system_prompt_requests_compact_punctuation():
     assert "半角标点" in SABER_BATCH_SYSTEM_TEMPLATE
     assert "尽量少用中文全角标点" in SABER_BATCH_SYSTEM_TEMPLATE
+
+
+def test_is_translation_failure_text_matches_common_failure_placeholders():
+    failure_texts = [
+        "翻译失败",
+        "【翻译失败】",
+        "翻译失败，请检查日志",
+        "译文生成失败",
+        "生成译文失败",
+        "无法翻译",
+        "未能翻译",
+        "翻译出错",
+        "翻译异常",
+        "翻译接口错误",
+        "[ERROR] 翻译失败",
+        "API返回失败",
+        "翻译服务返回错误",
+        "模型返回错误",
+        "请检查终端中的错误日志",
+        "translation_failed",
+        "translation_failure_placeholder",
+        "ERROR: Translation failed",
+        "Translation failed. Please check terminal logs.",
+        "failed to translate",
+        "translation error",
+        "unable to translate",
+    ]
+
+    assert all(is_translation_failure_text(text) for text in failure_texts)
+
+
+def test_is_translation_failure_text_does_not_match_normal_dialogue():
+    normal_texts = [
+        "",
+        "翻译这件事本来就很难。",
+        "那次翻译失败以后,他再也不敢接活了。",
+        "如果无法翻译古书,就去找先生。",
+        "He said the translation failed because the dictionary was wrong.",
+    ]
+
+    assert not any(is_translation_failure_text(text) for text in normal_texts)
 
 
 def test_build_batch_messages_uses_compact_two_message_layout():

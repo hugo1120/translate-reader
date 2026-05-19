@@ -76,11 +76,14 @@
 - `translate_manga_v2` 自 `2026-05-08` 起支持批后纠错闭环：
   - `_debug/failed-translations.tsv`
   - `_debug/review-pages.txt`
+  - `_debug/quality-review.tsv`
   - `_debug/final-review-report.txt`
   - `--retry-review-pages`
+  - `--retry-quality-review-pages`
   - 菜单 `扫描并纠正错误`
   - retry 会读取 `_debug/pages/*.json` 中前后页正常译文作为上下文，过滤翻译失败占位符
   - 新 debug 记录包含 `preprocessedPayload`，后续 retry 可优先走 `PREP-DEBUG`
+- `translate_manga_v2` 菜单 `扫描并纠正错误` 的硬错误扫描只识别失败占位、复查标记和缺失输出，不保证发现语义误译；通篇译文质检会额外用模型和启发式检查软质量问题，但仍不是人工校对的完全替代。
 - `translate_manga_v2` 的输入图片扫描规则自 `2026-05-11` 起固定为：
   - 只扫描输入目录下的直接文件，不递归子目录
   - 支持 `.jpg/.jpeg/.png/.webp`，扩展名大小写不敏感
@@ -155,6 +158,16 @@
   - 适用场景：理解 V4 readability 的黑字双样式默认、亮度/复杂度决策链路和回归样本。
 - [2026-05-08 V4 readability 实施计划](./plans/2026-05-08-v4-readability-implementation-plan.md)
   - 适用场景：历史记录，追踪 V4 readability 从旧 CLI 到 V2 的实现步骤和验证记录。
+- [2026-05-13 卡姆依传 01 质量重做实施计划](./plans/2026-05-13-kamui01-quality-rework-implementation-plan.md)
+  - 适用场景：当前任务文档，跟踪 `卡姆依传/01` 的指定页重做、版式分流、长旁白优化和真实页回归验证。
+- [2026-05-13 卡姆依传 01 三十页抽样自治回归设计](./specs/2026-05-13-kamui01-30-page-regression-design.md)
+  - 适用场景：为 `卡姆依传/01` 固定 30 页回归样本、停机标准和问题分型。
+- [2026-05-13 卡姆依传 01 三十页抽样自治回归实施计划](./plans/2026-05-13-kamui01-30-page-regression-implementation-plan.md)
+  - 适用场景：执行 `卡姆依传/01` 的 30 页抽样重跑、问题归类、定向修复和循环回归。
+- [2026-05-14 卡姆依传 01 嵌字参考汉化对齐实施计划](./plans/2026-05-14-kamui01-typesetting-reference-implementation-plan.md)
+  - 适用场景：当前任务文档，跟踪 `卡姆依传/01/out` 长说明块嵌字从竖排密集块调整为参考汉化式横排正文块的测试、实现和真实页验证。
+- [2026-05-14 translate_manga_v2 项目审计测试计划](../translate_manga_v2/docs/superpowers/plans/2026-05-14-project-audit-test-plan.md)
+  - 适用场景：当前任务文档，记录 V2 全项目入口、配置、纠错、质检、流水线、渲染、文档一致性和真实 debug 数据的审计测试矩阵。
 
 ### 历史文档
 

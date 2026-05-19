@@ -6,7 +6,7 @@ from translate_manga.core.translation_payload import (
     empty_usage as _empty_usage,
     normalize_translation_payload as _normalize_payload,
 )
-from translate_manga.core.translate.openai_compatible import TRANSLATION_FAILURE_TEXT
+from translate_manga.core.translate.openai_compatible import is_translation_failure_text
 
 
 _PREPROCESSED_DEBUG_KEYS = [
@@ -15,17 +15,19 @@ _PREPROCESSED_DEBUG_KEYS = [
     "autoDirections",
     "textlinesPerBubble",
     "bubbleColors",
+    "multimodalLayout",
+    "bubbleLayoutHints",
     "originalTexts",
     "ocrResults",
     "timings",
 ]
 
 
-def _normalize_texts(texts):
+def _normalize_texts(texts, *, preserve_empty=False):
     normalized = []
     for text in texts or []:
         value = str(text or "").strip()
-        if value:
+        if value or preserve_empty:
             normalized.append(value)
     return normalized
 
@@ -48,11 +50,11 @@ def _read_timing_value(record, name):
 def _normalize_translation_payload(payload, translated_texts):
     normalized = _normalize_payload(payload, translated_texts=translated_texts)
     return {
-        "translatedTexts": _normalize_texts(normalized.get("translatedTexts") or []),
+        "translatedTexts": _normalize_texts(normalized.get("translatedTexts") or [], preserve_empty=True),
         "rounds": [
             {
                 "name": item.get("name") or "final",
-                "translatedTexts": _normalize_texts(item.get("translatedTexts") or []),
+                "translatedTexts": _normalize_texts(item.get("translatedTexts") or [], preserve_empty=True),
                 "usage": dict(item.get("usage") or _empty_usage()),
             }
             for item in (normalized.get("rounds") or [])
@@ -123,7 +125,8 @@ class BatchDebugArtifactWriter:
         translated_texts = _normalize_texts(
             translated_texts
             if translated_texts is not None
-            else result.get("translatedTexts") or []
+            else result.get("translatedTexts") or [],
+            preserve_empty=True,
         )
         translation_payload = _normalize_translation_payload(
             translation_payload if translation_payload is not None else result.get("translation"),
@@ -246,13 +249,6 @@ class BatchDebugArtifactWriter:
         if error:
             add_reason("error")
         if (
-            status == "skipped-existing"
-            and page_type is None
-            and not original_texts
-            and not translated_texts
-        ):
-            add_reason("missing_cached_texts")
-        if (
             page_type == "frontmatter"
             and skip_reason == "frontmatter"
             and int(page_index or 0) >= 10
@@ -266,8 +262,10 @@ class BatchDebugArtifactWriter:
             reason = str(reason or "").strip()
             if reason == "translation_failed":
                 add_reason("translation_failed")
-        if any(str(text or "").strip() == TRANSLATION_FAILURE_TEXT for text in translated_texts or []):
+        if any(is_translation_failure_text(text) for text in translated_texts or []):
             add_reason("translation_failure_placeholder")
+        if status == "skipped-existing":
+            return bool(reasons), reasons
         if should_translate is False:
             return bool(reasons), reasons
         if should_translate is True and not original_texts:

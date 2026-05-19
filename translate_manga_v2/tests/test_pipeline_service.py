@@ -132,6 +132,57 @@ def test_build_bubbles_respects_forced_layout_mode(monkeypatch):
     assert [bubble["autoTextDirection"] for bubble in bubbles] == ["vertical", "vertical"]
 
 
+def test_build_bubbles_mixes_horizontal_bubbles_under_vertical_layout(monkeypatch):
+    monkeypatch.setattr(
+        "translate_manga.core.pipeline.service.load_settings",
+        lambda: {
+            "render": {
+                "layout_mode": "vertical",
+                "font_family": "fonts/horizontal.ttf",
+                "line_spacing": 0.84,
+                "stroke_enabled": True,
+                "stroke_color": "#FFFFFF",
+                "stroke_width": 1,
+                "text_align": "center",
+                "vertical_layout": {
+                    "font_family": "fonts/vertical.ttf",
+                    "line_spacing": 1.04,
+                },
+            }
+        },
+    )
+
+    bubbles = _build_bubbles(
+        {
+            "bubbleCoords": [[10, 20, 120, 60], [130, 20, 170, 140]],
+            "bubblePolygons": [
+                [[10, 20], [120, 20], [120, 60], [10, 60]],
+                [[130, 20], [170, 20], [170, 140], [130, 140]],
+            ],
+            "autoDirections": ["h", "v"],
+            "textlinesPerBubble": [[], []],
+            "bubbleColors": [],
+        },
+        {
+            "originalTexts": ["面白い", "来い"],
+            "ocrResults": [
+                {"text": "面白い", "engine": "manga_ocr"},
+                {"text": "来い", "engine": "manga_ocr"},
+            ],
+        },
+        ["有意思", "过来"],
+    )
+
+    assert bubbles[0]["textDirection"] == "horizontal"
+    assert bubbles[0]["fontFamily"] == "fonts/horizontal.ttf"
+    assert bubbles[0]["lineSpacing"] == 0.84
+    assert bubbles[0]["layoutProfile"] is None
+    assert bubbles[1]["textDirection"] == "vertical"
+    assert bubbles[1]["fontFamily"] == "fonts/vertical.ttf"
+    assert bubbles[1]["lineSpacing"] == 1.04
+    assert bubbles[1]["layoutProfile"] == "vertical_layout2"
+
+
 def test_build_bubbles_uses_horizontal_font_override(monkeypatch):
     monkeypatch.setattr(
         "translate_manga.core.pipeline.service.load_settings",
@@ -163,6 +214,494 @@ def test_build_bubbles_uses_horizontal_font_override(monkeypatch):
     )
 
     assert bubbles[0]["fontFamily"] == "fonts/汉仪正圆-65W.TTF"
+
+
+def test_build_bubbles_suppresses_top_header_noise_translation(monkeypatch):
+    monkeypatch.setattr(
+        "translate_manga.core.pipeline.service.load_settings",
+        lambda: {
+            "render": {
+                "layout_mode": "vertical",
+                "font_family": "fonts/horizontal.ttf",
+                "line_spacing": 0.84,
+                "stroke_enabled": True,
+                "stroke_color": "#FFFFFF",
+                "stroke_width": 1,
+                "text_align": "center",
+                "vertical_layout": {
+                    "font_family": "fonts/vertical.ttf",
+                    "line_spacing": 1.04,
+                },
+            }
+        },
+    )
+
+    bubbles = _build_bubbles(
+        {
+            "bubbleCoords": [[610, 20, 759, 90]],
+            "bubblePolygons": [[[758, 92], [608, 89], [610, 20], [759, 23]]],
+            "autoDirections": ["h"],
+            "textlinesPerBubble": [
+                [
+                    {"polygon": [[610, 20], [759, 23], [759, 51], [610, 49]], "direction": "h"},
+                    {"polygon": [[631, 75], [694, 75], [694, 90], [631, 90]], "direction": "h"},
+                ]
+            ],
+            "bubbleColors": [],
+        },
+        {
+            "originalTexts": ["カムイ伝日 ビーッ"],
+            "ocrResults": [{"text": "カムイ伝日 ビーッ", "engine": "48px_ocr", "confidence": 0.45}],
+        },
+        ["卡姆伊传日 哔—"],
+        image_size=(820, 1200),
+    )
+
+    assert bubbles[0]["bubbleRole"] == "header_noise"
+    assert bubbles[0]["translatedText"] == ""
+
+
+def test_build_bubbles_suppresses_top_header_noise_with_borderline_confidence(monkeypatch):
+    monkeypatch.setattr(
+        "translate_manga.core.pipeline.service.load_settings",
+        lambda: {
+            "render": {
+                "layout_mode": "vertical",
+                "font_family": "fonts/horizontal.ttf",
+                "line_spacing": 0.84,
+                "stroke_enabled": True,
+                "stroke_color": "#FFFFFF",
+                "stroke_width": 1,
+                "text_align": "center",
+                "vertical_layout": {
+                    "font_family": "fonts/vertical.ttf",
+                    "line_spacing": 1.04,
+                },
+            }
+        },
+    )
+
+    bubbles = _build_bubbles(
+        {
+            "bubbleCoords": [[646, 16, 792, 79]],
+            "bubblePolygons": [[[646, 16], [792, 16], [792, 79], [646, 79]]],
+            "autoDirections": ["h"],
+            "textlinesPerBubble": [
+                [
+                    {"polygon": [[646, 16], [792, 16], [792, 48], [646, 48]], "direction": "h"},
+                    {"polygon": [[700, 52], [760, 52], [760, 79], [700, 79]], "direction": "h"},
+                ]
+            ],
+            "bubbleColors": [],
+        },
+        {
+            "originalTexts": ["カムイ伝日 キャーン!!"],
+            "ocrResults": [{"text": "カムイ伝日 キャーン!!", "engine": "48px_ocr", "confidence": 0.78}],
+        },
+        ["卡姆伊传日 咻——!!"],
+        image_size=(816, 1143),
+    )
+
+    assert bubbles[0]["bubbleRole"] == "header_noise"
+    assert bubbles[0]["translatedText"] == ""
+
+
+def test_build_bubble_text_profiles_keeps_high_confidence_top_left_sfx():
+    profiles = pipeline_service.build_bubble_text_profiles(
+        {
+            "bubbleCoords": [[79, 64, 159, 82]],
+            "textlinesPerBubble": [
+                [{"polygon": [[79, 64], [159, 64], [159, 82], [79, 82]], "direction": "h"}]
+            ],
+        },
+        {
+            "originalTexts": ["KAA!!"],
+            "ocrResults": [{"text": "KAA!!", "engine": "48px_ocr", "confidence": 0.93}],
+        },
+        image_size=(816, 1143),
+    )
+
+    assert profiles[0]["role"] == "dialogue"
+    assert profiles[0]["suppressTranslation"] is False
+    assert profiles[0]["sourceText"] == "KAA!!"
+
+
+def test_build_bubble_text_profiles_keeps_vertical_dominant_mixed_bubble_as_dialogue():
+    profiles = pipeline_service.build_bubble_text_profiles(
+        {
+            "bubbleCoords": [[41, 20, 249, 180]],
+            "textlinesPerBubble": [
+                [
+                    {"polygon": [[229, 65], [249, 65], [249, 136], [229, 136]], "direction": "v"},
+                    {"polygon": [[204, 66], [224, 66], [224, 164], [204, 164]], "direction": "v"},
+                    {"polygon": [[181, 68], [199, 68], [199, 180], [181, 180]], "direction": "v"},
+                    {"polygon": [[157, 68], [177, 68], [177, 180], [157, 180]], "direction": "v"},
+                    {"polygon": [[133, 66], [154, 66], [152, 127], [131, 126]], "direction": "v"},
+                    {"polygon": [[109, 67], [129, 67], [130, 173], [110, 173]], "direction": "v"},
+                    {"polygon": [[98, 24], [126, 20], [129, 45], [101, 49]], "direction": "h"},
+                    {"polygon": [[41, 21], [72, 21], [72, 49], [41, 49]], "direction": "h"},
+                ]
+            ],
+        },
+        {
+            "originalTexts": ["long vertical dialogue"],
+            "ocrResults": [{"text": "long vertical dialogue", "engine": "48px_ocr", "confidence": 0.82}],
+        },
+        image_size=(816, 1143),
+    )
+
+    assert profiles[0]["role"] == "dialogue"
+    assert profiles[0]["directionOverride"] is None
+    assert profiles[0]["autoFontSettings"] == {
+        "min_size": 7,
+        "max_size": 22,
+        "padding_ratio": 0.64,
+    }
+    assert profiles[0]["positionOffset"] == {"x": 0, "y": 40}
+
+
+def test_build_bubble_text_profiles_normalizes_long_narration_source_text():
+    long_text = "どうも、 オオカミの生活 に、 たちいりすぎた ようだ。 しかも、 この白オオカミの成長は、 こ の物語に同時的にあつかわれている。"
+
+    profiles = pipeline_service.build_bubble_text_profiles(
+        {
+            "bubbleCoords": [[80, 300, 640, 720]],
+            "textlinesPerBubble": [
+                [{"direction": "v"} for _ in range(18)]
+            ],
+        },
+        {
+            "originalTexts": [long_text],
+            "ocrResults": [
+                {"text": long_text, "engine": "manga_ocr", "confidence": 0.66, "fallbackUsed": True}
+            ],
+        },
+        image_size=(816, 1143),
+    )
+
+    assert profiles[0]["role"] == "long_narration"
+    assert profiles[0]["sourceText"] == "どうも、オオカミの生活に、たちいりすぎたようだ。しかも、この白オオカミの成長は、この物語に同時的にあつかわれている。"
+
+
+def test_build_bubble_text_profiles_uses_horizontal_prose_for_wide_editorial_narration():
+    long_text = (
+        "どうも、オオカミの生活に、たちいりすぎたようだ。"
+        "しかも、この白オオカミの成長は、この物語に同時的にあつかわれている。"
+    ) * 5
+
+    profiles = pipeline_service.build_bubble_text_profiles(
+        {
+            "bubbleCoords": [[72, 678, 748, 1078]],
+            "textlinesPerBubble": [[{"direction": "v"} for _ in range(24)]],
+            "bubbleColors": [
+                {
+                    "edgeDensity": 0.09,
+                    "darkPixelRatio": 0.001,
+                    "grayStdDev": 10.0,
+                }
+            ],
+        },
+        {
+            "originalTexts": [long_text],
+            "ocrResults": [
+                {"text": long_text, "engine": "manga_ocr", "confidence": 0.66, "fallbackUsed": True}
+            ],
+        },
+        image_size=(816, 1143),
+    )
+
+    assert profiles[0]["role"] == "long_narration"
+    assert profiles[0]["directionOverride"] == "horizontal"
+    assert profiles[0]["textAlignOverride"] == "start"
+    assert profiles[0]["autoFontSettings"] == {
+        "min_size": 8,
+        "max_size": 20,
+        "padding_ratio": 0.84,
+    }
+
+
+def test_build_bubble_text_profiles_uses_horizontal_prose_for_low_confidence_wide_exposition():
+    long_text = (
+        "百姓といっても、庄屋から下人まで、いろいろに分かれている。"
+        "本百姓は高持百姓といって、年貢をおさめる義務をもった者である。"
+    ) * 3
+
+    profiles = pipeline_service.build_bubble_text_profiles(
+        {
+            "bubbleCoords": [[409, 583, 742, 828]],
+            "textlinesPerBubble": [[{"direction": "v"} for _ in range(13)]],
+            "bubbleColors": [
+                {
+                    "edgeDensity": 0.19,
+                    "darkPixelRatio": 0.025,
+                    "grayStdDev": 38.0,
+                }
+            ],
+        },
+        {
+            "originalTexts": [long_text],
+            "ocrResults": [
+                {"text": long_text, "engine": "manga_ocr", "confidence": 0.34, "fallbackUsed": True}
+            ],
+        },
+        image_size=(816, 1143),
+    )
+
+    assert profiles[0]["role"] == "long_narration"
+    assert profiles[0]["directionOverride"] == "horizontal"
+    assert profiles[0]["textAlignOverride"] == "start"
+
+
+def test_build_bubble_text_profiles_uses_compact_horizontal_settings_for_chart_lists():
+    chart_text = "荒おこし 3月 苗しろ 5月 荒くれかき しろかき 田うえ 水まわし 田の草とり 追肥 病虫害予防 刈りとり 9月 脱穀 10～11月 モミつき 選米"
+
+    profiles = pipeline_service.build_bubble_text_profiles(
+        {
+            "bubbleCoords": [[60, 349, 327, 672]],
+            "textlinesPerBubble": [[{"direction": "h"} for _ in range(17)]],
+            "bubbleColors": [
+                {
+                    "edgeDensity": 0.08,
+                    "darkPixelRatio": 0.002,
+                    "grayStdDev": 8.0,
+                }
+            ],
+        },
+        {
+            "originalTexts": [chart_text],
+            "ocrResults": [
+                {"text": chart_text, "engine": "48px_ocr", "confidence": 0.91, "fallbackUsed": False}
+            ],
+        },
+        image_size=(816, 1143),
+    )
+
+    assert profiles[0]["role"] == "long_narration"
+    assert profiles[0]["directionOverride"] == "horizontal"
+    assert profiles[0]["textAlignOverride"] == "start"
+    assert profiles[0]["autoFontSettings"] == {
+        "min_size": 8,
+        "max_size": 14,
+        "padding_ratio": 0.74,
+    }
+
+
+def test_build_bubble_text_profiles_applies_multimodal_layout_hints():
+    profiles = pipeline_service.build_bubble_text_profiles(
+        {
+            "bubbleCoords": [
+                [718, 1088, 792, 1132],
+                [58, 306, 528, 560],
+                [551, 52, 738, 168],
+            ],
+            "textlinesPerBubble": [
+                [{"direction": "h"}],
+                [{"direction": "v"} for _ in range(12)],
+                [{"direction": "v"} for _ in range(4)],
+            ],
+            "bubbleLayoutHints": [
+                {"role": "page_number", "suppressTranslation": True},
+                {"role": "long_narration", "directionOverride": "horizontal", "textAlignOverride": "start"},
+                {"role": "dialogue", "directionOverride": "vertical"},
+            ],
+        },
+        {
+            "originalTexts": ["30", "説明文" * 30, "おめでとう"],
+            "ocrResults": [
+                {"text": "30", "engine": "48px_ocr", "confidence": 0.99},
+                {"text": "説明文" * 30, "engine": "manga_ocr", "confidence": 0.92},
+                {"text": "おめでとう", "engine": "48px_ocr", "confidence": 0.9},
+            ],
+        },
+        image_size=(816, 1143),
+    )
+
+    assert profiles[0]["role"] == "page_number"
+    assert profiles[0]["sourceText"] == ""
+    assert profiles[0]["suppressTranslation"] is True
+    assert profiles[1]["role"] == "long_narration"
+    assert profiles[1]["directionOverride"] == "horizontal"
+    assert profiles[1]["textAlignOverride"] == "start"
+    assert profiles[2]["role"] == "dialogue"
+    assert profiles[2]["directionOverride"] == "vertical"
+
+
+def test_build_bubbles_keeps_vertical_dense_long_narration_in_vertical_style(monkeypatch):
+    monkeypatch.setattr(
+        "translate_manga.core.pipeline.service.load_settings",
+        lambda: {
+            "render": {
+                "layout_mode": "vertical",
+                "font_family": "fonts/horizontal.ttf",
+                "line_spacing": 0.84,
+                "stroke_enabled": True,
+                "stroke_color": "#FFFFFF",
+                "stroke_width": 1,
+                "text_align": "center",
+                "vertical_layout": {
+                    "font_family": "fonts/vertical.ttf",
+                    "line_spacing": 1.04,
+                },
+            }
+        },
+    )
+
+    original_text = "どうも、 オオカミの生活 に、 たちいりすぎた ようだ。 しかも、 この白オオカミの成長は、 こ の物語に同時的にあつかわれている。"
+    bubbles = _build_bubbles(
+        {
+            "bubbleCoords": [[40, 220, 720, 700]],
+            "bubblePolygons": [[[40, 220], [720, 220], [720, 700], [40, 700]]],
+            "autoDirections": ["v"],
+            "textlinesPerBubble": [
+                [{"direction": "v"} for _ in range(18)]
+            ],
+            "bubbleColors": [],
+        },
+        {
+            "originalTexts": [original_text],
+            "ocrResults": [
+                {"text": original_text, "engine": "manga_ocr", "confidence": 0.66, "fallbackUsed": True}
+            ],
+        },
+        ["这是一个很长的说明文块。"],
+        image_size=(816, 1143),
+    )
+
+    assert bubbles[0]["bubbleRole"] == "long_narration"
+    assert bubbles[0]["textDirection"] == "vertical"
+    assert bubbles[0]["fontFamily"] == "fonts/vertical.ttf"
+    assert bubbles[0]["layoutProfile"] == "vertical_layout2"
+    assert bubbles[0]["textAlign"] == "center"
+    assert bubbles[0]["autoFontSettings"] == {
+        "min_size": 8,
+        "max_size": 16,
+        "padding_ratio": 0.78,
+    }
+
+
+def test_build_bubbles_trims_l_shaped_vertical_long_narration_render_box(monkeypatch):
+    monkeypatch.setattr(
+        "translate_manga.core.pipeline.service.load_settings",
+        lambda: {
+            "render": {
+                "layout_mode": "auto",
+                "font_family": "fonts/horizontal.ttf",
+                "line_spacing": 0.84,
+                "stroke_enabled": True,
+                "stroke_color": "#FFFFFF",
+                "stroke_width": 1,
+                "text_align": "center",
+                "vertical_layout": {
+                    "font_family": "fonts/vertical.ttf",
+                    "line_spacing": 1.04,
+                },
+            }
+        },
+    )
+
+    textlines = []
+    for x in range(746, 430, -24):
+        textlines.append({"direction": "v", "polygon": [[x, 850], [x + 18, 850], [x + 18, 1058], [x, 1058]]})
+    for x in range(408, 74, -24):
+        textlines.append({"direction": "v", "polygon": [[x, 612], [x + 18, 612], [x + 18, 1058], [x, 1058]]})
+
+    original_text = "当時、非人はもっとも 身分のひくいものとされ 死牛馬のあと始末、皮革 竹細工、染物を職業とする者がおおかった。"
+    bubbles = _build_bubbles(
+        {
+            "bubbleCoords": [[75, 610, 762, 1068]],
+            "bubblePolygons": [[[78, 1069], [75, 611], [760, 606], [763, 1064]]],
+            "autoDirections": ["v"],
+            "textlinesPerBubble": [textlines],
+            "bubbleColors": [],
+        },
+        {
+            "originalTexts": [original_text],
+            "ocrResults": [
+                {"text": original_text, "engine": "manga_ocr", "confidence": 0.68, "fallbackUsed": True}
+            ],
+        },
+        ["当时，非人被视为身份最低下者，多从事死牛马处理和皮革竹细工。"],
+        image_size=(816, 1152),
+    )
+
+    assert bubbles[0]["bubbleRole"] == "long_narration"
+    assert bubbles[0]["textDirection"] == "vertical"
+    assert bubbles[0]["coords"][0] <= 75
+    assert bubbles[0]["coords"][2] < 470
+
+
+def test_build_bubble_text_profiles_suppresses_low_confidence_micro_kana_noise():
+    profiles = pipeline_service.build_bubble_text_profiles(
+        {
+            "bubbleCoords": [[611, 817, 654, 831]],
+            "textlinesPerBubble": [
+                [{"direction": "h", "polygon": [[611, 817], [654, 817], [654, 831], [611, 831]]}]
+            ],
+        },
+        {
+            "originalTexts": ["ッ"],
+            "ocrResults": [
+                {"text": "ッ", "engine": "manga_ocr", "confidence": 0.16, "fallbackUsed": True}
+            ],
+        },
+        image_size=(816, 1152),
+    )
+
+    assert profiles[0]["role"] == "ocr_noise"
+    assert profiles[0]["suppressTranslation"] is True
+    assert profiles[0]["sourceText"] == ""
+
+
+def test_build_bubbles_keeps_tall_vertical_long_narration_in_vertical_style(monkeypatch):
+    monkeypatch.setattr(
+        "translate_manga.core.pipeline.service.load_settings",
+        lambda: {
+            "render": {
+                "layout_mode": "auto",
+                "font_family": "fonts/horizontal.ttf",
+                "line_spacing": 0.84,
+                "stroke_enabled": True,
+                "stroke_color": "#FFFFFF",
+                "stroke_width": 1,
+                "text_align": "center",
+                "vertical_layout": {
+                    "font_family": "fonts/vertical.ttf",
+                    "line_spacing": 1.04,
+                },
+            }
+        },
+    )
+
+    original_text = "すりゃ、 年を 生 こしても 米がくえる だ……。 誕 そう言われるのですが、スタジューではなくなりませんが、 ウーム、 十年に一ぺん とれるか とれんかの みのりじゃ。"
+    bubbles = _build_bubbles(
+        {
+            "bubbleCoords": [[12, 20, 183, 907]],
+            "bubblePolygons": [[[14, 907], [11, 20], [182, 19], [184, 906]]],
+            "autoDirections": ["v"],
+            "textlinesPerBubble": [
+                [{"direction": direction} for direction in ["v", "v", "h", "v", "v", "v", "h", "v", "v", "v", "v", "v"]]
+            ],
+            "bubbleColors": [],
+        },
+        {
+            "originalTexts": [original_text],
+            "ocrResults": [
+                {"text": original_text, "engine": "48px_ocr", "confidence": 0.92, "fallbackUsed": False}
+            ],
+        },
+        ["有这米，就算上了年纪也能吃上饭了。"],
+        image_size=(816, 1143),
+    )
+
+    assert bubbles[0]["bubbleRole"] == "long_narration"
+    assert bubbles[0]["textDirection"] == "vertical"
+    assert bubbles[0]["fontFamily"] == "fonts/vertical.ttf"
+    assert bubbles[0]["layoutProfile"] == "vertical_layout2"
+    assert bubbles[0]["autoFontSettings"] == {
+        "min_size": 8,
+        "max_size": 16,
+        "padding_ratio": 0.78,
+    }
 
 
 def test_preprocess_page_passes_style_ocr_options(monkeypatch, tmp_path):

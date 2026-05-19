@@ -26,3 +26,18 @@ def test_legacy_auto_layout_mode_stays_auto():
     assert profile["layout_mode"] == "auto"
     assert profile["source_language"] == "japanese"
     assert profile["prompt_profile"] == "default"
+    assert profile.get("layout_assist") is None
+
+
+def test_multimodal_style_uses_auto_layout_without_changing_auto_style():
+    profile = resolve_style_profile("m")
+
+    assert profile["style_id"] == "style_mm"
+    assert profile["layout_mode"] == "auto"
+    assert profile["source_language"] == "japanese"
+    assert profile["prompt_profile"] == "default"
+    assert profile["reading_order"] == "rtl"
+    assert profile["layout_assist"] == {"type": "multimodal", "enabled": True}
+    assert resolve_style_profile("multimodal")["style_id"] == "style_mm"
+    assert resolve_style_profile("style_mm")["style_id"] == "style_mm"
+    assert resolve_style_profile("多模态")["style_id"] == "style_mm"

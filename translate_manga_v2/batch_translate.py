@@ -37,16 +37,43 @@ def _build_parser():
     parser.add_argument("--layout-mode", choices=["horizontal", "vertical", "auto"], help="排版方向")
     parser.add_argument(
         "--style-id",
-        choices=["1", "2", "3", "style1", "style2", "style3", "style_1", "style_2", "style_3"],
-        help="样式编号: 1/2/3 或 style1/style2/style3；优先级高于 --layout-mode",
+        choices=[
+            "1",
+            "2",
+            "3",
+            "A",
+            "a",
+            "auto",
+            "style1",
+            "style2",
+            "style3",
+            "style_1",
+            "style_2",
+            "style_3",
+            "style_auto",
+            "M",
+            "m",
+            "MM",
+            "mm",
+            "multimodal",
+            "multi_modal",
+            "style_mm",
+            "style_multimodal",
+            "多模态",
+            "多模态AI辅助",
+            "多模态ai辅助",
+        ],
+        help="样式编号: 1/2/3/A/M 或 style1/style2/style3/auto/multimodal；优先级高于 --layout-mode",
     )
     parser.add_argument("--workspace-root", help="临时工作目录根")
     parser.add_argument("--cache-root", help="隐藏 stage cache 根目录")
     parser.add_argument("--model", help="翻译模型名")
     parser.add_argument("--base-url", help="OpenAI-compatible base URL")
     parser.add_argument("--api-key", help="OpenAI-compatible API key")
+    parser.add_argument("--page-name", dest="page_names", action="append", help="只重做指定源文件名，可重复传入")
     parser.add_argument("--overwrite-existing", action="store_true", help="覆盖已存在的输出")
     parser.add_argument("--retry-review-pages", action="store_true", help="只重跑 _debug 标记需要复查/失败的页，并覆盖输出")
+    parser.add_argument("--retry-quality-review-pages", action="store_true", help="读取 _debug/quality-review.tsv 中的软质量问题页；会自动启用 --retry-review-pages")
     return parser
 
 
@@ -87,7 +114,9 @@ def main(argv=None):
             layout_mode=layout_mode,
             style_id=args.style_id,
             launch_mode="args",
-            retry_review_pages=args.retry_review_pages,
+            retry_review_pages=args.retry_review_pages or args.retry_quality_review_pages,
+            retry_quality_review_pages=args.retry_quality_review_pages,
+            target_page_names=args.page_names,
         )
     except Exception as error:
         print(f"Batch translation failed: {error}", file=sys.stderr)

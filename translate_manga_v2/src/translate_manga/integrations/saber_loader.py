@@ -576,16 +576,19 @@ _WORKER_SCRIPT = textwrap.dedent(
                     bubble_payload[key] = bubble.get(key)
             state = BubbleState.from_dict(bubble_payload)
             setattr(state, "_layout_profile", bubble.get("layoutProfile"))
+            setattr(state, "_auto_font_settings", bubble.get("autoFontSettings") or {})
             bubble_states.append(state)
         return bubble_states
 
     def apply_auto_font_settings(states, settings):
-        min_size = int(settings.get("min_size", 12) or 12)
-        max_size = int(settings.get("max_size", 80) or 80)
-        padding_ratio = float(settings.get("padding_ratio", 1.0) or 1.0)
         for state in states:
             if not state.translated_text:
                 continue
+            state_settings = dict(settings or {})
+            state_settings.update(getattr(state, "_auto_font_settings", {}) or {})
+            min_size = int(state_settings.get("min_size", 12) or 12)
+            max_size = int(state_settings.get("max_size", 80) or 80)
+            padding_ratio = float(state_settings.get("padding_ratio", 1.0) or 1.0)
             x1, y1, x2, y2 = state.coords
             state.font_size = calculate_auto_font_size(
                 state.translated_text,
@@ -774,8 +777,11 @@ _WORKER_SCRIPT = textwrap.dedent(
                 bubble_payload["autoTextDirection"] = auto_text_direction
                 state = BubbleState.from_dict(bubble_payload)
                 setattr(state, "_layout_profile", bubble.get("layoutProfile"))
+                setattr(state, "_auto_font_settings", bubble.get("autoFontSettings") or {})
                 raw_font_size = bubble.get("fontSize")
                 if raw_font_size in (None, "") and state.translated_text:
+                    state_settings = dict(auto_font_settings)
+                    state_settings.update(getattr(state, "_auto_font_settings", {}) or {})
                     x1, y1, x2, y2 = state.coords
                     state.font_size = calculate_auto_font_size(
                         state.translated_text,
@@ -783,9 +789,9 @@ _WORKER_SCRIPT = textwrap.dedent(
                         y2 - y1,
                         state.text_direction,
                         state.font_family,
-                        min_size=int(auto_font_settings.get("min_size", 12) or 12),
-                        max_size=int(auto_font_settings.get("max_size", 80) or 80),
-                        padding_ratio=float(auto_font_settings.get("padding_ratio", 1.0) or 1.0),
+                        min_size=int(state_settings.get("min_size", 12) or 12),
+                        max_size=int(state_settings.get("max_size", 80) or 80),
+                        padding_ratio=float(state_settings.get("padding_ratio", 1.0) or 1.0),
                     )
                 bubble_states.append(state)
             rendered = render_single_bubble_unified(

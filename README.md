@@ -8,9 +8,9 @@
 
 - 批量翻译单本或多本漫画目录，输出到每本目录下的 `out`。
 - 支持中断后继续，默认跳过已生成的译图。
-- 支持批后自动复查，最多重试失败页、疑似坏页和缺失输出页。
+- 支持批后自动复查，最多重试失败页、疑似坏页和缺失输出页；菜单 3 可追加模型质检软质量问题页。
 - 支持菜单入口和命令行入口。
-- 支持日漫横排、日漫竖排、英漫横排三种样式。
+- 支持日漫横排、日漫竖排、日漫自动横竖排、英漫横排四种样式。
 - 支持书系 Profile：同一作品后续卷可复用背景、人名、术语和称呼。
 - 输出 `_debug` 调试记录，方便定位 OCR、翻译、渲染和失败页。
 - 本地私有 API 配置不进 Git，不进 Release 包。
@@ -115,7 +115,7 @@ start_cli.bat
 
 - `继续上次任务`：复用上次保存的一个或多个输入目录。
 - `新建任务`：重新输入单本或多本漫画目录。
-- `扫描并纠正错误`：读取 `_debug`，只重跑失败、需复查或缺失输出的页面。
+- `扫描并纠正错误`：读取 `_debug`，可只重跑硬错误页，也可追加通篇译文质检后重跑软质量问题页。
 - `退出`
 
 新建任务输入规则：
@@ -141,9 +141,10 @@ C:/Manga/徳川家康/02 -> C:/Manga/徳川家康/02/out
 | --- | --- | --- | --- |
 | Style 1 | 日漫横排 | 横排，左到右，黑体 | 日语 |
 | Style 2 | 日漫竖排 | 竖排，右到左，圆体 | 日语 |
+| Auto | 日漫自动横竖排 | 原文横排气泡按横排渲染，原文竖排气泡按竖排渲染 | 日语 |
 | Style 3 | 英漫横排 | 横排，左到右，圆体 | 英语 |
 
-命令行推荐使用 `--style-id 1|2|3`。旧参数 `--layout-mode horizontal|vertical|auto` 仍兼容。
+命令行推荐使用 `--style-id 1|2|auto|3`。旧参数 `--layout-mode horizontal|vertical|auto` 仍兼容。
 
 ## 命令行用法
 
@@ -157,6 +158,12 @@ C:/Manga/徳川家康/02 -> C:/Manga/徳川家康/02/out
 
 ```powershell
 ./start_cli.bat --input "C:/Manga/Book/01" --output "C:/Manga/Book/01/out" --style-id 2 --retry-review-pages
+```
+
+只重跑通篇质检标记的软质量问题页：
+
+```powershell
+./start_cli.bat --input "C:/Manga/Book/01" --output "C:/Manga/Book/01/out" --style-id auto --retry-quality-review-pages
 ```
 
 后台跑批并写日志：
@@ -176,6 +183,7 @@ out/
     texts/*.translation.txt
     review-pages.txt
     failed-translations.tsv
+    quality-review.tsv
     final-review-report.txt
     summary.json
 ```
@@ -184,6 +192,7 @@ out/
 
 - `_debug/review-pages.txt`：需要复查的页面。
 - `_debug/failed-translations.tsv`：失败或疑似失败清单。
+- `_debug/quality-review.tsv`：菜单 3 通篇质检发现的软质量问题页。
 - `_debug/final-review-report.txt`：最终复查报告、耗时汇总和残留问题。
 - `_debug/pages/*.json`：单页 OCR、译文、状态、耗时和上下文。
 
@@ -306,6 +315,7 @@ API 报错：
 
 有页面没翻译或翻译错：
 
-- 菜单选择 `扫描并纠正错误`。
-- 或命令行添加 `--retry-review-pages`。
+- 失败占位、缺译文、缺输出这类硬错误：菜单选择 `扫描并纠正错误` 的硬错误修复，或命令行添加 `--retry-review-pages`。
+- 明显误译、残留原文、称呼不一致、中文不通顺、OCR 噪声残留等软质量问题：菜单 3 选择 `硬错误+通篇译文质检`，或在已有 `_debug/quality-review.tsv` 时命令行添加 `--retry-quality-review-pages`。
+- 语义误译不能保证 100% 自动识别；模型质检看的是 `_debug/pages/*.json` 的 OCR 原文和译文，不等同于人工校对，也不直接判断最终 PNG 的嵌字审美。
 - 如果同一页多轮后仍显示 `translation_failed` / `translation_failure_placeholder`，通常是翻译 API 拒翻或超时。人工修补时必须同时更新输出图、`_debug/pages/*.json`、`_debug/texts/*.translation.txt`、`review-pages.txt`、`failed-translations.tsv`、`summary.json` 和 stage cache，否则下次扫描会继续把它当失败页重跑。

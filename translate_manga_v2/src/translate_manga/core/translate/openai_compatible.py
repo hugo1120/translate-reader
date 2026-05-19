@@ -15,6 +15,79 @@ MULTI_ROUND_MAX_TEXTS = 5
 MULTI_ROUND_DENSE_TEXT_LIMIT = 6
 MULTI_ROUND_DENSE_CHAR_LIMIT = 120
 
+
+def is_translation_failure_text(value):
+    text = str(value or "").strip()
+    if not text:
+        return False
+    if text == TRANSLATION_FAILURE_TEXT:
+        return True
+    compact = "".join(text.split()).lower()
+    compact_clean = compact.strip("[]【】()（）{}<>《》「」『』:：,，.。!！?？\"'`")
+    canonical = "".join(TRANSLATION_FAILURE_TEXT.split()).lower()
+    if compact == canonical:
+        return True
+
+    spaced = re.sub(r"[\s_\-]+", " ", text.lower()).strip(" \t\r\n:：,，.。!！?？[]【】()（）\"'")
+    if (
+        "translation_failed" in compact
+        or "translationfailure" in compact
+        or "translationerror" in compact
+        or "failureplaceholder" in compact
+    ):
+        return True
+
+    chinese_failure_prefixes = (
+        "翻译失败",
+        "翻译出错",
+        "翻译错误",
+        "翻译异常",
+        "无法翻译",
+        "未能翻译",
+        "译文生成失败",
+        "生成译文失败",
+    )
+    if len(compact_clean) <= 32 and compact_clean.startswith(chinese_failure_prefixes):
+        return True
+    if (
+        len(compact_clean) <= 48
+        and compact_clean.startswith(("error", "错误", "异常", "失败", "占位"))
+        and any(marker in compact_clean for marker in chinese_failure_prefixes)
+    ):
+        return True
+
+    chinese_diagnostics = (
+        "请检查终端",
+        "错误日志",
+        "翻译接口错误",
+        "翻译api错误",
+        "翻译服务错误",
+        "翻译服务返回错误",
+        "api返回失败",
+        "接口返回失败",
+        "模型错误",
+        "模型返回失败",
+        "模型返回错误",
+        "模型调用失败",
+    )
+    if len(compact_clean) <= 80 and any(marker in compact_clean for marker in chinese_diagnostics):
+        return True
+
+    english_failure_prefixes = (
+        "translation failed",
+        "translation failure",
+        "translation error",
+        "failed to translate",
+        "unable to translate",
+        "could not translate",
+    )
+    if len(spaced) > 96:
+        return False
+    if spaced.startswith(english_failure_prefixes):
+        return True
+    return spaced.startswith(("error", "placeholder")) and any(phrase in spaced for phrase in english_failure_prefixes)
+
+
 SABER_BATCH_SYSTEM_TEMPLATE = _DEFAULT_TRANSLATION_PROMPTS["system"]
 
 _ROUND_PROMPTS = _DEFAULT_TRANSLATION_PROMPTS["rounds"]
@@ -356,7 +429,7 @@ def _analyze_ocr_retry(original_texts, translated_texts):
     if latin_like_count >= max(1, len(non_empty_originals) // 2):
         reasons.append("too_many_latin_fragments")
 
-    failure_count = sum(1 for text in non_empty_translations if text == TRANSLATION_FAILURE_TEXT)
+    failure_count = sum(1 for text in non_empty_translations if is_translation_failure_text(text))
     if failure_count >= max(1, len(non_empty_originals) // 2):
         reasons.append("translation_failed")
 

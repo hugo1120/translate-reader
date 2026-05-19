@@ -12,7 +12,7 @@
 
 - `继续上次任务`：复用上一次保存的一个或多个输入目录，继续跑未完成内容
 - `新建任务`：重新输入一个或多个漫画目录，并覆盖上次任务记忆
-- `扫描并纠正错误`：扫描已有 `_debug` 记录和缺失输出图，只重跑需要复查/失败/未生成的页
+- `扫描并纠正错误`：扫描已有 `_debug` 记录和缺失输出图；可选择只修复硬错误，或追加通篇译文质检后只重跑被标记的问题页
 - `退出`：退出菜单
 
 菜单每次翻译完成后都会返回主菜单，不会直接退出。
@@ -52,6 +52,11 @@ D:/book-b/item/image -> D:/book-b/item/image/out
 
 纠错重跑会读取旧 `_debug/pages/*.json` 里前后页的正常译文作为翻译上下文；新生成的 debug 记录还会保存可复用预处理摘要，后续纠错会优先复用它，减少重复 OCR/PREP。
 
+选择 `扫描并纠正错误` 后会再选择扫描模式：
+
+- `只修复硬错误`：不额外调用模型，只处理失败、复查标记和缺失输出图
+- `硬错误+通篇译文质检`：先修复硬错误；即使仍有少量硬错误未清完，也会继续让模型审核该书已有译文，生成 `_debug/quality-review.tsv`，再覆盖重跑这些软质量问题页。硬错误页仍会保留在 `failed-translations.tsv` / `review-pages.txt`
+
 跨程序重启会记住上一次配置，保存在：
 
 ```text
@@ -59,6 +64,38 @@ config/session.json
 ```
 
 `config/local.json` 用于本机路径和 API key，已被 `.gitignore` 忽略；公开同步只保留无密钥模板 `config/local.example.json`。
+
+菜单 `3. 扫描并纠正错误` 支持单独 API 配置：
+
+```json
+{
+  "scan_fix_translation": {
+    "model": "your-scan-fix-model",
+    "base_url": "https://your-scan-fix-base-url/v1",
+    "api_key": "your-scan-fix-api-key"
+  }
+}
+```
+
+它只影响扫描纠错、通篇译文质检和质检后覆盖重跑；正常新建/继续翻译仍使用 `translation`。留空字段会自动继承 `translation`。
+
+`多模态AI辅助` 样式使用独立 API 配置：
+
+```json
+{
+  "multimodal_layout": {
+    "enabled": false,
+    "model": "mimo-v2.5",
+    "base_url": "https://your-vision-openai-compatible-base-url/v1",
+    "api_key": "your-vision-api-key",
+    "request_timeout_seconds": 90.0,
+    "max_edge": 1280,
+    "cache_enabled": true
+  }
+}
+```
+
+`Auto` 不调用多模态 AI；只有选择 `M` / `m` / `multimodal` / `style_mm` 时才会启用多模态版面辅助。若 `model`、`base_url` 或 `api_key` 配置不完整，或接口失败，该页会降级为普通 Auto 版式，并在 `_debug/pages/*.json` 的 `multimodalLayout` 中记录原因。`cache_enabled=false` 可在重跑时强制刷新多模态版面分析。
 
 ## 纯命令行
 
@@ -84,23 +121,25 @@ config/session.json
 
 ```powershell
 ./.venv310/Scripts/python.exe ./run_batch_background.py "D:/path/to/input" "D:/path/to/input/out" --log-path "./logs/batch-live.log" --style-id 3
-./.venv310/Scripts/python.exe ./run_batch_background.py "D:/path/to/input" "D:/path/to/input/out" --retry-review-pages
+./.venv310/Scripts/python.exe ./run_batch_background.py "D:/path/to/input" "D:/path/to/input/out" --style-id auto --retry-quality-review-pages
 ```
 
-后台入口支持 `--layout-mode`、`--style-id`、`--overwrite-existing`、`--retry-review-pages`，参数含义和 `batch_translate.py` 保持一致。
+后台入口支持 `--layout-mode`、`--style-id`、`--overwrite-existing`、`--retry-review-pages`、`--retry-quality-review-pages`，参数含义和 `batch_translate.py` 保持一致。
 
 ## 风格说明
 
 - `Style 1 = horizontal JP`：横排黑体，左到右，日语 OCR/提示词
 - `Style 2 = vertical JP`：竖排圆体，右到左，日语 OCR/提示词
+- `Auto = auto JP`：原文横排气泡按 Style 1 渲染，原文竖排气泡按 Style 2 渲染，日语 OCR/提示词
 - `Style 3 = horizontal EN`：横排圆体，左到右，PaddleOCR English ONNX + 英语提示词
+- `多模态AI辅助 = auto JP + vision layout assist`：现有 OCR/翻译/擦字链路不变，只额外用多模态 AI 判断标题、页码、说明块和横竖排提示
 
-命令行推荐用 `--style-id 1|2|3`。旧参数 `--layout-mode horizontal|vertical|auto` 仍保留兼容，未显式传 `--style-id` 时会按 `horizontal -> Style 1`、`vertical -> Style 2` 映射；`auto` 保持旧的自动方向模式。
+命令行推荐用 `--style-id 1|2|auto|3|m`。旧参数 `--layout-mode horizontal|vertical|auto` 仍保留兼容，未显式传 `--style-id` 时会按 `horizontal -> Style 1`、`vertical -> Style 2`、`auto -> Auto` 映射。
 
 ## 覆盖策略
 
 - 完整翻译/继续任务：默认跳过已有输出
-- 扫描并纠正错误：只覆盖 `_debug` 标记需要复查/失败的页，以及源图存在但输出图缺失的页
+- 扫描并纠正错误：硬错误模式只覆盖 `_debug` 标记需要复查/失败的页，以及源图存在但输出图缺失的页；通篇质检模式还会覆盖 `_debug/quality-review.tsv` 标记的软质量问题页
 
 ## 性能配置
 
@@ -139,7 +178,16 @@ config/session.json
 
 - `_debug/review-pages.txt`：需要复查的页名和原因
 - `_debug/failed-translations.tsv`：失败页 TSV 清单，菜单纠错和 `--retry-review-pages` 会优先使用它
+- `_debug/quality-review.tsv`：通篇译文质检发现的误译、残留原文、称呼不一致、中文不通顺等软质量问题页
 - `_debug/final-review-report.txt`：最终复查报告，包含阶段耗时汇总、残留问题页和页面耗时 Top 10
+
+`quality-review.tsv` 由菜单 3 的通篇质检模式生成，也可以用命令行 `--retry-quality-review-pages` 消费；该参数会自动启用 `--retry-review-pages`。对应页成功进入重跑后会自动清理。若重跑仍失败，新的硬错误会继续落到 `failed-translations.tsv` / `review-pages.txt`。
+
+能力边界：
+
+- 硬错误扫描不做语义判断，只能发现失败占位、缺译文、缺输出等确定性问题。
+- 通篇质检会尝试发现明显误译、残留原文、称呼不一致、中文不通顺、OCR 噪声残留、横竖排不匹配等，但不保证覆盖所有翻译错误。
+- 通篇质检依据 `_debug/pages/*.json` 的 OCR 原文和译文，不直接判断最终 PNG 的嵌字审美。
 
 如果同一页多轮后仍是 `translation_failed` / `translation_failure_placeholder`，通常是翻译 API 对内容拒翻、超时或返回失败占位符。人工修补时不能只覆盖最终 PNG；需要同步更新该页 `_debug/pages/*.json`、`_debug/texts/*.translation.txt`、整本 `review-pages.txt`、`failed-translations.tsv`、`summary.json` 和隐藏 stage cache，否则后续扫描会继续把它当失败页。
 

@@ -14,6 +14,22 @@
     "request_timeout_seconds": 90.0,
     "curl_timeout_seconds": 95
   },
+  "scan_fix_translation": {
+    "model": "",
+    "base_url": "",
+    "api_key": "",
+    "request_timeout_seconds": 90.0,
+    "curl_timeout_seconds": 95
+  },
+  "multimodal_layout": {
+    "enabled": false,
+    "model": "mimo-v2.5",
+    "base_url": "",
+    "api_key": "",
+    "request_timeout_seconds": 90.0,
+    "max_edge": 1280,
+    "cache_enabled": true
+  },
   "pipeline": {
     "translation_quality": "high",
     "debug_flush_interval": 25,

@@ -1,4 +1,5 @@
 import os
+import re
 import tempfile
 from pathlib import Path
 from time import perf_counter
@@ -76,6 +77,465 @@ def _normalize_layout_direction(value, default="vertical"):
     if raw_value in {"h", "horizontal"}:
         return "horizontal"
     return default
+
+
+_CJK_TOKEN_CLASS = r"\u3400-\u9fff\u3040-\u30ff々〆ヵヶー、。！？…・「」『』（）〔〕［］【】〈〉《》"
+_CJK_SPACE_RE = re.compile(fr"(?<=[{_CJK_TOKEN_CLASS}])\s+(?=[{_CJK_TOKEN_CLASS}])")
+_INLINE_SPACE_RE = re.compile(r"[ \t]{2,}")
+_MICRO_KANA_NOISE_RE = re.compile(r"^[\u3040-\u30ffー]{1,2}$")
+
+
+def _normalize_source_text_for_translation(text):
+    lines = [line.strip() for line in str(text or "").replace("\r", "\n").split("\n")]
+    value = "\n".join(line for line in lines if line)
+    if not value:
+        return ""
+    value = _INLINE_SPACE_RE.sub(" ", value)
+    return _CJK_SPACE_RE.sub("", value)
+
+
+def _bubble_line_directions(textlines):
+    directions = []
+    for textline in textlines or []:
+        direction = _normalize_layout_direction((textline or {}).get("direction"), default="")
+        if direction and direction not in directions:
+            directions.append(direction)
+    return directions
+
+
+def _bubble_line_direction_counts(textlines):
+    line_directions = [
+        _normalize_layout_direction((textline or {}).get("direction"), default="")
+        for textline in textlines or []
+    ]
+    line_directions = [direction for direction in line_directions if direction]
+    return {
+        "horizontal": sum(1 for direction in line_directions if direction == "horizontal"),
+        "vertical": sum(1 for direction in line_directions if direction == "vertical"),
+        "total": len(line_directions),
+    }
+
+
+def _textline_bounds(textline):
+    polygon = (textline or {}).get("polygon") or []
+    xs = []
+    ys = []
+    for point in polygon:
+        if not isinstance(point, (list, tuple)) or len(point) < 2:
+            continue
+        try:
+            xs.append(int(point[0]))
+            ys.append(int(point[1]))
+        except (TypeError, ValueError):
+            continue
+    if not xs or not ys:
+        return None
+    return [min(xs), min(ys), max(xs), max(ys)]
+
+
+def _vertical_textline_bounds(textlines):
+    bounds = []
+    for textline in textlines or []:
+        direction = _normalize_layout_direction((textline or {}).get("direction"), default="")
+        if direction != "vertical":
+            continue
+        line_bounds = _textline_bounds(textline)
+        if line_bounds is not None:
+            bounds.append(line_bounds)
+    return bounds
+
+
+def _build_bubble_metrics(coords, textlines, original_text, ocr_result, image_size=None):
+    text = str(original_text or "").strip()
+    directions = _bubble_line_directions(textlines)
+    metrics = {
+        "width": 0,
+        "height": 0,
+        "areaRatio": 0.0,
+        "topRatio": 1.0,
+        "leftRatio": 1.0,
+        "rightRatio": 1.0,
+        "charCount": len(text),
+        "lineCount": len(textlines or []),
+        "directions": directions,
+        "confidence": 1.0,
+        "fallbackUsed": False,
+    }
+    if isinstance(coords, (list, tuple)) and len(coords) >= 4:
+        width = max(0, int(coords[2]) - int(coords[0]))
+        height = max(0, int(coords[3]) - int(coords[1]))
+        metrics["width"] = width
+        metrics["height"] = height
+        if isinstance(image_size, (list, tuple)) and len(image_size) >= 2:
+            page_width = max(1, int(image_size[0]))
+            page_height = max(1, int(image_size[1]))
+            metrics["areaRatio"] = float(width * height) / float(page_width * page_height)
+            metrics["topRatio"] = max(0.0, float(coords[1]) / float(page_height))
+            metrics["leftRatio"] = max(0.0, float(coords[0]) / float(page_width))
+            metrics["rightRatio"] = max(0.0, float(page_width - int(coords[2])) / float(page_width))
+    if isinstance(ocr_result, dict):
+        try:
+            metrics["confidence"] = float(ocr_result.get("confidence", 1.0) or 1.0)
+        except (TypeError, ValueError):
+            metrics["confidence"] = 1.0
+        metrics["fallbackUsed"] = bool(ocr_result.get("fallbackUsed"))
+    return metrics
+
+
+def _bubble_role_from_context(coords, textlines, original_text, ocr_result, image_size=None):
+    if not isinstance(coords, (list, tuple)) or len(coords) < 4:
+        return "dialogue"
+    metrics = _build_bubble_metrics(coords, textlines, original_text, ocr_result, image_size=image_size)
+    width = metrics["width"]
+    height = metrics["height"]
+    directions = metrics["directions"]
+    direction_counts = _bubble_line_direction_counts(textlines)
+    horizontal_count = direction_counts["horizontal"]
+    vertical_count = direction_counts["vertical"]
+    text = str(original_text or "").strip()
+    confidence = metrics["confidence"]
+
+    if (
+        _MICRO_KANA_NOISE_RE.match(text)
+        and len(textlines or []) <= 2
+        and width <= 80
+        and height <= 32
+        and confidence < 0.38
+    ):
+        return "ocr_noise"
+
+    if isinstance(image_size, (list, tuple)) and len(image_size) >= 2:
+        page_width = max(1, int(image_size[0]))
+        page_height = max(1, int(image_size[1]))
+        top_ratio = metrics["topRatio"]
+        if (
+            top_ratio <= 0.12
+            and height <= int(page_height * 0.09)
+            and width >= int(height * 1.6)
+            and len(textlines or []) >= 2
+            and directions == ["horizontal"]
+            and confidence < 0.8
+        ):
+            return "header_noise"
+        if (
+            top_ratio <= 0.08
+            and height <= int(page_height * 0.035)
+            and len(text) <= 12
+            and (metrics["leftRatio"] <= 0.12 or metrics["rightRatio"] <= 0.12)
+            and (top_ratio <= 0.04 or confidence < 0.8)
+        ):
+            return "header_noise"
+        if (
+            top_ratio <= 0.18
+            and "horizontal" in directions
+            and "vertical" in directions
+            and horizontal_count >= vertical_count
+            and len(text) >= 4
+            and width >= int(page_width * 0.08)
+            and height <= int(page_height * 0.25)
+        ):
+            return "title_caption"
+
+    if len(text) >= 120:
+        return "long_narration"
+    if metrics["areaRatio"] >= 0.12 and len(text) >= 60:
+        return "long_narration"
+    if metrics["lineCount"] >= 14 and len(text) >= 50 and height >= 140:
+        return "long_narration"
+    return "dialogue"
+
+
+def _long_narration_auto_font_settings(coords, textlines, original_text, ocr_result, image_size=None):
+    metrics = _build_bubble_metrics(coords, textlines, original_text, ocr_result, image_size=image_size)
+    if metrics["charCount"] >= 400 or metrics["areaRatio"] >= 0.28 or metrics["lineCount"] >= 24:
+        return {
+            "min_size": 8,
+            "max_size": 20,
+            "padding_ratio": 0.84,
+        }
+    if metrics["charCount"] >= 220 or metrics["areaRatio"] >= 0.16 or metrics["lineCount"] >= 18:
+        return {
+            "min_size": 8,
+            "max_size": 18,
+            "padding_ratio": 0.74,
+        }
+    return {
+        "min_size": 10,
+        "max_size": 20,
+        "padding_ratio": 0.76,
+    }
+
+
+def _is_horizontal_chart_list_long_narration(coords, textlines, original_text, ocr_result, image_size=None):
+    metrics = _build_bubble_metrics(coords, textlines, original_text, ocr_result, image_size=image_size)
+    direction_counts = _bubble_line_direction_counts(textlines)
+    total = direction_counts["total"]
+    if total < 10 or direction_counts["horizontal"] < max(8, int(total * 0.75)):
+        return False
+    if metrics["height"] < 160 or metrics["width"] < 180:
+        return False
+    return metrics["charCount"] <= max(180, metrics["lineCount"] * 12)
+
+
+def _horizontal_chart_list_auto_font_settings():
+    return {
+        "min_size": 8,
+        "max_size": 14,
+        "padding_ratio": 0.74,
+    }
+
+
+def _bubble_color_metric(bubble_color, key, default):
+    if not isinstance(bubble_color, dict):
+        return default
+    try:
+        return float(bubble_color.get(key, default))
+    except (TypeError, ValueError):
+        return default
+
+
+def _should_use_horizontal_editorial_long_narration(
+    coords,
+    textlines,
+    original_text,
+    ocr_result,
+    image_size=None,
+    bubble_color=None,
+):
+    metrics = _build_bubble_metrics(coords, textlines, original_text, ocr_result, image_size=image_size)
+    direction_counts = _bubble_line_direction_counts(textlines)
+    total = direction_counts["total"]
+    if total <= 0 or direction_counts["vertical"] < max(1, int(total * 0.7)):
+        return False
+    if not isinstance(image_size, (list, tuple)) or len(image_size) < 2:
+        return False
+
+    page_width = max(1, int(image_size[0]))
+    page_height = max(1, int(image_size[1]))
+    width_ratio = float(metrics["width"]) / float(page_width)
+    height_ratio = float(metrics["height"]) / float(page_height)
+    edge_density = _bubble_color_metric(bubble_color, "edgeDensity", 1.0)
+    dark_pixel_ratio = _bubble_color_metric(bubble_color, "darkPixelRatio", 1.0)
+
+    quiet_large_block = (
+        width_ratio >= 0.55
+        and height_ratio >= 0.28
+        and (metrics["charCount"] >= 360 or metrics["lineCount"] >= 22 or metrics["areaRatio"] >= 0.20)
+        and edge_density <= 0.13
+        and dark_pixel_ratio <= 0.04
+    )
+    low_confidence_exposition = (
+        metrics["fallbackUsed"]
+        and metrics["confidence"] < 0.55
+        and metrics["charCount"] >= 150
+        and width_ratio >= 0.38
+        and height_ratio >= 0.16
+        and dark_pixel_ratio <= 0.05
+    )
+    return quiet_large_block or low_confidence_exposition
+
+
+def _should_keep_vertical_long_narration(coords, textlines, original_text, ocr_result, image_size=None, bubble_color=None):
+    if _should_use_horizontal_editorial_long_narration(
+        coords,
+        textlines,
+        original_text,
+        ocr_result,
+        image_size=image_size,
+        bubble_color=bubble_color,
+    ):
+        return False
+
+    metrics = _build_bubble_metrics(coords, textlines, original_text, ocr_result, image_size=image_size)
+    line_directions = [
+        _normalize_layout_direction((textline or {}).get("direction"), default="")
+        for textline in textlines or []
+    ]
+    line_directions = [direction for direction in line_directions if direction]
+    vertical_count = sum(1 for direction in line_directions if direction == "vertical")
+    return (
+        bool(line_directions)
+        and metrics["width"] > 0
+        and metrics["height"] > 0
+        and vertical_count >= max(1, int(len(line_directions) * 0.7))
+    )
+
+
+def _vertical_long_narration_auto_font_settings():
+    return {
+        "min_size": 8,
+        "max_size": 16,
+        "padding_ratio": 0.78,
+    }
+
+
+def _vertical_long_narration_render_coords(coords, textlines):
+    if not isinstance(coords, (list, tuple)) or len(coords) < 4:
+        return None
+    bounds = _vertical_textline_bounds(textlines)
+    if len(bounds) < 12:
+        return None
+
+    x1, y1, x2, y2 = [int(value) for value in coords[:4]]
+    width = max(0, x2 - x1)
+    height = max(0, y2 - y1)
+    if width <= 0 or height <= 0:
+        return None
+
+    early_cutoff = y1 + height * 0.35
+    late_cutoff = y1 + height * 0.45
+    early_bounds = [item for item in bounds if item[1] <= early_cutoff]
+    if len(early_bounds) < max(6, int(len(bounds) * 0.35)):
+        return None
+
+    early_min_x = min(item[0] for item in early_bounds)
+    early_max_x = max(item[2] for item in early_bounds)
+    late_right_bounds = [
+        item
+        for item in bounds
+        if item[0] > early_max_x + 2 and item[1] >= late_cutoff
+    ]
+    if len(late_right_bounds) < max(4, int(len(bounds) * 0.25)):
+        return None
+
+    trimmed_width = early_max_x - early_min_x
+    if trimmed_width < width * 0.3 or trimmed_width > width * 0.85:
+        return None
+
+    line_widths = [max(1, item[2] - item[0]) for item in early_bounds]
+    padding = max(8, min(24, int(round(sum(line_widths) / len(line_widths)))))
+    return [
+        x1,
+        y1,
+        min(x2, early_max_x + padding),
+        y2,
+    ]
+
+
+def _should_compact_vertical_dialogue(coords, textlines, original_text, ocr_result, image_size=None):
+    metrics = _build_bubble_metrics(coords, textlines, original_text, ocr_result, image_size=image_size)
+    direction_counts = _bubble_line_direction_counts(textlines)
+    total = direction_counts["total"]
+    if total < 6:
+        return False
+    if direction_counts["vertical"] < max(4, int(total * 0.6)):
+        return False
+    return metrics["width"] >= 120 and metrics["height"] >= 100
+
+
+def _compact_vertical_dialogue_auto_font_settings():
+    return {
+        "min_size": 7,
+        "max_size": 22,
+        "padding_ratio": 0.64,
+    }
+
+
+def _compact_vertical_dialogue_position_offset(coords, textlines):
+    if not isinstance(coords, (list, tuple)) or len(coords) < 4:
+        return {"x": 0, "y": 0}
+    if _bubble_line_direction_counts(textlines)["horizontal"] <= 0:
+        return {"x": 0, "y": 0}
+    height = max(0, int(coords[3]) - int(coords[1]))
+    return {"x": 0, "y": max(12, min(44, int(round(height * 0.25))))}
+
+
+def build_bubble_text_profiles(detection, ocr, image_size=None):
+    bubble_coords = detection.get("bubbleCoords", []) or []
+    textlines_per_bubble = detection.get("textlinesPerBubble", []) or []
+    bubble_colors = detection.get("bubbleColors", []) or []
+    bubble_layout_hints = detection.get("bubbleLayoutHints", []) or []
+    original_texts = ocr.get("originalTexts", []) or []
+    ocr_results = ocr.get("ocrResults", []) or []
+    profiles = []
+
+    for index, coords in enumerate(bubble_coords):
+        original_text = original_texts[index] if index < len(original_texts) else ""
+        textlines = textlines_per_bubble[index] if index < len(textlines_per_bubble) else []
+        ocr_result = ocr_results[index] if index < len(ocr_results) else {}
+        bubble_color = bubble_colors[index] if index < len(bubble_colors) and isinstance(bubble_colors[index], dict) else {}
+        layout_hint = bubble_layout_hints[index] if index < len(bubble_layout_hints) and isinstance(bubble_layout_hints[index], dict) else {}
+        role = _bubble_role_from_context(
+            coords,
+            textlines,
+            original_text,
+            ocr_result,
+            image_size=image_size,
+        )
+        hinted_role = str(layout_hint.get("role") or "").strip()
+        if hinted_role:
+            role = hinted_role
+        profile = {
+            "role": role,
+            "sourceText": str(original_text or "").strip(),
+            "suppressTranslation": False,
+            "directionOverride": None,
+            "autoFontSettings": None,
+            "textAlignOverride": None,
+            "positionOffset": None,
+            "renderCoords": None,
+        }
+        if role in {"header_noise", "ocr_noise", "page_number", "header", "noise", "sfx"} or layout_hint.get("suppressTranslation"):
+            profile["sourceText"] = ""
+            profile["suppressTranslation"] = True
+        elif role == "title_caption":
+            profile["sourceText"] = _normalize_source_text_for_translation(original_text)
+            profile["directionOverride"] = "horizontal"
+            profile["autoFontSettings"] = {
+                "min_size": 12,
+                "max_size": 36,
+                "padding_ratio": 0.72,
+            }
+        elif role == "long_narration":
+            profile["sourceText"] = _normalize_source_text_for_translation(original_text)
+            if _should_keep_vertical_long_narration(
+                coords,
+                textlines,
+                original_text,
+                ocr_result,
+                image_size=image_size,
+                bubble_color=bubble_color,
+            ):
+                profile["directionOverride"] = "vertical"
+                profile["autoFontSettings"] = _vertical_long_narration_auto_font_settings()
+                profile["renderCoords"] = _vertical_long_narration_render_coords(coords, textlines)
+            else:
+                profile["directionOverride"] = "horizontal"
+                profile["textAlignOverride"] = "start"
+                if _is_horizontal_chart_list_long_narration(
+                    coords,
+                    textlines,
+                    original_text,
+                    ocr_result,
+                    image_size=image_size,
+                ):
+                    profile["autoFontSettings"] = _horizontal_chart_list_auto_font_settings()
+                else:
+                    profile["autoFontSettings"] = _long_narration_auto_font_settings(
+                        coords,
+                        textlines,
+                        original_text,
+                        ocr_result,
+                        image_size=image_size,
+                    )
+        elif role == "dialogue" and _should_compact_vertical_dialogue(
+            coords,
+            textlines,
+            original_text,
+            ocr_result,
+            image_size=image_size,
+        ):
+            profile["autoFontSettings"] = _compact_vertical_dialogue_auto_font_settings()
+            profile["positionOffset"] = _compact_vertical_dialogue_position_offset(coords, textlines)
+        hinted_direction = _normalize_layout_direction(layout_hint.get("directionOverride"), default="")
+        if hinted_direction in {"horizontal", "vertical"} and not profile["suppressTranslation"]:
+            profile["directionOverride"] = hinted_direction
+        hinted_align = str(layout_hint.get("textAlignOverride") or "").strip()
+        if hinted_align and not profile["suppressTranslation"]:
+            profile["textAlignOverride"] = hinted_align
+        profiles.append(profile)
+
+    return profiles
 
 
 def _resolve_render_style(layout_mode_override=None, font_family_override=None):
@@ -533,6 +993,8 @@ def _split_filtered_payload(payload):
         "autoDirections": payload.get("autoDirections", []) or [],
         "textlinesPerBubble": payload.get("textlinesPerBubble", []) or [],
         "bubbleColors": payload.get("bubbleColors", []) or [],
+        "bubbleLayoutHints": payload.get("bubbleLayoutHints", []) or [],
+        "multimodalLayout": payload.get("multimodalLayout"),
         "rawMask": payload.get("rawMask"),
     }
     ocr = {
@@ -566,9 +1028,10 @@ def _enrich_bubble_color_metrics(payload, source_path):
     return enriched
 
 
-def _build_bubbles(detection, ocr, translated_texts, *, layout_mode_override=None, font_family_override=None):
+def _build_bubbles(detection, ocr, translated_texts, *, layout_mode_override=None, font_family_override=None, image_size=None):
     style = _resolve_render_style(layout_mode_override=layout_mode_override, font_family_override=font_family_override)
-    vertical_style = _resolve_vertical_render_style()
+    horizontal_style = _resolve_render_style(layout_mode_override="horizontal", font_family_override=font_family_override)
+    vertical_style = _resolve_render_style(layout_mode_override="vertical", font_family_override=font_family_override)
     bubbles = []
     bubble_coords = detection.get("bubbleCoords", []) or []
     bubble_polygons = detection.get("bubblePolygons", []) or []
@@ -577,37 +1040,52 @@ def _build_bubbles(detection, ocr, translated_texts, *, layout_mode_override=Non
     original_texts = ocr.get("originalTexts", []) or []
     ocr_results = ocr.get("ocrResults", []) or []
     colors = detection.get("bubbleColors", []) or []
+    bubble_profiles = build_bubble_text_profiles(detection, ocr, image_size=image_size)
 
     for index, coords in enumerate(bubble_coords):
         color = colors[index] if index < len(colors) and isinstance(colors[index], dict) else {}
-        readability_style = _resolve_bubble_readability_style(style, color, coords)
+        bubble_profile = bubble_profiles[index] if index < len(bubble_profiles) else {}
+        render_coords = bubble_profile.get("renderCoords") or coords
         auto_direction = _normalize_layout_direction(
             auto_directions[index] if index < len(auto_directions) else "vertical"
         )
-        direction = auto_direction if style["layoutMode"] == "auto" else style["layoutMode"]
+        if style["layoutMode"] == "horizontal":
+            direction = "horizontal"
+        elif style["layoutMode"] == "vertical":
+            direction = "horizontal" if auto_direction == "horizontal" else "vertical"
+        else:
+            direction = auto_direction
+        if bubble_profile.get("directionOverride"):
+            direction = _normalize_layout_direction(bubble_profile.get("directionOverride"), default=direction)
         is_vertical_layout = direction == "vertical"
-        font_family = vertical_style["fontFamily"] if is_vertical_layout else style["fontFamily"]
-        line_spacing = vertical_style["lineSpacing"] if is_vertical_layout else style["lineSpacing"]
+        bubble_style = vertical_style if is_vertical_layout else horizontal_style
+        readability_style = _resolve_bubble_readability_style(bubble_style, color, coords)
+        translated_text = translated_texts[index] if index < len(translated_texts) else ""
+        if bubble_profile.get("suppressTranslation"):
+            translated_text = ""
         bubbles.append(
             {
-                "coords": coords,
+                "coords": render_coords,
                 "polygon": bubble_polygons[index] if index < len(bubble_polygons) else [],
                 "direction": direction,
                 "textDirection": direction,
                 "autoTextDirection": auto_direction,
                 "textlines": textlines_per_bubble[index] if index < len(textlines_per_bubble) else [],
                 "originalText": original_texts[index] if index < len(original_texts) else "",
-                "translatedText": translated_texts[index] if index < len(translated_texts) else "",
+                "translatedText": translated_text,
                 "ocrResult": ocr_results[index] if index < len(ocr_results) else {},
-                "fontFamily": font_family,
+                "fontFamily": bubble_style["fontFamily"],
                 "textColor": readability_style["textColor"],
                 "fillColor": readability_style["fillColor"],
                 "strokeEnabled": readability_style["strokeEnabled"],
                 "strokeColor": readability_style["strokeColor"],
                 "strokeWidth": readability_style["strokeWidth"],
-                "lineSpacing": line_spacing,
-                "textAlign": style["textAlign"],
+                "lineSpacing": bubble_style["lineSpacing"],
+                "textAlign": bubble_profile.get("textAlignOverride") or bubble_style["textAlign"],
+                "position": bubble_profile.get("positionOffset"),
                 "layoutProfile": "vertical_layout2" if is_vertical_layout else None,
+                "bubbleRole": bubble_profile.get("role", "dialogue"),
+                "autoFontSettings": bubble_profile.get("autoFontSettings"),
                 "autoFgColor": color.get("autoFgColor"),
                 "autoBgColor": color.get("autoBgColor"),
                 "colorConfidence": color.get("colorConfidence", 0.0),
@@ -756,6 +1234,7 @@ def redo_page_render(runtime, page_id, source_path, cached_result, saber_session
         updated.get("translatedTexts", []) or [],
         layout_mode_override=getattr(runtime, "layout_mode", None),
         font_family_override=getattr(runtime, "font_family", None),
+        image_size=load_image_size(source_path),
     )
     rendered = render_page(
         clean_image_path,
@@ -910,6 +1389,7 @@ def run_page_pipeline(
         translated_texts,
         layout_mode_override=layout_mode_override,
         font_family_override=getattr(runtime, "font_family", None),
+        image_size=load_image_size(source_path),
     )
     inpaint_config = _resolve_inpaint_config()
 

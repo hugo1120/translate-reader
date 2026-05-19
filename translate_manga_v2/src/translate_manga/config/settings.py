@@ -62,6 +62,30 @@ _ENV_MAPPINGS = {
     "TRANSLATE_MANGA_CLI_API_KEY": ("translation", "api_key", "str"),
     "TRANSLATE_MANGA_CLI_REQUEST_TIMEOUT_SECONDS": ("translation", "request_timeout_seconds", "float"),
     "TRANSLATE_MANGA_CLI_CURL_TIMEOUT_SECONDS": ("translation", "curl_timeout_seconds", "int"),
+    "TRANSLATE_MANGA_CLI_SCAN_FIX_MODEL": ("scan_fix_translation", "model", "str"),
+    "TRANSLATE_MANGA_CLI_SCAN_FIX_BASE_URL": ("scan_fix_translation", "base_url", "str"),
+    "TRANSLATE_MANGA_CLI_SCAN_FIX_API_KEY": ("scan_fix_translation", "api_key", "str"),
+    "TRANSLATE_MANGA_CLI_SCAN_FIX_REQUEST_TIMEOUT_SECONDS": (
+        "scan_fix_translation",
+        "request_timeout_seconds",
+        "float",
+    ),
+    "TRANSLATE_MANGA_CLI_SCAN_FIX_CURL_TIMEOUT_SECONDS": (
+        "scan_fix_translation",
+        "curl_timeout_seconds",
+        "int",
+    ),
+    "TRANSLATE_MANGA_CLI_MULTIMODAL_LAYOUT_ENABLED": ("multimodal_layout", "enabled", "bool"),
+    "TRANSLATE_MANGA_CLI_MULTIMODAL_LAYOUT_MODEL": ("multimodal_layout", "model", "str"),
+    "TRANSLATE_MANGA_CLI_MULTIMODAL_LAYOUT_BASE_URL": ("multimodal_layout", "base_url", "str"),
+    "TRANSLATE_MANGA_CLI_MULTIMODAL_LAYOUT_API_KEY": ("multimodal_layout", "api_key", "str"),
+    "TRANSLATE_MANGA_CLI_MULTIMODAL_LAYOUT_REQUEST_TIMEOUT_SECONDS": (
+        "multimodal_layout",
+        "request_timeout_seconds",
+        "float",
+    ),
+    "TRANSLATE_MANGA_CLI_MULTIMODAL_LAYOUT_MAX_EDGE": ("multimodal_layout", "max_edge", "int"),
+    "TRANSLATE_MANGA_CLI_MULTIMODAL_LAYOUT_CACHE_ENABLED": ("multimodal_layout", "cache_enabled", "bool"),
     "TRANSLATE_MANGA_CLI_OCR_ENGINE": ("ocr", "engine", "str"),
     "TRANSLATE_MANGA_CLI_OCR_SOURCE_LANGUAGE": ("ocr", "source_language", "str"),
     "TRANSLATE_MANGA_CLI_OCR_ENABLE_HYBRID": ("ocr", "enable_hybrid", "bool"),
@@ -282,15 +306,50 @@ def resolve_path_value(value, project_root=None):
     return str((resolved_root / path).resolve())
 
 
+def _normalize_translation_config(translation, fallback=None):
+    fallback = fallback or {}
+    return {
+        "model": str(translation.get("model") or fallback.get("model") or "mimo-v2.5-pro"),
+        "base_url": str(
+            translation.get("base_url")
+            or fallback.get("base_url")
+            or "https://your-openai-compatible-base-url/v1"
+        ),
+        "api_key": str(translation.get("api_key") or fallback.get("api_key") or ""),
+        "request_timeout_seconds": float(
+            translation.get("request_timeout_seconds")
+            or fallback.get("request_timeout_seconds")
+            or 90.0
+        ),
+        "curl_timeout_seconds": int(
+            float(translation.get("curl_timeout_seconds") or fallback.get("curl_timeout_seconds") or 95)
+        ),
+    }
+
+
 def resolve_translation_config(project_root=None, settings=None):
     payload = deepcopy(settings if settings is not None else load_settings(project_root))
-    translation = payload.get("translation") or {}
+    return _normalize_translation_config(payload.get("translation") or {})
+
+
+def resolve_scan_fix_translation_config(project_root=None, settings=None):
+    payload = deepcopy(settings if settings is not None else load_settings(project_root))
+    base_config = resolve_translation_config(settings=payload)
+    return _normalize_translation_config(payload.get("scan_fix_translation") or {}, fallback=base_config)
+
+
+def resolve_multimodal_layout_config(project_root=None, settings=None, enabled_override=None):
+    payload = deepcopy(settings if settings is not None else load_settings(project_root))
+    config = payload.get("multimodal_layout") or {}
+    enabled = bool(config.get("enabled", False)) if enabled_override is None else bool(enabled_override)
     return {
-        "model": str(translation.get("model") or "mimo-v2.5-pro"),
-        "base_url": str(translation.get("base_url") or "https://your-openai-compatible-base-url/v1"),
-        "api_key": str(translation.get("api_key") or ""),
-        "request_timeout_seconds": float(translation.get("request_timeout_seconds") or 90.0),
-        "curl_timeout_seconds": int(float(translation.get("curl_timeout_seconds") or 95)),
+        "enabled": enabled,
+        "model": str(config.get("model") or "mimo-v2.5").strip(),
+        "base_url": str(config.get("base_url") or "").strip(),
+        "api_key": str(config.get("api_key") or "").strip(),
+        "request_timeout_seconds": float(config.get("request_timeout_seconds") or 90.0),
+        "max_edge": max(256, int(config.get("max_edge") or 1280)),
+        "cache_enabled": bool(config.get("cache_enabled", True)),
     }
 
 

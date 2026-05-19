@@ -133,9 +133,13 @@ Expected: 能列出含 `tokugawa#01_010.jpg` 的返工清单。
 - 2026-05-09 补齐：返工入口会同时检查缺失输出页；后台入口 `run_batch_background.py` 也支持 `--retry-review-pages` 和 `--style-id`。
 - 2026-05-11 补齐：缺失输出页扫描和输入扫描统一使用稳定自然排序，已覆盖 `cover.jpg + 00001.jpg`、`1/2/10/100`、补零数字页和大小写 `.JPG/.PNG/.WebP`。
 - 2026-05-11 实跑修补：`东京大麻特区：被称为大麻王的男人/02` 中 `0_00014.jpg` 至 `0_00019.jpg` 因敏感词触发翻译失败占位符，已用人工译文重嵌；修补时同步更新最终 PNG、`_debug/pages/*.json`、`_debug/texts/*.translation.txt`、`review-pages.txt`、`failed-translations.tsv`、`summary.json` 和 stage cache，避免下次扫描继续重跑。
+- 2026-05-11 补齐：菜单 `扫描并纠正错误` 增加 `只修复硬错误` / `硬错误+通篇译文质检` 两种模式；通篇质检会读取 `_debug/pages/*.json` 的原文和译文，生成 `_debug/quality-review.tsv`，再复用 `--retry-review-pages` 覆盖重跑被标记页。普通硬错误扫描默认不消费旧 `quality-review.tsv`，避免历史软质检记录干扰常规纠错。
+- 2026-05-11 补齐：菜单 `扫描并纠正错误` 支持专用 `scan_fix_translation` API 配置；硬错误重翻、通篇译文质检和质检后重翻优先使用该配置，留空字段继承普通 `translation`，菜单 1/2 正常翻译不受影响。
 - 验证命令：
   - `.venv310/Scripts/python.exe -m pytest tests/test_cli_batch.py::test_debug_writer_flags_translation_failure_placeholders tests/test_cli_batch.py::test_run_batch_translation_retry_review_pages_only_processes_failed_translation_list tests/test_batch_translate_entry.py -q`，结果 `7 passed`
   - 2026-05-09 全量回归：`.venv310/Scripts/python.exe -m pytest -q`，结果 `169 passed`
   - 2026-05-11 全量回归：`.venv310/Scripts/python.exe -m pytest -q`，结果 `184 passed`
+  - 2026-05-11 质检入口回归：`.venv310/Scripts/python.exe -m pytest -q`，结果 `192 passed`
+  - 2026-05-11 扫描纠错专用 API 回归：`.venv310/Scripts/python.exe -m pytest -q`，结果 `196 passed`
   - `.venv310/Scripts/python.exe -m compileall -q src batch_translate.py run_batch_background.py`
   - `start_cli.bat --help`

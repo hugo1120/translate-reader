@@ -26,10 +26,22 @@ def _candidate_context_paths(input_dir, pipeline_config=None):
     return [root / str(name).strip() for name in names if str(name).strip()]
 
 
+def _read_context_file(path):
+    raw = Path(path).read_bytes()
+    for encoding in ("utf-8-sig", "utf-16", "gb18030", "cp932"):
+        try:
+            content = raw.decode(encoding).strip()
+        except UnicodeDecodeError:
+            continue
+        if content:
+            return content
+    return ""
+
+
 def find_existing_manga_context(input_dir, pipeline_config=None):
     for path in _candidate_context_paths(input_dir, pipeline_config=pipeline_config):
         if path.exists() and path.is_file():
-            content = path.read_text(encoding="utf-8").strip()
+            content = _read_context_file(path)
             if content:
                 return {
                     "path": path,

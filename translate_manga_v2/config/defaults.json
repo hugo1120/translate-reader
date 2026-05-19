@@ -14,6 +14,22 @@
     "request_timeout_seconds": 90.0,
     "curl_timeout_seconds": 95
   },
+  "scan_fix_translation": {
+    "model": "",
+    "base_url": "",
+    "api_key": "",
+    "request_timeout_seconds": 90.0,
+    "curl_timeout_seconds": 95
+  },
+  "multimodal_layout": {
+    "enabled": false,
+    "model": "mimo-v2.5",
+    "base_url": "",
+    "api_key": "",
+    "request_timeout_seconds": 90.0,
+    "max_edge": 1280,
+    "cache_enabled": true
+  },
   "ocr": {
     "source_language": "japanese",
     "engine": "48px_ocr",
@@ -24,7 +40,7 @@
   },
   "prompts": {
     "translation": {
-      "system": "你是专业漫画翻译器。\n\n任务是把漫画中的日文文本翻译成自然、准确、紧凑的简体中文。\n\n硬性要求:\n- 逐条处理输入文本, 严格保留 `<|数字|>` 编号前缀\n- 只输出译文, 不要解释, 不要加注释\n- 人名、称呼、语气前后一致\n- 拟声词、音效词、已经是中文的内容可原样保留\n- 尽量少用中文全角标点, 优先使用更紧凑的半角标点\n- 半角标点要自然, 不要影响阅读\n",
+      "system": "你是专业漫画翻译器。\n\n任务是把漫画中的日文文本翻译成自然、准确、紧凑的简体中文。\n\n硬性要求:\n- 逐条处理输入文本, 严格保留 `<|数字|>` 编号前缀\n- 只输出译文, 不要解释, 不要加注释\n- 人名、称呼、语气前后一致\n- 拟声词、音效词、已经是中文的内容可原样保留\n- 日文术语、假名词和专有表达必须译成中文, 不要保留罗马字转写\n- 尽量少用中文全角标点, 优先使用更紧凑的半角标点\n- 半角标点要自然, 不要影响阅读\n",
       "rounds": {
         "draft": "第1轮 初稿: 忠实翻译, 先保证信息完整和语义正确。",
         "contextual": "第2轮 上下文修订: 结合已给出的上下文和第1轮草稿, 统一称呼、语气和前后逻辑。",

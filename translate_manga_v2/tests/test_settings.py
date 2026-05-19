@@ -95,6 +95,137 @@ def test_resolve_translation_config_uses_single_config_entry(tmp_path):
     }
 
 
+def test_resolve_scan_fix_translation_config_overrides_translation_when_present(tmp_path):
+    project_root = tmp_path / "translate_manga_cli"
+    config_dir = project_root / "config"
+    config_dir.mkdir(parents=True)
+
+    (config_dir / "defaults.json").write_text(
+        json.dumps(
+            {
+                "translation": {
+                    "model": "normal-model",
+                    "base_url": "https://normal.example/v1",
+                    "api_key": "normal-key",
+                    "request_timeout_seconds": 12.5,
+                    "curl_timeout_seconds": 34,
+                },
+                "scan_fix_translation": {
+                    "model": "scan-model",
+                    "base_url": "https://scan.example/v1",
+                    "api_key": "scan-key",
+                },
+            },
+            ensure_ascii=False,
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
+    (config_dir / "local.json").write_text("{}", encoding="utf-8")
+
+    config = settings_module.resolve_scan_fix_translation_config(project_root=project_root)
+
+    assert config == {
+        "model": "scan-model",
+        "base_url": "https://scan.example/v1",
+        "api_key": "scan-key",
+        "request_timeout_seconds": 12.5,
+        "curl_timeout_seconds": 34,
+    }
+
+
+def test_resolve_scan_fix_translation_config_falls_back_to_translation_when_empty(tmp_path):
+    project_root = tmp_path / "translate_manga_cli"
+    config_dir = project_root / "config"
+    config_dir.mkdir(parents=True)
+
+    (config_dir / "defaults.json").write_text(
+        json.dumps(
+            {
+                "translation": {
+                    "model": "normal-model",
+                    "base_url": "https://normal.example/v1",
+                    "api_key": "normal-key",
+                    "request_timeout_seconds": 12.5,
+                    "curl_timeout_seconds": 34,
+                },
+                "scan_fix_translation": {
+                    "model": "",
+                    "base_url": "",
+                    "api_key": "",
+                },
+            },
+            ensure_ascii=False,
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
+    (config_dir / "local.json").write_text("{}", encoding="utf-8")
+
+    config = settings_module.resolve_scan_fix_translation_config(project_root=project_root)
+
+    assert config == {
+        "model": "normal-model",
+        "base_url": "https://normal.example/v1",
+        "api_key": "normal-key",
+        "request_timeout_seconds": 12.5,
+        "curl_timeout_seconds": 34,
+    }
+
+
+def test_resolve_multimodal_layout_config_uses_own_config_and_env(tmp_path, monkeypatch):
+    project_root = tmp_path / "translate_manga_cli"
+    config_dir = project_root / "config"
+    config_dir.mkdir(parents=True)
+
+    (config_dir / "defaults.json").write_text(
+        json.dumps(
+            {
+                "multimodal_layout": {
+                    "enabled": False,
+                    "model": "default-vision",
+                    "base_url": "https://default-vision.example/v1",
+                    "api_key": "",
+                    "request_timeout_seconds": 45.0,
+                    "max_edge": 1024,
+                    "cache_enabled": True,
+                }
+            },
+            ensure_ascii=False,
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
+    (config_dir / "local.json").write_text(
+        json.dumps(
+            {
+                "multimodal_layout": {
+                    "model": "local-vision",
+                    "api_key": "local-key",
+                }
+            },
+            ensure_ascii=False,
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
+    monkeypatch.setenv("TRANSLATE_MANGA_CLI_MULTIMODAL_LAYOUT_ENABLED", "true")
+    monkeypatch.setenv("TRANSLATE_MANGA_CLI_MULTIMODAL_LAYOUT_BASE_URL", "https://env-vision.example/v1")
+    monkeypatch.setenv("TRANSLATE_MANGA_CLI_MULTIMODAL_LAYOUT_MAX_EDGE", "900")
+
+    config = settings_module.resolve_multimodal_layout_config(project_root=project_root)
+
+    assert config == {
+        "enabled": True,
+        "model": "local-vision",
+        "base_url": "https://env-vision.example/v1",
+        "api_key": "local-key",
+        "request_timeout_seconds": 45.0,
+        "max_edge": 900,
+        "cache_enabled": True,
+    }
+
+
 def test_resolve_translation_prompt_config_merges_defaults_and_local(tmp_path):
     project_root = tmp_path / "translate_manga_cli"
     config_dir = project_root / "config"

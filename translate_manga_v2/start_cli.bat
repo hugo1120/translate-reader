@@ -46,8 +46,10 @@ echo Example:
 echo   start_cli.bat --input "D:/path/to/input" --output "D:/path/to/output" --style-id 2
 echo   start_cli.bat "D:/path/to/input" "D:/path/to/output" --style-id 3
 echo   start_cli.bat --input "D:/path/to/input" --output "D:/path/to/output" --retry-review-pages
+echo   start_cli.bat --input "D:/path/to/input" --output "D:/path/to/output" --style-id auto --retry-quality-review-pages
 echo.
 echo Style 1 = horizontal JP
 echo Style 2 = vertical JP
+echo Auto = auto JP
 echo Style 3 = horizontal EN
 goto :eof

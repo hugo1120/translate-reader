@@ -10,10 +10,20 @@ _STYLE_ALIASES = {
     "style2": "style2",
     "style_2": "style2",
     "vertical": "style2",
+    "a": "auto",
     "auto": "auto",
+    "style_auto": "auto",
     "3": "style3",
     "style3": "style3",
     "style_3": "style3",
+    "m": "style_mm",
+    "mm": "style_mm",
+    "multimodal": "style_mm",
+    "multi_modal": "style_mm",
+    "style_mm": "style_mm",
+    "style_multimodal": "style_mm",
+    "多模态": "style_mm",
+    "多模态ai辅助": "style_mm",
 }
 
 
@@ -61,6 +71,20 @@ STYLE_PROFILES = {
         "prompt_profile": "default",
         "reading_order": "rtl",
         "ocr": {},
+    },
+    "style_mm": {
+        "style_id": "style_mm",
+        "label": "多模态AI辅助",
+        "layout_mode": "auto",
+        "font_family": None,
+        "source_language": "japanese",
+        "prompt_profile": "default",
+        "reading_order": "rtl",
+        "ocr": {},
+        "layout_assist": {
+            "type": "multimodal",
+            "enabled": True,
+        },
     },
 }
 

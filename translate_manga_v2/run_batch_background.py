@@ -75,11 +75,37 @@ def _build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--layout-mode", choices=["horizontal", "vertical", "auto"], help="排版方向")
     parser.add_argument(
         "--style-id",
-        choices=["1", "2", "3", "style1", "style2", "style3", "style_1", "style_2", "style_3"],
-        help="样式编号: 1/2/3 或 style1/style2/style3；优先级高于 --layout-mode",
+        choices=[
+            "1",
+            "2",
+            "3",
+            "A",
+            "a",
+            "auto",
+            "style1",
+            "style2",
+            "style3",
+            "style_1",
+            "style_2",
+            "style_3",
+            "style_auto",
+            "M",
+            "m",
+            "MM",
+            "mm",
+            "multimodal",
+            "multi_modal",
+            "style_mm",
+            "style_multimodal",
+            "多模态",
+            "多模态AI辅助",
+            "多模态ai辅助",
+        ],
+        help="样式编号: 1/2/3/A/M 或 style1/style2/style3/auto/multimodal；优先级高于 --layout-mode",
     )
     parser.add_argument("--overwrite-existing", action="store_true", help="覆盖已存在输出")
     parser.add_argument("--retry-review-pages", action="store_true", help="只重跑 _debug 标记需要复查/失败的页，并覆盖输出")
+    parser.add_argument("--retry-quality-review-pages", action="store_true", help="读取 _debug/quality-review.tsv 中的软质量问题页；会自动启用 --retry-review-pages")
     return parser
 
 
@@ -104,7 +130,8 @@ def main(argv=None) -> int:
             layout_mode=args.layout_mode,
             style_id=args.style_id,
             overwrite_existing=True if args.overwrite_existing else None,
-            retry_review_pages=args.retry_review_pages,
+            retry_review_pages=args.retry_review_pages or args.retry_quality_review_pages,
+            retry_quality_review_pages=args.retry_quality_review_pages,
         )
     except Exception:
         _write(log_path, "RUN ERROR")
